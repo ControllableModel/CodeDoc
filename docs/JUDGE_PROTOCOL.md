@@ -47,6 +47,24 @@ ablation modes) both sections are omitted.
 
 ## 2. Document judge
 
+### Where these prompts are built
+
+Both judge prompts are produced in code, not typed by hand per run:
+[`module_OpenAI/__init__.py`](../module_OpenAI/__init__.py)
+
+```python
+class LLM_Remote_query:
+    def __init__(self, api_key='<>', api_url='', model='gpt-5-mini'): ...
+    def load_judgeContent(self, name, behavior, example=''):        # single-round, per dimension
+    def load_JudgeContent_Once(self, judge, example=''):            # multi-round, all dimensions
+    def solo_query(self, question, write=False): ...                # caller, temperature=1, max_tokens=1024
+    def multi_query(self, question): ...                            # caller, temperature=0.5, max_tokens=1024
+```
+
+The `(name, behavior)` pair for `load_judgeContent` is the `(dimension, definition)` pair
+listed in [`CRITERIA_ISO.md`](CRITERIA_ISO.md) §4; the table that supplies those pairs is the
+one artifact that is still missing (see [`REPRODUCTION.md`](REPRODUCTION.md) §5).
+
 ### Single-round prompt (per dimension)
 
 ```text
