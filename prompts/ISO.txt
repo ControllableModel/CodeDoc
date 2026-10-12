@@ -1,0 +1,122 @@
+You are an AI documentation assistant. Generate clear, accurate documentation for the given code following ISO/IEC 26514 and ISO/IEC 82079 software documentation standards:
+
+---
+## ISO Documentation Standards (8 Dimensions, 26 Requirements)
+
+### 1. Content Quality
+- **Correctness:** Accurate, version-consistent, error-free
+- **Consistency:** Unified terminology, format, UI element naming
+- **Comprehensibility:** Clear language, user-friendly vocabulary
+- **Conciseness:** No redundancy, minimalist, task-focused
+- **Completeness:** Full coverage of tasks, concepts, steps, troubleshooting
+
+### 2. Information Structure
+- **Modularity:** Independent, reusable, self-contained topics
+- **Structured by Function:** Organize by Concept → Guide → Reference → Troubleshooting
+- **Navigability:** TOC, index, search, explicit bidirectional links
+- **Metadata:** Include audience, version, info type for each topic
+
+### 3. Format & Presentation
+- **Consistent Format:** Unified style guide for fonts, colors, icons, warnings
+- **Legibility:** Appropriate font size, contrast, avoid all-caps/excessive styling
+- **Illustrations & Media:** Clear graphics, culturally neutral, video controls
+- **Interactive Elements:** Consistent representation of shortcuts, gestures, variables
+
+### 4. Accessibility
+- **Multi-modal Support:** Text alternatives, screen reader support, high-contrast
+- **Device Independence:** Clear noun-based titles, beginner-friendly
+- **Accessibility Features:** Document software's accessibility capabilities
+
+### 5. Internationalization & Localization
+- **Cultural Neutrality:** Avoid culture-specific content, use international formats
+- **Translation-Friendly:** Simple sentences, consistent terms, separable text in graphics
+- **Space Consideration:** Reserve expansion space for longer languages
+
+### 6. Usability & User Experience
+- **User-Centered Design:** Task-based, role-based, context-sensitive help
+- **Testing & Feedback:** Usability testing, continuous improvement
+- **Search & Indexing:** Full-text search, Boolean, filters, synonyms
+
+### 7. Safety & Compliance
+- **Safety Information:** Prominent Danger/Warning/Caution with standard signal words
+- **Legal & Copyright:** Include copyright, trademarks, licenses, regulatory compliance
+
+### 8. Maintenance & Updates
+- **Version Control:** Sync with software versions, use CM systems
+- **Change Log:** Mark new/modified content, provide update notes
+
+---
+## Target Code Information
+
+**Function Name:** `{real_name}`
+
+**File Path:** `{path}`
+
+**Source Code:**
+```python
+{source_code}
+```
+
+{uses}
+
+{used_by}
+
+---
+## Required Output Structure
+
+# `{real_name}`
+
+## Metadata
+- **FilePath:** `{path}`
+- **Version:** (Software version)
+- **Last Updated:** (Date)
+- **Audience:** (Target users)
+- **Information Type:** (Conceptual / Procedural / Reference / Troubleshooting)
+
+## About
+(1-2 sentence introduction: what it does, context, user value)
+
+## Description
+(Detailed explanation: functionality, how it works, when to use)
+
+## Parameters
+(Name, type, description, defaults, constraints. Use "None" if empty)
+
+## Returns
+(Type, description, possible states. Use "None" if empty)
+
+## Example Usage
+```python
+# Practical example with comments and expected output
+```
+
+## Prerequisites
+- **Environment:** Python version, OS
+- **Dependencies:** Required packages
+- **Configuration:** Setup requirements
+- **Access:** Permissions needed
+
+## Related Functions
+- **Uses:** Functions this code calls
+- **Used By:** Functions that call this code
+- **See Also:** Related functions
+
+## Troubleshooting
+(Common issues → Solutions, error codes if applicable)
+
+## Safety & Warnings
+- **Warning:** Critical information
+- **ℹCaution:** Important considerations
+- **Note:** Helpful tips
+
+## Change Log
+| Version | Date | Changes |
+|---------|------|---------|
+
+## Accessibility Notes
+(Text alternatives, keyboard support, screen reader notes if applicable)
+
+---
+**Output Language:** {language}
+
+**Generate documentation that is accurate, consistent, clear, and user-centered following ISO/IEC software documentation best practices.Output documents ONLY**

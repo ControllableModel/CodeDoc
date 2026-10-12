@@ -1,0 +1,50 @@
+{
+    "Consistent": {
+        "judge": 4,
+        "evidence": "The documentation accurately describes the function's operation and context, though it could provide more examples of different inputs and outputs."
+    },
+    "Complete": {
+        "judge": 4,
+        "evidence": "The documentation covers the function's purpose, usage, and the expected outputs but lacks a thorough explanation of the dependencies and potential exceptions clearly."
+    },
+    "Exercisable": {
+        "judge": 5,
+        "evidence": "The presented scripts can be executed successfully, as the function properly generates a YAML configuration file based on the environment variables."
+    },
+    "HighQuality": {
+        "judge": 4,
+        "evidence": "The code is relatively well-structured, and while it includes some comments, more thorough commentary could help facilitate greater understanding."
+    },
+    "CommunityFriendly": {
+        "judge": 4,
+        "evidence": "The function adheres to typical coding standards, but additional adherence to broader community practices could enhance its acceptance."
+    },
+    "development": {
+        "judge": 4,
+        "evidence": "The organization supports further development; however, clearer guidance on extending functionality would be beneficial."
+    },
+    "Public": {
+        "judge": 3,
+        "evidence": "The documentation does not specify a permanent public access repository nor demonstrate clear steps for sharing the code."
+    },
+    "DOI": {
+        "judge": 1,
+        "evidence": "No DOI or unique access link is provided for the documentation or code."
+    },
+    "Reproduced": {
+        "judge": 4,
+        "evidence": "The function can reproduce results based on environmental configurations, enabling others to achieve similar outputs."
+    },
+    "Replicated": {
+        "judge": 3,
+        "evidence": "While it allows replication of the results through the provided functionality, detailed steps for independent development aren't specified."
+    },
+    "Flexible": {
+        "judge": 4,
+        "evidence": "The documentation mentions that details can be flexible based on user needs, which is a positive aspect."
+    },
+    "Available": {
+        "judge": 1,
+        "evidence": "The documentation does not mention the presence of 'Artifacts Available' or 'Results Validated' badges or how to apply for them."
+    }
+}

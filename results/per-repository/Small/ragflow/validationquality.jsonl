@@ -1,0 +1,50 @@
+{
+    "Consistent": {
+        "judge": 4,
+        "evidence": "The documentation is relevant and describes the function's operations well, although some warnings suggest potential inconsistencies regarding the specific NLTK resource names."
+    },
+    "Complete": {
+        "judge": 4,
+        "evidence": "The document covers relevant components and provides warnings for potential issues, but does not explain how to acquire proprietary components, specifically in the context of NLTK resources."
+    },
+    "Exercisable": {
+        "judge": 5,
+        "evidence": "The provided scripts and function can be executed successfully; both functions operate as intended when run in a compatible Python environment with the required libraries."
+    },
+    "HighQuality": {
+        "judge": 5,
+        "evidence": "The code is well-structured with thorough comments explaining the parameters, warnings, and functionality, making it easy for others to understand."
+    },
+    "CommunityFriendly": {
+        "judge": 4,
+        "evidence": "The code adheres to general best practices, but there are some points where the behavior of the code could be further clarified for community usage, especially regarding error handling."
+    },
+    "development": {
+        "judge": 4,
+        "evidence": "The documentation is organized for understanding and further development, though it could offer more on future compatibility or extensibility of the functions."
+    },
+    "Public": {
+        "judge": 1,
+        "evidence": "There is no mention of a public repository or a location where the documentation and code can be accessed by the community."
+    },
+    "DOI": {
+        "judge": 1,
+        "evidence": "No DOI or unique access link is provided for referencing the code or documentation."
+    },
+    "Reproduced": {
+        "judge": 5,
+        "evidence": "The functions can reproduce the expected output based on the current Python version and the availability of necessary NLTK resources."
+    },
+    "Replicated": {
+        "judge": 4,
+        "evidence": "Others may replicate results with similar setup, though the function's behavior (like sys.exit) in a library context could hinder this."
+    },
+    "Flexible": {
+        "judge": 3,
+        "evidence": "The documentation allows room for interpretation regarding specific review criteria, but it could explicitly state how the work could adapt to different journal/conference requirements."
+    },
+    "Available": {
+        "judge": 1,
+        "evidence": "The documentation does not state that artifacts are available or validated, nor does it indicate the process for applying badges."
+    }
+}

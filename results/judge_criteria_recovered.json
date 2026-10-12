@@ -1,0 +1,74 @@
+{
+  "Metadata": {
+    "definition": "Each topic should include metadata (e.g., audience, product version, information type) to facilitate content management and retrieval.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Consistent Format": {
+    "definition": "Uses a unified style guide (fonts, colors, icons, warning formats, etc.); maintains consistent formatting for both print and electronic documents.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Legibility": {
+    "definition": "Font size and color contrast are suitable for the reading environment; avoids all-caps text, excessive italics, or underlining.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Illustrations and Media": {
+    "definition": "Graphics should be clear and consistent, placed adjacent to relevant text; avoids culturally sensitive images; videos and animations should be brief and have control options.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Representation of Interactive Elements": {
+    "definition": "Uses consistent graphics or formats to represent keyboard shortcuts, mouse actions, touch gestures, etc.; uses symbols or graphics to distinguish literal values from variables.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Multi-modal Support": {
+    "definition": "Provides text alternatives for non-text content (images, videos, audio); supports screen readers, high-contrast modes, etc.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Device Independence": {
+    "definition": "Avoids dependencies on specific devices (e.g., 'click the green button'); provides instructions for multiple operation methods (keyboard, voice, touch, etc.).",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Accessibility Features": {
+    "definition": "Clearly explains the software's accessibility features and how to use them.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Cultural Neutrality": {
+    "definition": "Avoids culture-specific examples, humor, and images; uses internationally recognized date, currency, and measurement unit formats.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Translation-Friendly": {
+    "definition": "Uses simple sentences, consistent terminology, and avoids abbreviations and slang; text in graphics should be separable to facilitate translation.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Space Consideration": {
+    "definition": "Reserves space for text expansion (e.g., German and Finnish text is typically longer than English).",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "User-Centered Design": {
+    "definition": "Designs content based on user tasks and roles; provides context-sensitive help.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Testing and Feedback": {
+    "definition": "Conducts usability testing to ensure information is easy to find, use, and understand; collects user feedback for continuous improvement.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Search and Indexing": {
+    "definition": "Provides full-text search, Boolean search, and filtering capabilities; indexes should include synonyms and user-friendly terms.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Safety Information": {
+    "definition": "Safety information (e.g., danger, warning, caution) should be prominent and consistent; uses standard signal words (Danger, Warning, Caution).",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Legal and Copyright": {
+    "definition": "Includes copyright notices, trademark information, and license terms; complies with relevant laws and regulations (e.g., Section 508, ISO standards).",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Version Control": {
+    "definition": "Documentation should be updated in sync with software versions; uses configuration management (CM) systems to manage changes.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  },
+  "Change Log": {
+    "definition": "Clearly identifies new or modified content; provides release notes and compatibility information.",
+    "source": "5Score/DOTquality_mul_Eval.jsonl"
+  }
+}

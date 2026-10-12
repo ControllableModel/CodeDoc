@@ -1,0 +1,194 @@
+## Correctness
+### JUDGE
+4
+### EVIDENCE
+Overall the document accurately and thoroughly describes the code: it correctly explains _safe_rollback's behavior (calls connection.rollback(), catches Exception broadly, logs via logger.exception), the registration of the Pool reset listener via event.listens_for in _setup_gevent_compatibility, the use of the module-level _GEVENT_COMPATIBILITY_SETUP flag to avoid duplicate registration, the semantics of _safe_reset (checking reset_state.terminate_only, obtaining gevent.get_hub(), testing hub.loop.in_callback and using gevent.spawn_later(0, ...) vs direct _safe_rollback), and that init_app calls db.init_app(app) then _setup_gevent_compatibility().
+
+The main correctness issue is a small but important inaccuracy: the document states that the code will "fall back" to direct _safe_rollback if gevent is not available or on ImportError. In the actual code, gevent is imported at module top-level (import gevent), so a missing gevent would raise ImportError at import time and the module would not load; the inner try/except's ImportError branch cannot catch that top-level import failure. Thus the claim that the function will transparently degrade when gevent is not installed is misleading. Also, the except (AttributeError, ImportError) inside _safe_reset is effectively only useful for AttributeError (e.g., missing hub/loop/in_callback); the ImportError case is redundant given the top-level import. Apart from this nuance, the document's descriptions and notes align with the code.
+## Consistency
+### JUDGE
+4
+### EVIDENCE
+Positive consistency:
+- Function and identifier names are used consistently across prose and code: _safe_rollback, _safe_reset, _setup_gevent_compatibility, init_app and _GEVENT_COMPATIBILITY_SETUP all match between description and the provided code.
+- Behavioral descriptions map directly to implementation: e.g., broad except catching Exception with logger.exception in _safe_rollback; gevent.get_hub()/hub.loop.in_callback check and gevent.spawn_later usage in _safe_reset; event.listens_for(Pool, "reset") and global flag guard in _setup_gevent_compatibility; init_app calls db.init_app(app) then _setup_gevent_compatibility().
+- Return-value/side-effect notes are consistent (functions return None and rely on side effects), and parameter descriptions align with code signatures.
+Areas lowering score (minor inconsistencies):
+- Mixed-language presentation (Chinese and English interleaved) and inconsistent bullet markers ("·", "-", numbered lists) create a small style/format inconsistency.
+- Minor wording/format variations in headings (e.g., sometimes "parameters:" vs "parameters") and a bit of redundant explanation across sections.
+Overall the document is coherent and consistent in terminology and behavior mapping to code, with only superficial formatting/language inconsistencies.
+## Comprehensibility
+### JUDGE
+5
+### EVIDENCE
+The document is highly clear and well structured: each function has a short purpose line, explicit parameter descriptions, a step‑by‑step code description, and a Note and Output Example section that summarize behavior and side effects. The included code snippet matches the prose, making it easy to cross‑check implementation details (e.g., _safe_rollback swallowing Exception and logging via logger.exception, _setup_gevent_compatibility using _GEVENT_COMPATIBILITY_SETUP to avoid duplicate registration, and _safe_reset using gevent.get_hub()/spawn_later). Technical terms (gevent, SQLAlchemy Pool, rollback, reset_state.terminate_only) are used appropriately and explained in context. Minor caveat: the document mixes Chinese and English, which could slightly reduce readability for monolingual readers, but for the intended developer audience the vocabulary and explanations are concise and unambiguous.
+## Conciseness
+### JUDGE
+3
+### EVIDENCE
+The document is informative and covers all behaviors, but it is not very concise — the same facts are repeated across sections. Examples of redundancy: (1) Multiple places state that _safe_rollback "swallows all Exception and only records a log" (in _safe_rollback Note, in _safe_reset Note, and earlier in _safe_rollback description). (2) The gevent scheduling behavior (checking hub.loop.in_callback and using gevent.spawn_later(0, ...)) is explained in nearly identical detail in _setup_gevent_compatibility, _safe_reset and their Notes. (3) The fact that functions return None or perform side effects is repeated several times (e.g. _setup_gevent_compatibility Output Example, _safe_reset Output Example, init_app Output Example). (4) The relationship between _safe_reset and _safe_rollback (that _safe_reset decides scheduling while _safe_rollback performs the actual rollback and logs exceptions) is repeatedly restated. These repetitions make the document longer than necessary; however, the information is clear and appropriately detailed for readers who may read sections independently, so the document is moderately concise rather than poor.
+## Completeness
+### JUDGE
+4
+### EVIDENCE
+Strengths:
+- Covers purpose and high-level intent for each function (_safe_rollback, _safe_reset, _setup_gevent_compatibility, init_app).
+- Documents parameters, expected behaviors, side effects and return values (noting they are None / side-effecting).
+- Describes interaction/relationships among functions (who calls whom, init_app → _setup_gevent_compatibility → _safe_reset → _safe_rollback).
+- Explains gevent-specific scheduling logic (hub.loop.in_callback check and gevent.spawn_later fallback) and SQLAlchemy Pool.reset listener registration.
+- Notes error handling strategies and limitations: _safe_rollback swallows all Exception and logs; _safe_reset only catches AttributeError/ImportError for gevent access; _setup_gevent_compatibility uses a module flag to prevent duplicate registration.
+- Provides output/examples and explicit notes about behavior when reset_state.terminate_only is True and when gevent is unavailable.
+
+Gaps / inaccuracies / missing troubleshooting and reference details:
+- Practical troubleshooting & operational guidance is limited: no guidance on configuring logger or how to inspect/logs in production to verify rollbacks happened (only mentions logger dependency).
+- Missing tests / examples: no concrete code example showing how a caller should use init_app in app lifecycle, or how to verify the listener was registered beyond the conceptual output example.
+- Import-time mismatch: the code imports gevent at module top. The docs say _safe_reset catches ImportError when accessing gevent, but if gevent is missing the import at the top would raise ImportError at import time — this contradiction (catching ImportError locally vs module-level import) is not documented.
+- No discussion of specific DB exceptions (e.g., OperationalError) or whether connection.rollback() is safe on closed/pooled connections beyond noting exceptions are swallowed.
+- Concurrency/async concerns are only briefly noted; no deeper guidance on thread/greenlet safety or interactions in multi-process deployments.
+- No guidance on what callers should do if they need to ensure rollback succeeded (beyond a short note suggesting different strategies).
+- No mention of how _GEVENT_COMPATIBILITY_SETUP behaves across multiple imports/modules or in test environments where modules may be reloaded.
+
+Overall: The document is thorough about function behavior, flow and error-handling intent and contains useful notes and examples, but omits some practical operational/troubleshooting guidance and contains a notable import-time vs runtime exception-handling inconsistency. Because of these omissions it is not fully complete for operational use, so the score is 4 (very good, but not perfect).
+## Modularity
+### JUDGE
+5
+### EVIDENCE
+The document is highly modular: each function is documented in its own clearly titled section (e.g. _safe_rollback, _setup_gevent_compatibility, _safe_reset, init_app) with consistent subheadings (parameters, Code Description, Note, Output Example). Each topic is self-contained — it explains inputs, behavior, side effects, return value (or lack thereof), and relationships to other module pieces. The responsibilities are well separated (small focused functions, e.g. _safe_rollback only handles rollback and logging; _safe_reset decides scheduling; _setup_gevent_compatibility handles listener registration; init_app wires things together), making the content reusable and easy for different audiences (maintainers, integrators, reviewers). Cross-references and dependencies (db, gevent, logger, _GEVENT_COMPATIBILITY_SETUP) are explicitly noted. Minor room for improvement (explicit target-audience label or short usage snippet) does not detract from the clear, modular structure, so the modularity quality is excellent.
+## Structured by Function
+### JUDGE
+4
+### EVIDENCE
+Strengths:
+- Document is organized per function (_safe_rollback, _setup_gevent_compatibility, _safe_reset, init_app) — each section contains a conceptual description (purpose), parameter list, detailed code/behavior description and notes.  This maps well to the “structured by function” idea.
+- Reference-style info present: parameter names and expectations, return behavior (None), examples of side effects, and an actual code listing for precise reference.
+- Operational guidance included: how _safe_reset decides between immediate vs delayed rollback, how _setup_gevent_compatibility registers the listener and prevents duplicate registration, and how init_app sequences db.init_app and setup.  There are also notes on interactions (who calls whom) and gevent fallbacks.
+- Some troubleshooting/operational caveats are documented: that _safe_rollback swallows exceptions and logs them (so callers cannot detect success), dependency on logger configuration, gevent import/attribute failure fallbacks, and terminate_only behavior.
+
+Weaknesses / missing pieces:
+- There is no dedicated, labeled “Troubleshooting” section with concrete troubleshooting steps or common error symptoms and remedies (only scattered notes about logging and exception swallowing).
+- No small usage examples or short quick-reference table (e.g., typical call sites, expected types) beyond prose and the init_app description.
+- No explicit error codes or API-like contract section (only behavioral notes).
+
+Overall: the document is well structured by function and covers conceptual, operational and reference information; it only lacks a dedicated troubleshooting section and compact quick-reference artifacts, so I rate it 4/5.
+## Navigability
+### JUDGE
+1
+### EVIDENCE
+The document contains no navigability features: there is no table of contents, no index, and no search guidance. Cross-references to other functions exist only as plain text (e.g. mentions of _safe_rollback, _safe_reset, _setup_gevent_compatibility, init_app) but there are no hyperlinks or explicit navigation links. There is also no bidirectional linking or references back to callers; references are descriptive only (for example, “被本模块的 init_app 调用”) rather than linked. The structure uses headings which aids reading, but that alone does not provide the requested navigability features.
+## Metadata
+### JUDGE
+1
+### EVIDENCE
+The document lacks explicit metadata fields for each topic. While it documents function purpose, parameters, code behavior, notes, and example outputs, it does not include audience, product/version, information type (e.g., API guide, design note), owner/maintainer, last-updated/date, tags, or file/module path. Examples of missing metadata: no 'Audience' or 'Intended Users' declared for _safe_rollback/_setup_gevent_compatibility/init_app; no 'Version' or 'Product' indicated for the code; no 'Document Type' or 'Status' (draft/released); no contact/owner or timestamp. The only structured metadata-like items are parameter names and a type hint (app: DifyApp) and a module-level boolean annotation (_GEVENT_COMPATIBILITY_SETUP: bool), which are code details, not document metadata for content management or retrieval.
+## Consistent Format
+### JUDGE
+4
+### EVIDENCE
+Positives: The document uses a repeated, predictable structure for each function (name, short description, parameters, Code Description, Note/Output Example), and the code is provided in a clear, formatted block. Headers, parameter lists, and descriptive sections are consistently present for each FunctionDef, making the content easy to scan. Negatives / inconsistencies: heading levels vary (some functions use '##', one uses '###'), bullet markers are mixed (middle dot '·', hyphen '-', and standard bullets), punctuation alternates between full‑width (Chinese) and half‑width (ASCII) characters, and the document mixes Chinese and English text which affects visual uniformity. Also, some sections (e.g., Output Example) appear for some functions but not others. Overall the format is well structured and consistent in intent, but has minor stylistic inconsistencies that prevent an "excellent" score.
+## Legibility
+### JUDGE
+4
+### EVIDENCE
+The document is overall well structured and readable: it uses clear Markdown-like headings, sectioning (FunctionDef blocks), inline bold and code formatting, and a dedicated code block for the actual implementation which preserves indentation and makes code easy to scan. There is no use of ALL-CAPS, excessive italics, or underlining. Terminology and function names are consistently formatted (e.g. _safe_rollback, _safe_reset, init_app), and comments/notes are separated from main text. However, two limitations reduce a perfect score: (1) font size and color-contrast information cannot be determined from the plain-text/Markdown content (so suitability for the reading environment is not specified), and (2) the document mixes English and Chinese, which may reduce legibility for readers fluent in only one language. Minor issues: some long paragraphs could be broken up for quicker skimming. For these reasons I judge legibility as 4 (good) rather than 5 (excellent).
+## Illustrations and Media
+### JUDGE
+1
+### EVIDENCE
+No illustrations or media are present in the document. The content consists solely of text and code blocks (function descriptions, notes, and source code). There are no images, diagrams, screenshots, charts, videos, or animations, nor any captions, alt text, or media controls. While code examples are positioned near their explanations, the document does not mention or include any illustrative or multimedia elements, so the Illustrations and Media quality is not applicable / not mentioned.
+## Representation of Interactive Elements
+### JUDGE
+1
+### EVIDENCE
+The document contains no interactive UI elements (no keyboard shortcuts, mouse actions, touch gestures, or similar) and therefore does not apply any representation conventions for them. Parameter names and code are shown in normal prose and code blocks (e.g. connection, dbapi_connection, reset_state.terminate_only) but there is no use of symbols/graphics to distinguish literal values from variables or any consistent graphical format for interactive actions. In short, representation of interactive elements is not mentioned or used.
+## Multi-modal Support
+### JUDGE
+1
+### EVIDENCE
+The document contains only code and textual descriptions and does not mention or provide any accessibility or multi-modal features. There are no images, videos, or audio assets, and there is no provision of text alternatives (e.g., alt text), captions, transcripts, ARIA roles, screen-reader guidance, high-contrast mode support, keyboard navigation notes, or any accessibility-related attributes or instructions. No keywords such as "alt", "aria", "accessibility", "screen reader", "contrast", "caption", or "transcript" appear in the text.
+## Device Independence
+### JUDGE
+5
+### EVIDENCE
+The document contains only programmatic instructions and API calls and makes no references to device-specific interactions (no 'click', 'tap', 'press', 'green button', or any mouse/touch/voice instructions). Examples from the text: "connection.rollback()", "db.init_app(app)", "gevent.spawn_later(0, lambda: _safe_rollback(dbapi_connection))" — all are code-level operations. Additionally, the text explicitly describes alternative runtime contexts (gevent callback vs non-gevent fallback) and fallback behavior, showing it explains multiple execution methods rather than tying instructions to a particular device or interface. Therefore it is device-independent (no device-specific dependencies or instructions).
+## Accessibility Features
+### JUDGE
+1
+### EVIDENCE
+The document describes code behavior ( _safe_rollback, _safe_reset, _setup_gevent_compatibility, init_app ), parameters, error handling and gevent/SQLAlchemy interactions, but contains no information about accessibility features. It does not mention screen-reader support, keyboard/navigation alternatives, localization, contrast, ARIA or other assistive-technology considerations, nor how to enable or use any accessibility settings. The Notes and Output Example sections only cover runtime behavior, dependencies and fallback semantics—there is no explanation of accessibility features or instructions for users with disabilities.
+## Cultural Neutrality
+### JUDGE
+5
+### EVIDENCE
+The document contains only technical content (function descriptions, code, behavior) and does not include culture-specific examples, idioms, humor, or images. It makes no references to dates, currencies, or measurement units that would require locale-specific formats. Language usage is bilingual (English and Chinese) but this is a translation/presentation choice and does not introduce cultural bias in examples or assumptions. Overall the content is technical and context-neutral, so it meets cultural neutrality requirements.
+## Translation-Friendly
+### JUDGE
+4
+### EVIDENCE
+Positives: 1) Terminology is consistent—function names (_safe_rollback, _safe_reset, _setup_gevent_compatibility, init_app), parameters and key concepts (rollback, gevent, hub, reset_state.terminate_only) are used uniformly across the document. 2) Most sentences are short and declarative, and code is provided in separate blocks, making code text easy to isolate for translation. 3) No slang; technical abbreviations (gevent, DB-API) are standard library/project names and used predictably.
+Negatives / issues: 1) Mixed Chinese and English in the same document may complicate machine translation or require language-specific handling. 2) A few long, compound sentences and parenthetical remarks (for example the long description paragraphs under Code Description) reduce simplicity and could be split for easier translation. 3) Occasional nonstandard bullet characters (·) and inline code/attributes (hub.loop.in_callback, logger.exception) embedded in prose may need special handling to ensure correct separation in translation workflows. 4) Uses domain abbreviations (DB-API) and library names (gevent, SQLAlchemy) without expansion; these are acceptable but should be documented if full localization is needed.
+## Space Consideration
+### JUDGE
+1
+### EVIDENCE
+The document contains no consideration of UI text expansion or localization. It is entirely focused on backend logic and event handling; there are no layout or UI strings reserved for longer translations. Specific evidence: (1) No i18n mechanism (gettext/_()) or comments about translated text are present. (2) User-facing text is limited to a single logger message "Failed to rollback connection" which is a fixed English string and not prepared for expansion or translation. (3) No mention of reserving extra space for languages with longer strings, nor any guidance about UI/formatting adjustments for translated text. Therefore Space Consideration is not mentioned.
+## User-Centered Design
+### JUDGE
+5
+### EVIDENCE
+The document is highly user-centered for developer readers: it states the user task and role (what callers like init_app/_safe_reset should expect), gives clear purpose statements for each function, documents parameters, return values (or lack thereof), and side effects. It explains behavior in normal and error conditions (when exceptions are swallowed, when gevent is unavailable), lists dependencies (gevent, SQLAlchemy, logger, db), and describes calling relationships and sequence (init_app -> _setup_gevent_compatibility -> _safe_reset -> _safe_rollback). It includes actionable notes and caveats (e.g., global flag prevents duplicate registration, rollback exceptions are logged and not propagated, callers cannot rely on exceptions to detect rollback success, concurrency not handled), and provides example outputs/behaviors and the actual source code. These elements support typical developer tasks (integration, debugging, maintenance) and provide context-sensitive guidance (when to delay rollback, fallback behavior), satisfying excellent user-centered design.
+## Testing and Feedback
+### JUDGE
+1
+### EVIDENCE
+The document contains no mention of usability testing, test cases, acceptance criteria, automated or manual test procedures, or any plan to collect user feedback. It documents function behavior, error-handling and logging (logger.exception is used for runtime diagnostics), but provides no instructions for verifying correctness (e.g., test scenarios for gevent vs non-gevent environments), no examples of test inputs/expected outputs, and no mechanism for gathering or acting on user feedback. Therefore Testing and Feedback is not addressed.
+## Search and Indexing
+### JUDGE
+1
+### EVIDENCE
+The document is focused on functions (_safe_rollback, _safe_reset, _setup_gevent_compatibility, init_app), their parameters, behavior, and example code. It contains no mention of search or indexing features: there are no references to "search", "full-text", "boolean", "filtering", "index", "synonym", "tag", or any metadata/schema for indexing. While the text is well-structured and full-text-searchable as-is, it provides no explicit guidance, fields, or mappings to support full-text/Boolean search, filtering capabilities, or synonym/user-friendly term indexing — therefore Search and Indexing is Not Mentioned.
+## Safety Information
+### JUDGE
+3
+### EVIDENCE
+Positive evidence:
+- The document explicitly documents safety-relevant behavior in multiple 'Note:' sections (e.g., “_safe_rollback 吞掉了所有 Exception 并只记录日志，因此调用方无法通过异常判断回滚是否成功”；“该函数不处理并发或线程/greenlet 同步问题”) which makes key risks and limitations available to readers.
+- The implementation and comments make the hazardous behavior clear: code uses a broad except Exception and logs via logger.exception("Failed to rollback connection") instead of re-raising, and the descriptions explain the consequence (caller cannot detect rollback success).
+- The gevent-related safety handling is described: delaying rollback when hub.loop.in_callback is True and fallback behavior on AttributeError/ImportError are documented.
+
+Negative evidence:
+- The document does not use standard safety signal words (Danger, Warning, Caution) anywhere; there are no prominent signal labels to draw attention to critical safety items.
+- Safety information presentation is inconsistent: it is scattered in notes and descriptive paragraphs rather than consolidated into a clear, prominent safety/warning block; formatting relies on plain 'Note:' headings rather than standard signal words or visual emphasis.
+- No explicit, standardized safety action steps (e.g., "Warning: if you need guaranteed rollback, do X") — the notes describe consequences but do not consistently provide prescriptive mitigation in a standard warning format.
+
+Overall assessment: safety-relevant content is present and accurate (hence not low), but it lacks prominence, standardized signal words, and consistently formatted warnings — therefore a middle score.
+## Legal and Copyright
+### JUDGE
+1
+### EVIDENCE
+The document contains code, function descriptions, and implementation notes but does not include any legal or copyright information. Specifically:
+- No copyright notice or year/owner attribution is present.
+- No license text or reference to a software license (e.g., MIT, Apache, GPL) is included.
+- No trademark notices or acknowledgements are provided.
+- No statements about compliance with laws, accessibility standards (e.g., Section 508), or ISO standards appear.
+- No contributor, attribution, or usage/redistribution terms are given.
+Therefore, legal and copyright quality is: Not Mention (score 1).
+## Version Control
+### JUDGE
+1
+### EVIDENCE
+The document contains no mention of version control, release/version numbers, changelogs, tags, branches, commit IDs, or any CM tools/processes (e.g. git, SVN, CI/CD). There is no header or metadata indicating when the documentation was last updated or which software version it corresponds to, nor instructions to update docs in sync with code changes. The text describes functions and behavior but does not reference versioning, versioned API compatibility, or a configuration management workflow—therefore Version Control quality is Not Mention.
+## Change Log
+### JUDGE
+2
+### EVIDENCE
+Positive aspects:
+- The document contains clear compatibility information about gevent and SQLAlchemy (e.g. descriptions that _safe_reset will use gevent.get_hub(), check hub.loop.in_callback and call gevent.spawn_later(0, ...) when appropriate, and that it falls back to direct _safe_rollback if gevent is unavailable).
+- Notes explicitly state compatibility behavior and fallback semantics (for example: "If project has no gevent ... function will automatically fall back to directly calling _safe_rollback" and "_safe_reset ... only catches AttributeError/ImportError; rollback exceptions are handled by _safe_rollback").
+
+Negative aspects (why it is not a Change Log):
+- The document does not identify what is new or modified relative to a previous version (no "Added/Changed/Removed" sections, no diff-style notes).
+- There are no release notes, no version numbers, no dates, and no migration or upgrade guidance.
+- No explicit compatibility matrix or statements about which versions of dependencies (gevent, SQLAlchemy, Python) were introduced/changed or are supported—only behavioral descriptions.
+- No changelog metadata (author/date/version/issue references) or examples showing prior vs. current behavior.
+
+Conclusion: The technical descriptions and compatibility notes are useful, but the document lacks the core elements of a change log (explicitly calling out changes, release notes, versions, dates, and migration guidance). Hence a low score (2).

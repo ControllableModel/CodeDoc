@@ -1,0 +1,51 @@
+The path to the target object in this project is:
+{path}
+
+Now you need to generate a document for a function, whose name is **{real_name}**.
+
+## The ARTICLE for this Source Code:
+DOI: https://doi.org/10.48550/arXiv.2405.16555
+
+| Page                  | Method / Technique                                   | Description                                                                                                                                                                   |
+| --------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **p.6–7**             | **Heat Conduction Operator (HCO)**                   | Core operator based on the physical heat conduction equation, used to propagate visual information across image patches.                                                      |
+| **p.7 (Eq. 9)**       | **DCT2D / IDCT2D Implementation**                    | The HCO is implemented using **2D Discrete Cosine Transform (DCT2D)** and **Inverse DCT2D (IDCT2D)** instead of Fourier transforms for GPU efficiency and O(N¹·⁵) complexity. |
+| **p.7–8**             | **Neumann Boundary Condition**                       | Used in the derivation of HCO to replace DFT/IDFT with DCT2D/IDCT2D for image data with rectangular boundaries.                                                               |
+| **p.8 (Sec. 3.2.2)**  | **Adaptive Thermal Diffusivity (k)**                 | A **learnable parameter** representing diffusion rate, predicted dynamically from frequency features to adapt to image content.                                               |
+| **p.8 (Fig. 4a)**     | **Frequency Value Embeddings (FVEs)**                | Learnable embeddings representing frequency positions, analogous to positional embeddings in Vision Transformers (ViT).                                                       |
+| **p.9 (Eq. 11)**      | **Matrix Multiplication Implementation of DCT/IDCT** | Efficient GPU implementation via precomputed cosine matrices ( C, D ) with ( B = CAD^T, A = C^TBD ).                                                                          |
+| **p.9 (Sec. B)**      | **GPU-Optimized DCT/IDCT**                           | Custom matrix-multiplication implementation benchmarked against Torch-DCT, achieving 661 img/s vs 367 img/s.                                                                  |
+| **p.10 (Sec. 3.2.3)** | **Depth-wise Convolution (DWConv)**                  | Used before HCO to extract local spatial features in each heat conduction layer.                                                                                              |
+| **p.10 (Fig. 4b)**    | **Linear + SiLU Branch (Gated MLP)**                 | Nonlinear transformation after HCO, inspired by LLaMA's gated MLP structure.                                                                                                  |
+| **p.11–12**           | **AdamW Optimizer**                                  | Used for all training experiments (learning rate = 2×10⁻³, betas = (0.9, 0.999), cosine decay schedule).                                                                      |
+| **p.12**              | **Cosine Decay Learning Rate Scheduler**             | Controls learning rate annealing during training.                                                                                                                             |
+| **p.12**              | **Label Smoothing & EMA**                            | Applied to stabilize training and improve generalization.                                                                                                                     |
+| **p.14 (Table 11)**   | **Ablation: Depth-wise Conv vs. LayerNorm**          | Confirms DWConv improves performance by 0.2–0.7 % compared to normalization alone.                                                                                            |
+
+## The content of the target code is as follows:
+```python
+{source_code}
+```
+
+{uses}
+
+{used_by}
+
+Please follow the structure:
+# `name(args)`
+
+## metadata
+* FilePath: 
+* Version: ()
+* Writer: CodeEval
+
+## description
+(description ability, used by who and uses who, and how it works in ARTICLE)
+
+## parameters
+
+## example_output
+
+## warnings
+
+（Please Generate in {language}.）

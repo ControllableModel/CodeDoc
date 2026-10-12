@@ -1,0 +1,74 @@
+{
+    "Reference Content": {
+        "judge": 4,
+        "evidence": "The content includes a clear explanation of the function's purpose and behavior, but there's no mention of whether it should create standalone articles or be embedded."
+    },
+    "Conceptual Content Guidelines": {
+        "judge": 4,
+        "evidence": "The document explains the purpose of the function and includes use cases related to command-line options. However, it could benefit from clearer examples or scenarios where this function would be used."
+    },
+    "Error Reference Content Guidelines": {
+        "judge": 3,
+        "evidence": "The document mentions that unknown parameters will cause an error, but it doesn't provide specific troubleshooting steps or a clear section separating known issues."
+    },
+    "Tutorial Content Guidelines": {
+        "judge": 3,
+        "evidence": "While the document explains how to use the main function, it lacks a defined audience, specific tutorial goals, and doesn't anticipate user questions."
+    },
+    "Getting Started Content Guidelines": {
+        "judge": 4,
+        "evidence": "There is a concise explanation of how to use the function, including prerequisites; however, steps could be better structured and clarified."
+    },
+    "Content Type Consistency": {
+        "judge": 5,
+        "evidence": "The document maintains a clear structure focusing on procedural content, which fits the expected model for this type of documentation."
+    },
+    "Balanced Hierarchy": {
+        "judge": 4,
+        "evidence": "The document has a simple structure, making it navigable. However, it could be improved by grouping related sections better."
+    },
+    "Content Order": {
+        "judge": 4,
+        "evidence": "Most content is organized logically, starting from concepts to behaviors. However, a clearer separation of sections might enhance clarity."
+    },
+    "Category Title Naming": {
+        "judge": 4,
+        "evidence": "The document uses clear action-based titles but could further generalize some specific terms to improve scalability."
+    },
+    "Reuse Instead of Copying": {
+        "judge": 3,
+        "evidence": "The document does not demonstrate the use of reusable text variables and mentions several points that could overlap in content."
+    },
+    "Title Standards": {
+        "judge": 5,
+        "evidence": "The title is clear, descriptive, and falls within the character limit, effectively conveying the purpose."
+    },
+    "Introduction Standards": {
+        "judge": 4,
+        "evidence": "The introduction provides context but could be more succinct and avoid repetition of the title."
+    },
+    "Permission Declaration Standards": {
+        "judge": 2,
+        "evidence": "There are no permission declarations included, which might impact clarity in understanding access yet."
+    },
+    "Product Label Standards": {
+        "judge": 3,
+        "evidence": "The document refers to specific product features, but it lacks clear labels and reusable notes that link to them."
+    },
+    "Process Content Standards": {
+        "judge": 5,
+        "evidence": "Procedural content is written clearly with step-by-step instructions reflecting the function's operations."
+    },
+    "Next Steps Standards": {
+        "judge": 3,
+        "evidence": "The document does not adequately guide users to follow-up actions or next topics related to the command-line options."
+    },
+    "Further Reading Standards": {
+        "judge": 2,
+        "evidence": "The document lacks resources for further reading, which could enhance understanding for users looking for deeper insights."
+    },
+    "Prerequisites Standards": {
+        "judge": 4,
+        "evidence": "It lists necessary components for the function's operation clearly but could highlight potential pitfalls more effectively."
+    }
+}

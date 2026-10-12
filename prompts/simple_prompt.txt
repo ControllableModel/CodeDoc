@@ -1,0 +1,13 @@
+f"""Generate documentation for the following code in {args.language}.
+
+Code to document:
+```python
+{info["source_code"]}
+```
+uses:
+{uses}
+
+used_by:
+{used_by}
+
+Provide clear and concise documentation."""

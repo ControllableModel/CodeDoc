@@ -1,0 +1,90 @@
+## Reference Content
+### JUDGE
+4
+### EVIDENCE
+The document provides a clear explanation of what the method `replaced_percent` does, but it does not mention whether reference articles are standalone or embedded.
+## Conceptual Content Guidelines
+### JUDGE
+4
+### EVIDENCE
+The document begins with explanations of each method's purpose and use cases, yet it lacks a structured 'About' section and does not clearly outline prerequisites or next steps.
+## Error Reference Content Guidelines
+### JUDGE
+4
+### EVIDENCE
+The document includes warnings for methods but could improve error handling instructions and separation of troubleshooting from known issues.
+## Tutorial Content Guidelines
+### JUDGE
+3
+### EVIDENCE
+The document provides method descriptions but lacks a clear tutorial format. It does not define the audience or goals and could use more examples.
+## Getting Started Content Guidelines
+### JUDGE
+2
+### EVIDENCE
+The document does not provide a concise, step-based quick-start guide, and lacks clarity on prerequisites or next steps.
+## Content Type Consistency
+### JUDGE
+5
+### EVIDENCE
+The document maintains a consistent structure for documenting methods and their parameters.
+## Balanced Hierarchy
+### JUDGE
+3
+### EVIDENCE
+The method descriptions are organized but could improve on navigability by adding higher-level sections for clarity.
+## Content Order
+### JUDGE
+4
+### EVIDENCE
+The content is generally organized logically, but could be improved by explicitly separating conceptual explanations from implementations and troubleshooting.
+## Category Title Naming
+### JUDGE
+4
+### EVIDENCE
+The method names are clear and descriptive, though some could be more concise.
+## Reuse Instead of Copying
+### JUDGE
+5
+### EVIDENCE
+The document seems to effectively use classes and methods without duplication.
+## Title Standards
+### JUDGE
+5
+### EVIDENCE
+The titles are clear, descriptive, and remain within the character limits specified.
+## Introduction Standards
+### JUDGE
+4
+### EVIDENCE
+Each method has a short introduction, but a general introductory section for the document could enhance context.
+## Permission Declaration Standards
+### JUDGE
+1
+### EVIDENCE
+There are no permissions stated upfront, which is a requirement for clarity on user actions.
+## Product Label Standards
+### JUDGE
+2
+### EVIDENCE
+The document lacks clear product-specific feature markings or labeled notes with links.
+## Process Content Standards
+### JUDGE
+4
+### EVIDENCE
+Procedural content is largely presented as step-by-step instructions, particularly in method breakdowns.
+## Next Steps Standards
+### JUDGE
+2
+### EVIDENCE
+The document does not provide clear follow-up links or guidance for users after completing a method.
+## Further Reading Standards
+### JUDGE
+1
+### EVIDENCE
+The document does not include a 'Further reading' section with external or advanced resources.
+## Prerequisites Standards
+### JUDGE
+3
+### EVIDENCE
+Warnings are included for some methods, but a systematic approach to listing prerequisites could be improved.
