@@ -64,20 +64,34 @@ python evaluate_ablation.py --base_dir numpy_ablation
 sections/code blocks, presence of dependency sections). It does not score documentation
 quality. `numpy_ablation/` in this repository is the output of exactly these commands.
 
-## 5. Step 3 — judging and scoring: **not reproducible as shipped**
+## 5. Step 3 — judging and scoring: partially shipped, not runnable end to end
 
-The reported quality scores (`3Score/`, `5Score/`, `results/per-repository/`) were produced by
-an LLM-as-a-judge harness that is **not part of this repository**. There is no script here that
+The judge **prompt construction and the model calls are in this repository**:
+[`module_OpenAI/__init__.py`](../module_OpenAI/__init__.py) provides
 
-* builds the judge prompts (their text is recovered in [`JUDGE_PROTOCOL.md`](JUDGE_PROTOCOL.md)),
-* calls the judge and stores `judge` / `evidence` per dimension,
-* aggregates dimension scores into the per-entity, per-repository and per-category numbers,
-* performs the controlled-masking sensitivity experiment, or
-* computes the human–judge agreement statistics.
+* `LLM_Remote_query.load_judgeContent(name, behavior, example)` — builds the single-round,
+  per-dimension judge prompt from a `(name, definition)` pair;
+* `LLM_Remote_query.load_JudgeContent_Once(judge, example)` — builds the multi-round judge
+  prompt;
+* `LLM_Remote_query.solo_query` / `multi_query` — the callers (retry loop prints
+  `Request Try Left: N`, which is reproduced verbatim in the archived `5Score` log), with
+  `temperature=1` and `max_tokens=1024` hard-coded in the class.
 
-What **is** shipped is the evidence: the judge transcripts and per-repository outputs under
-`results/`, `3Score/` and `5Score/`. They can be inspected and re-aggregated by hand, and the
-per-dimension definitions they contain have been extracted into
+What is **not** in the repository is everything around that:
+
+* the **driver** that walks repositories and entities and feeds each `(name, behavior)` pair to
+  the builder — i.e. the per-dimension criteria table itself is absent, which is why the
+  definitions had to be recovered from the judging logs (see
+  [`CRITERIA_ISO.md`](CRITERIA_ISO.md) §4);
+* the **aggregation** from dimension scores to per-entity, per-repository and per-category
+  scores (the repository-level mean reported in the paper);
+* the **controlled-masking** sensitivity experiment;
+* the **human-evaluation** analysis, including the agreement statistics.
+
+So the reported quality scores cannot be re-derived end to end from this repository as it
+stands, although the judging prompts, the model calls and the raw outputs are all present.
+What **is** shipped as evidence: the judge transcripts and per-repository outputs under
+`results/`, `3Score/` and `5Score/`, plus the recovered per-dimension definitions in
 [`results/judge_criteria_recovered.json`](../results/judge_criteria_recovered.json).
 
 ## 6. Step 4 — token accounting

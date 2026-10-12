@@ -36,7 +36,7 @@ CodeEval/
 │   ├── Github.txt             # GitHub-style criteria + required output structure
 │   ├── artifact.txt           # original (pre-standards) template, kept for reference
 │   └── simple_prompt.txt      # template used by the "no prompt optimisation" ablation
-├── module_OpenAI/             # thin request helper
+├── module_OpenAI/             # LLM helper: judge-prompt construction + model calls
 ├── docs/                      # criteria tables, judge protocol, reproduction guide
 ├── results/                   # published evaluation evidence (see §6)
 ├── 3Score/  5Score/           # raw judge outputs: 3-level and 1–5-level protocols

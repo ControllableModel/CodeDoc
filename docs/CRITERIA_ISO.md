@@ -104,8 +104,8 @@ archived artifacts define them.
 `bad` | `good` | `excellent` (e.g. `DOTquality_mul_Eval.jsonl`: 13 `good`, 10 `bad`,
 3 `excellent`). The label semantics are not defined in the archived prompts.
 
-**1–5 protocol (`5Score/`)** — integer scores. The judge prompt states the scale endpoints
-verbatim:
+**1–5 protocol (`5Score/`)** — integer scores. The judge prompt is assembled in
+`module_OpenAI.LLM_Remote_query.load_judgeContent`, whose scale sentence reads verbatim:
 
 > *"you can choose from 1 score(Not Mention) to 5 score (excellent)"*
 
