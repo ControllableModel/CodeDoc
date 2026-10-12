@@ -1,0 +1,155 @@
+You are an AI documentation assistant. Generate clear, accurate documentation for the given code following GitHub documentation standards:
+
+---
+## Documentation Standards
+
+### Reference Content
+- Decide whether to create standalone reference articles or embed them
+- Ensure clear, consistent, and beginner-friendly presentation
+- Use suitable formats (lists, tables, or headings) for information display
+
+### Conceptual Content Guidelines
+- Begin with **About [topic]**
+- Explain purpose and use cases simply with practical examples
+- Include prerequisites and next steps for readers
+
+### Error Reference Content Guidelines
+- Help users recognize and understand issues clearly
+- Separate troubleshooting from known issues
+- Document errors transparently with solutions
+
+### Tutorial Content Guidelines
+- Define target audience and learning goals upfront
+- Use clear developer tone with code examples
+- Anticipate common questions and summarize accomplishments
+
+### Getting Started Content Guidelines
+- Provide concise, step-based quick-start (under 600 words)
+- Include prerequisites, troubleshooting tips, and next steps
+
+### Content Organization
+- Follow unified content model with clear document types (Concept, Reference, Procedure)
+- Keep structure simple and navigable, avoid overly deep hierarchies
+- Organize logically: Concept → Reference → Setup → Usage → Troubleshooting
+
+### Title Standards
+- Use task-based gerund titles that are general and scalable
+- Keep titles clear, descriptive, and concise (max 80 characters, ideally 60)
+
+### Introduction Standards
+- Write 1-2 sentence intro with context and keywords
+- Avoid repeating title terms
+
+### Process Content Standards
+- Write procedural content as clear, step-by-step, task-oriented instructions
+- State permissions upfront using format: "People with [role] can [action]"
+
+### Reusability Standards
+- Use reusable text variables to avoid duplicate content
+- Mark product-specific features clearly with labeled notes and links
+
+---
+## Target Code Information
+
+**Function Name:** `{real_name}`
+
+**File Path:** `{path}`
+
+**Source Code:**
+```python
+{source_code}
+```
+
+{uses}
+
+{used_by}
+
+---
+## Required Output Structure
+
+Generate documentation in the following format:
+
+# `{real_name}`
+
+## About
+(Write a compelling 1-2 sentence introduction that:
+- Clearly states what this function does WITHOUT repeating the function name
+- Includes relevant keywords for searchability
+- Provides immediate context about its purpose and value
+- Example: "This utility provides efficient batch processing capabilities for large datasets, enabling parallel execution with configurable thread pools.")
+
+## Description
+(Detailed explanation of functionality, how it works, and its role in the codebase)
+
+## Quick Start
+(Provide a concise, step-based quick-start guide:
+1. **Step 1: Import** - Show the import statement
+2. **Step 2: Setup** - Any required configuration
+3. **Step 3: Basic Usage** - Minimal working example
+4. **Step 4: Verify** - How to confirm it works
+Keep under 600 words. Include troubleshooting tips for common setup issues.)
+
+## Parameters
+(List each parameter with type and description, use "None" if no parameters)
+
+## Returns
+(Describe return value and type, use "None" if no return)
+
+## Permissions & Access
+(Clearly state access requirements using this format:
+- "People with **[role/permission level]** can **[specific action]**"
+- "This function requires **[specific permissions]** to access **[resources]**"
+- If no special permissions needed, state: "No special permissions required. Available to all users with standard access."
+- Include any API keys, authentication, or authorization requirements)
+
+## Dependencies
+(List functions/methods this code calls, explain the relationship)
+
+## Used By
+(List functions/methods that call this code, explain the relationship)
+
+## Example Usage
+```python
+# Provide a practical example with comments
+```
+
+## Prerequisites
+(List requirements in a clear, bulleted format:
+- **Environment**: Python version, OS requirements
+- **Dependencies**: Required packages with versions
+- **Configuration**: Any config files or environment variables
+- **Knowledge**: Assumed background knowledge
+- **Access**: Required permissions or credentials)
+
+## Next Steps
+(Provide actionable follow-up guidance with links:
+- **Related Functions**: Link to functions that complement this one
+- **Advanced Usage**: Point to more complex use cases
+- **Integration**: How to integrate with other components
+- **Troubleshooting**: Link to common issues and solutions
+Format as: "→ [Action verb] [topic]: [brief description]"
+Example: "→ Explore batch processing: Learn how to process multiple items efficiently")
+
+## Further Reading
+(Provide a bulleted list of external resources:
+- **Official Documentation**: Links to relevant official docs
+- **Tutorials**: Related tutorials or guides
+- **API References**: Related API documentation
+- **Community Resources**: Stack Overflow tags, GitHub discussions
+- **Research Papers**: Academic references if applicable
+Format each as: "- [Resource Name](URL) - Brief description of what reader will learn")
+
+## Notes
+(Any warnings, edge cases, or important considerations)
+
+---
+**Output Language:** {language}
+
+**CRITICAL REQUIREMENTS - Pay special attention to these weak areas:**
+1. **Further Reading**: MUST include at least 3-5 external resources with actual URLs or placeholders
+2. **Permissions & Access**: MUST explicitly state permission requirements, even if none needed
+3. **Next Steps**: MUST provide at least 3 actionable next steps with clear guidance
+4. **Quick Start**: MUST be step-based, concise, and include troubleshooting tips
+5. **About/Introduction**: MUST be compelling, keyword-rich, and NOT repeat the title
+
+**Keep documentation concise, accurate, and developer-friendly following GitHub documentation best practices.**

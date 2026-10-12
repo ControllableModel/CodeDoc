@@ -1,0 +1,49 @@
+{
+  "description": "Example configuration for ablation study experiments",
+  "experiments": {
+    "full": {
+      "description": "Complete system with all features",
+      "relevant": true,
+      "prompt_template": "prompts/ISO.txt"
+    },
+    "no_dep": {
+      "description": "Without dependency information",
+      "relevant": false,
+      "prompt_template": "prompts/ISO.txt"
+    },
+    "no_prompt": {
+      "description": "Without prompt optimization",
+      "relevant": true,
+      "prompt_template": null
+    },
+    "baseline": {
+      "description": "Minimal configuration",
+      "relevant": false,
+      "prompt_template": null
+    }
+  },
+  "evaluation_metrics": [
+    "total_tokens",
+    "text_tokens",
+    "num_sections",
+    "num_code_blocks",
+    "has_dependencies",
+    "has_dependents"
+  ],
+  "quality_dimensions": [
+    "completeness",
+    "accuracy",
+    "clarity",
+    "usefulness"
+  ],
+  "recommended_sample_size": {
+    "small_project": "5-10 functions",
+    "medium_project": "20-30 functions",
+    "large_project": "50+ functions"
+  },
+  "statistical_tests": [
+    "t-test for mean differences",
+    "Mann-Whitney U test for non-parametric data",
+    "Cohen's d for effect size"
+  ]
+}

@@ -1,0 +1,92 @@
+# ---------------------------------------------------------------------------
+# Credentials -- NEVER commit API keys. Use the LLM_KEY environment variable
+# (see .env.example) or pass --llm_key on the command line.
+# ---------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.key
+
+# ---------------------------------------------------------------------------
+# IDE / OS
+# ---------------------------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# ---------------------------------------------------------------------------
+# Third-party source snapshots.
+# The evaluated repositories are cloned locally as *inputs* and are NOT
+# redistributed here: they carry their own licences and their own .git.
+# See docs/REPRODUCTION.md for the repository URLs, the pinned commits and
+# the entity counts, and scripts/fetch_repositories.sh to re-clone them.
+# ---------------------------------------------------------------------------
+Small-Size/
+Middle-Size/
+Large-Size/
+repositories/
+*- 副本/
+
+# Nested git metadata of the cloned inputs
+**/.git/
+
+# ---------------------------------------------------------------------------
+# Voluminous, regenerable intermediates
+# (the evaluation *scores* are published, the raw generated docs are not)
+# ---------------------------------------------------------------------------
+extracted_dependencies/
+markdown_docs/
+*.info
+.project_doc_record/
+Token Cost.txt
+ablation_results/
+docs_ablation_*/
+
+# ---------------------------------------------------------------------------
+# Private correspondence / submission records -- never publish these
+# (reviewer reports, editor decisions, author e-mail traffic)
+# ---------------------------------------------------------------------------
+VIEW.txt
+*.eml
+review*/
+
+# ---------------------------------------------------------------------------
+# Local scratch
+# ---------------------------------------------------------------------------
+*.log
+scratch/
+_tmp/
