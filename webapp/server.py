@@ -50,10 +50,28 @@ DEFAULT_CONFIG = {
     "model": "gpt-6-luna",
     "use_max_completion_tokens": True,
     "max_completion_tokens": 8000,
-    #: Prices are per million tokens and must be set for whatever endpoint is used;
-    #: the defaults below are DeepSeek list prices and are only a rough orientation.
-    "price_in_per_m": 2.0,
-    "price_out_per_m": 8.0,
+    #: Price list of the configured endpoint, per million tokens, in USD.
+    #: Two context tiers x four service modes, plus cached-input and cache-creation
+    #: rates, because providers charge all of these differently.
+    "pricing": {
+        "currency": "USD",
+        "long_context_threshold": 272000,
+        "mode": "standard",
+        "tiers": {
+            "short": {
+                "standard": {"input": 0.09, "cached_input": 0.009, "cache_creation": 0.1125, "output": 0.45},
+                "flex":     {"input": 0.045, "cached_input": 0.0045, "cache_creation": 0.05625, "output": 0.225},
+                "batch":    {"input": 0.045, "cached_input": 0.0045, "cache_creation": 0.05625, "output": 0.225},
+                "priority": {"input": 0.18, "cached_input": 0.018, "cache_creation": 0.225, "output": 0.90},
+            },
+            "long": {
+                "standard": {"input": 0.18, "cached_input": 0.018, "cache_creation": 0.225, "output": 0.675},
+                "flex":     {"input": 0.09, "cached_input": 0.009, "cache_creation": 0.1125, "output": 0.3375},
+                "batch":    {"input": 0.09, "cached_input": 0.009, "cache_creation": 0.1125, "output": 0.3375},
+                "priority": {"input": 0.36, "cached_input": 0.036, "cache_creation": 0.45, "output": 1.35},
+            },
+        },
+    },
     "temperature": 1.0,
     "judge_temperature": 0.0,
     "max_tokens": 40000,
@@ -97,6 +115,38 @@ def save_config(config: dict) -> dict:
             merged[key] = config[key]
     CONFIG_PATH.write_text(json.dumps(merged, indent=2), encoding="utf-8")
     return merged
+
+
+def compute_cost(prompt_tokens: int, completion_tokens: int, cached_tokens: int,
+                 config: dict) -> dict:
+    """Cost of one call under the configured tier and mode.
+
+    The tier is chosen by prompt length (a long-context call is priced per its whole
+    prompt), and cached prompt tokens are billed at the cached-input rate. Returns the
+    amount plus the breakdown, so the UI can show why a number is what it is.
+    """
+    pricing = config.get("pricing") or DEFAULT_CONFIG["pricing"]
+    tier_name = "long" if prompt_tokens > int(pricing.get("long_context_threshold", 272000)) else "short"
+    mode = pricing.get("mode", "standard")
+    rates = (pricing.get("tiers", {}).get(tier_name, {}) or {}).get(mode) or {}
+    if not rates:  # unknown mode: fall back to standard of the same tier
+        rates = (pricing.get("tiers", {}).get(tier_name, {}) or {}).get("standard", {})
+
+    cached = min(max(0, int(cached_tokens or 0)), max(0, int(prompt_tokens or 0)))
+    fresh = max(0, int(prompt_tokens or 0) - cached)
+    amount = (
+        fresh / 1e6 * float(rates.get("input", 0))
+        + cached / 1e6 * float(rates.get("cached_input", rates.get("input", 0)))
+        + int(completion_tokens or 0) / 1e6 * float(rates.get("output", 0))
+    )
+    return {
+        "amount": round(amount, 6),
+        "currency": pricing.get("currency", "USD"),
+        "tier": tier_name,
+        "mode": mode,
+        "cached_tokens": cached,
+        "rates": rates,
+    }
 
 
 def public_config(config: dict) -> dict:
@@ -321,6 +371,7 @@ def generate_document(repo_name: str, custom_path: str, mode: str, limit: int, s
     usage = {
         "prompt_tokens": sum(r["prompt_tokens"] for r in mine),
         "completion_tokens": sum(r["completion_tokens"] for r in mine),
+        "cached_tokens": sum(r.get("cached_tokens", 0) for r in mine),
     }
 
     out_dir = ROOT / "outputs" / "console" / (repo_name or "custom")
@@ -331,16 +382,20 @@ def generate_document(repo_name: str, custom_path: str, mode: str, limit: int, s
 
     prompt_tokens = int(usage.get("prompt_tokens") or 0)
     completion_tokens = int(usage.get("completion_tokens") or 0)
-    price_in = float(config.get("price_in_per_m") or 2.0)
-    price_out = float(config.get("price_out_per_m") or 8.0)
-    cost = prompt_tokens / 1e6 * price_in + completion_tokens / 1e6 * price_out
+    cost_info = compute_cost(prompt_tokens, completion_tokens,
+                             usage.get("cached_tokens", 0), config)
     return {
         "qname": qname,
         "document": document or "",
         "chars": len(document or ""),
         "seconds": round(seconds, 2),
-        "tokens": {"prompt": prompt_tokens, "completion": completion_tokens},
-        "cost_cny": round(cost, 5),
+        "tokens": {"prompt": prompt_tokens, "completion": completion_tokens,
+                   "cached": usage.get("cached_tokens", 0)},
+        "cost": cost_info["amount"],
+        "currency": cost_info["currency"],
+        "cost_detail": cost_info,
+        #: kept for the earlier callers that read cost_cny
+        "cost_cny": cost_info["amount"],
         "model": core.model,
         "saved_to": str(out_dir),
     }
@@ -507,7 +562,9 @@ def start_batch(spec: dict, config: dict, workers: int = 5) -> str:
             "started": time.time(),
             "kind": "batch",
             "progress": {"done": 0, "total": len(targets), "failed": 0,
-                         "prompt_tokens": 0, "completion_tokens": 0, "cost_cny": 0.0,
+                         "prompt_tokens": 0, "completion_tokens": 0,
+                         "cached_tokens": 0, "cost": 0.0, "cost_cny": 0.0,
+                         "currency": (config.get("pricing") or {}).get("currency", "USD"),
                          "current": ""},
             "cancel": False,
         }
@@ -528,7 +585,9 @@ def start_batch(spec: dict, config: dict, workers: int = 5) -> str:
                 progress["done"] += 1
                 progress["prompt_tokens"] += result["tokens"]["prompt"]
                 progress["completion_tokens"] += result["tokens"]["completion"]
-                progress["cost_cny"] = round(progress["cost_cny"] + result["cost_cny"], 5)
+                progress["cached_tokens"] += result["tokens"].get("cached", 0)
+                progress["cost"] = round(progress["cost"] + result["cost"], 6)
+                progress["cost_cny"] = progress["cost"]
         except Exception as exc:  # noqa: BLE001 - one failure must not stop the batch
             with _LOCK:
                 progress = _JOBS[job_id]["progress"]

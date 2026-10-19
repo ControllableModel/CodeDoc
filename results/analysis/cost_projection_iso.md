@@ -121,3 +121,44 @@ python scripts/analyze_scores.py --scores outputs/bench_flask/docs/scores_iso_26
 ≈ ¥5.1 and 6 minutes, and it yields the ISO-vs-practice comparison on identical
 documents — the direct answer to the review's complaint that the rubric dimensions are
 not specific to code.
+
+
+## H. Re-priced for the production endpoint (gpt-6-luna, USD)
+
+The figures above are DeepSeek list prices in CNY. The console and the pipeline now run
+against `gpt-6-luna` at `https://apic1.ohmycdn.com/v1`, priced in USD with two context
+tiers and four service modes:
+
+| | short context (<=272K) | long context (>272K) |
+|---|---|---|
+| input | $0.09 / M | $0.18 / M |
+| cached input | $0.009 / M | $0.018 / M |
+| cache creation | $0.1125 / M | $0.225 / M |
+| output | $0.45 / M | $0.675 / M |
+| flex / batch | half of standard | half of standard |
+| priority | double of standard | double of standard |
+
+Measured on the real endpoint (same prompts, richer relation sources):
+
+| unit | tokens | cost (standard, short) |
+|---|---|---|
+| one generation | ~1,700 in / ~1,850 out | **$0.00099** |
+| one ISO judging pass (14 dims) | ~2,500 in / ~900 out | ~$0.00063 |
+| full pipeline per document | — | **~$0.0016** |
+
+| scope | documents | cost |
+|---|---|---|
+| 900 (RQ2.1 main table) | 900 | ~$1.5 |
+| whole validation suite | 1,800 | ~$2.9 |
+| full corpus, both axes | 79,745 | ~$129 |
+
+So the API budget is no longer a consideration at all: the entire planned experiment
+matrix is a few dollars, and even dumping the whole corpus is cheaper than the review
+round-trip. The binding constraints stay human annotation and the multi-language
+extractors.
+
+Notes:
+* cached input is billed at one tenth of fresh input, so repeated runs over the same
+  prompts get cheaper; the console records cached tokens when the provider reports them.
+* the tier is chosen by prompt length, so the long-context rates only bite on prompts
+  above 272K tokens — far above our largest (18.9K characters).

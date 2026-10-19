@@ -17,6 +17,12 @@ const state = {
 
 const $ = (id) => document.getElementById(id);
 
+function money(amount, currency) {
+  const symbol = (currency || "USD") === "USD" ? "$" : "¥";
+  const value = Number(amount || 0);
+  return `${symbol}${value < 0.01 ? value.toFixed(4) : value.toFixed(3)}`;
+}
+
 function el(tag, cls, text) {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
@@ -80,6 +86,14 @@ function fillConfigForm(config) {
   $("cfgSourceBudget").value = config.source_budget ?? 8000;
   $("cfgRelevant").checked = !!config.relevant;
 
+  const pricing = config.pricing || {};
+  const modeSelect = $("cfgPriceMode");
+  if (modeSelect) {
+    modeSelect.value = pricing.mode || "standard";
+    renderPriceTable(pricing, modeSelect.value);
+    modeSelect.onchange = () => renderPriceTable(pricing, modeSelect.value);
+  }
+
   const templateSelect = $("cfgTemplate");
   templateSelect.innerHTML = "";
   for (const template of state.templates) {
@@ -132,6 +146,24 @@ async function renderCriteriaDetail() {
   }
 }
 
+function renderPriceTable(pricing, mode) {
+  const host = $("priceTable");
+  if (!host) return;
+  const tiers = pricing.tiers || {};
+  const rows = [
+    ["短上下文 输入", (tiers.short?.[mode]?.input ?? "—")],
+    ["短上下文 输出", (tiers.short?.[mode]?.output ?? "—")],
+    ["短上下文 缓存输入", (tiers.short?.[mode]?.cached_input ?? "—")],
+    ["长上下文 输入", (tiers.long?.[mode]?.input ?? "—")],
+    ["长上下文 输出", (tiers.long?.[mode]?.output ?? "—")],
+    ["长上下文 缓存输入", (tiers.long?.[mode]?.cached_input ?? "—")],
+  ];
+  const unit = pricing.currency === "USD" ? "USD" : (pricing.currency || "");
+  host.innerHTML = rows
+    .map(([label, value]) => `<div class="crit"><b>${label}</b> — ${value} per 1M tokens (${unit})</div>`)
+    .join("") + `<div class="crit">长上下文阈值：${(pricing.long_context_threshold || 272000).toLocaleString()} tokens</div>`;
+}
+
 async function saveConfig() {
   const payload = {
     base_url: $("cfgBase").value.trim(),
@@ -143,6 +175,9 @@ async function saveConfig() {
     relevant: $("cfgRelevant").checked,
     criteria: [...document.querySelectorAll("#criteriaList input:checked")].map((b) => b.value),
   };
+  if ($("cfgPriceMode")) {
+    payload.pricing = { ...(state.config.pricing || {}), mode: $("cfgPriceMode").value };
+  }
   const key = $("cfgKey").value.trim();
   if (key) payload.api_key = key;
 
@@ -410,8 +445,12 @@ async function generate() {
     state.usage.tokens += result.tokens.prompt + result.tokens.completion;
     state.usage.cost += result.cost_cny;
     state.usage.calls += 1;
-    $("usage").textContent = `本次会话：${state.usage.calls} 次调用 · ${state.usage.tokens.toLocaleString()} tokens · ¥${state.usage.cost.toFixed(3)}`;
-    setStatus(`生成完成：${result.chars} 字符 · ${result.seconds}s · in ${result.tokens.prompt} / out ${result.tokens.completion} tokens · ¥${result.cost_cny}`, "ok");
+    $("usage").textContent = `本次会话：${state.usage.calls} 次调用 · ${state.usage.tokens.toLocaleString()} tokens · ${money(state.usage.cost, result.currency)}`;
+    const detail = result.cost_detail || {};
+    setStatus(`生成完成：${result.chars} 字符 · ${result.seconds}s · in ${result.tokens.prompt}`
+      + (result.tokens.cached ? `(缓存 ${result.tokens.cached})` : "")
+      + ` / out ${result.tokens.completion} tokens · ${money(result.cost, result.currency)}`
+      + (detail.mode ? ` · ${detail.tier}/${detail.mode}` : ""), "ok");
   } catch (error) {
     setStatus(`生成失败：${error.message}`, "err");
   } finally {
@@ -427,7 +466,12 @@ async function generateAll() {
   }
   const { repo, customPath, mode, limit, seed } = analysisParams();
   const total = state.analysis.counts.entities;
-  if (!confirm(`将为 ${total} 个实体生成文档（真实调用模型，按当前单价约 ¥${(total * 0.029).toFixed(2)}），继续？`)) return;
+  const pricing = (state.config.pricing || {});
+  const priceMode = pricing.mode || "standard";
+  const tier = (pricing.tiers || {}).short || {};
+  const rate = tier[priceMode] || tier.standard || {};
+  const guess = total * ((1400 / 1e6) * (rate.input || 0) + (2100 / 1e6) * (rate.output || 0));
+  if (!confirm(`将为 ${total} 个实体生成文档（真实调用模型，按 ${pricing.currency || "USD"} ${priceMode} 费率估算约 ${money(guess, pricing.currency)}），继续？`)) return;
 
   $("batchBtn").disabled = true;
   setStatus(`批量生成中：0/${total}`, "warn");
@@ -451,13 +495,15 @@ async function generateAll() {
       const progress = status.progress || {};
       last = status;
       const done = progress.done || 0;
-      setStatus(`批量生成：${done}/${progress.total || total} · ¥${(progress.cost_cny || 0).toFixed(3)}`
+      setStatus(`批量生成：${done}/${progress.total || total} · ${money(progress.cost, progress.currency)}`
         + (progress.failed ? ` · 失败 ${progress.failed}` : ""), "warn");
-      $("usage").textContent = `本次会话：in ${(progress.prompt_tokens || 0).toLocaleString()} / out ${(progress.completion_tokens || 0).toLocaleString()} tokens · ¥${(progress.cost_cny || 0).toFixed(3)}`;
+      $("usage").textContent = `本次会话：in ${(progress.prompt_tokens || 0).toLocaleString()}`
+        + ` / out ${(progress.completion_tokens || 0).toLocaleString()} tokens · `
+        + money(progress.cost, progress.currency);
       if (status.status === "done" || status.status === "cancelled") break;
     }
     const progress = last.progress || {};
-    setStatus(`批量完成：${progress.done}/${progress.total} 实体 · ¥${(progress.cost_cny || 0).toFixed(3)}`
+    setStatus(`批量完成：${progress.done}/${progress.total} 实体 · ${money(progress.cost, progress.currency)}`
       + (progress.failed ? ` · 失败 ${progress.failed}` : ""), "ok");
     if (state.selectedEntity) {
       const doc = await api(`/api/document?repo=${encodeURIComponent(repo)}&qname=${encodeURIComponent(state.selectedEntity)}`);

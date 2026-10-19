@@ -156,6 +156,20 @@
       <input id="cfgRelevant" type="checkbox" />
     </label>
 
+    <label class="row"><span>计费模式</span>
+      <select id="cfgPriceMode">
+        <option value="standard">standard</option>
+        <option value="flex">flex</option>
+        <option value="batch">batch</option>
+        <option value="priority">priority</option>
+      </select>
+      <small>影响界面金额，不影响实际扣费</small>
+    </label>
+    <div class="criteria-box row">
+      <span>当前费率</span>
+      <div id="priceTable" class="criteria-detail" style="margin-top:0"></div>
+    </div>
+
     <div class="row criteria-box">
       <span>准则集</span>
       <div id="criteriaList" class="checks"></div>
