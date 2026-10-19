@@ -21,6 +21,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -36,6 +39,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -51,6 +57,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -66,6 +75,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Content Quality",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -81,6 +93,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -96,6 +111,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Information Structure",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -111,6 +129,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -126,6 +147,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Information Structure",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -141,6 +165,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Information Structure",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -156,6 +183,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Format & Presentation",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -171,6 +201,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Content Quality",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -186,6 +219,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -201,6 +237,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Format & Presentation",
+      "paper_name": "Interactive Element Representation",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -216,6 +255,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -231,6 +273,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -246,6 +291,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -261,6 +309,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "i18n & Localization",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -276,6 +327,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "i18n & Localization",
+      "paper_name": "Translation Friendly",
       "note": ""
     },
     {
@@ -291,6 +345,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "i18n & Localization",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -306,6 +363,9 @@
       },
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -321,6 +381,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -336,6 +399,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Usability & UX",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -351,6 +417,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Safety & Compliance",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -366,6 +435,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Safety & Compliance",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -381,6 +453,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -396,6 +471,9 @@
       },
       "applicable_to_entity": false,
       "applies_to_kinds": null,
+      "in_paper_table": true,
+      "paper_category": "Maintenance & Updates",
+      "paper_name": "",
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     }
   ]

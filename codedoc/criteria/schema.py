@@ -53,6 +53,23 @@ class Criterion:
     #: comparisons meaningless. Non-applicable pairs are now excluded from both
     #: the question asked and the aggregation.
     applies_to_kinds: Optional[List[str]] = None
+    #: Whether the dimension appears in the rubric table printed in the paper
+    #: (Table 2: ISO 14 dimensions in 7 categories; Table 3: GitHub 12 dimensions in
+    #: 5 categories). The criterion set itself is the *full* set the judge was asked
+    #: about — the archived per-dimension scores contain all 26 ISO and all 18 GitHub
+    #: dimensions, so the printed tables are a subset, not the measurement rubric.
+    #: Both facts are recorded rather than reconciled silently; see
+    #: results/analysis/criteria_paper_vs_artifact.md.
+    in_paper_table: bool = True
+    #: Category as printed in the paper's table. The printed tables regroup the
+    #: dimensions (e.g. GitHub's "Further Reading" row does not exist in the full
+    #: set), so reproducing the table needs the printed category, not ours.
+    paper_category: str = ""
+    #: Dimension label as printed in the paper when it differs from the judge's
+    #: variable name. The variable names are frozen because the archived per-dimension
+    #: scores are keyed by them; the paper's wording is recorded here instead of
+    #: renaming and breaking comparability with the published data.
+    paper_name: str = ""
     note: str = ""
 
     def __post_init__(self) -> None:
@@ -146,6 +163,22 @@ class CriterionSet:
     def entity_level(self) -> List[Criterion]:
         """Criteria that govern a single code entity (usable as a docstring rubric)."""
         return [c for c in self.criteria if c.applicable_to_entity]
+
+    def table_label(self, criterion: "Criterion") -> tuple:
+        """(category, dimension) as printed in the paper."""
+        return (criterion.paper_category or criterion.category,
+                criterion.paper_name or criterion.name)
+
+    def in_paper_table(self) -> List[Criterion]:
+        """Criteria printed in the paper's rubric table (a subset of this set)."""
+        return [c for c in self.criteria if c.in_paper_table]
+
+    def table_gap(self) -> Dict[str, List[str]]:
+        """Dimensions measured but not printed in the paper's table, and vice versa."""
+        return {
+            "measured_not_in_table": [c.name for c in self.criteria if not c.in_paper_table],
+            "in_table_not_measured": [],  # filled by the audit against archived scores
+        }
 
     def for_kind(self, kind: str) -> List[Criterion]:
         """Entity-level criteria that can be judged for this entity kind."""

@@ -26,6 +26,21 @@ from codedoc.criteria.schema import Criterion, CriterionSet, DOCUMENT_SET, ENTIT
 # ---------------------------------------------------------------------------
 KNOWN_ANCHORS = {1: "Not Mention", 5: "Excellent"}
 
+#: ISO rubric printed in the paper (Table 2): 7 categories, 14 dimensions.
+#: NOTE: the archived per-dimension scores contain all 26 ISO dimensions, so this
+#: table is a *subset* of what the judge was actually asked about.
+PAPER_ISO = [
+    ("Content Quality", ["Conciseness", "Legibility"]),
+    ("Information Structure", ["Modularity", "Navigability", "Metadata"]),
+    ("Format & Presentation", ["Consistent Format", "Representation of Interactive Elements"]),
+    ("i18n & Localization", ["Cultural Neutrality", "Translation-Friendly", "Space Consideration"]),
+    ("Usability & UX", ["Search and Indexing"]),
+    ("Safety & Compliance", ["Safety Information", "Legal and Copyright"]),
+    ("Maintenance & Updates", ["Change Log"]),
+]
+
+#: The full ISO criterion set as measured (26 dimensions, 8 categories). This is the
+#: set the judge was asked about, so judge variable names must stay as they are.
 ISO_CATEGORIES = [
     ("Content Quality", ["Correctness", "Consistency", "Comprehensibility", "Conciseness", "Completeness"]),
     ("Information Structure", ["Modularity", "Structured by Function", "Navigability", "Metadata"]),
@@ -60,7 +75,7 @@ ISO_DEFINITIONS = {
     "Consistent Format": "Formatting follows a uniform convention across artifacts.",
     "Legibility": "The text is typographically readable (spacing, structure, length).",
     "Illustrations and Media": "Illustrative material is provided where it aids understanding.",
-    "Representation of Interactive Elements": "Interactive elements of the software are represented in the documentation.",
+    "Representation of Interactive Elements": "Interactive elements of the software (shortcuts, gestures) are represented in the documentation.",
     "Multi-modal Support": "Content is available in more than one modality.",
     "Device Independence": "Content is not bound to a specific device or display.",
     "Accessibility Features": "Content meets accessibility requirements.",
@@ -76,6 +91,19 @@ ISO_DEFINITIONS = {
     "Change Log": "Changes to the documentation are recorded.",
 }
 
+#: GitHub rubric printed in the paper (Table 3): 5 categories, 12 dimensions.
+#: As with ISO, the archived scores cover all 18 dimensions, so this is a subset.
+PAPER_GITHUB = [
+    ("Content Model", ["Title Standards", "Category Title Naming"]),
+    ("Article Content", ["Permission Declaration Standards", "Process Content Standards",
+                         "Next Steps Standards", "Prerequisites Standards"]),
+    ("Reference Content", ["Reference Content", "Conceptual Content Guidelines",
+                           "Error Reference Content Guidelines"]),
+    ("Tutorial Content", ["Tutorial Content Guidelines", "Getting Started Content Guidelines"]),
+    ("Further Reading", ["Further Reading Standards"]),
+]
+
+#: The full GitHub criterion set as measured (18 dimensions, 5 categories).
 GITHUB_CATEGORIES = [
     ("Content Quality", ["Content Type Consistency", "Reuse Instead of Copying"]),
     ("Structure & Organization", ["Balanced Hierarchy", "Content Order", "Category Title Naming"]),
@@ -116,6 +144,47 @@ PRACTICE_DEFINITIONS = {
 #: A free function has no inheritance contract, so scoring it on one measures the
 #: rubric, not the document: in the first full-corpus run functions scored 1.78 on
 #: "Inheritance/Polymorphism Contract" purely because the property cannot exist.
+#: GitHub dimension definitions. The recovered file only covers the ISO dimensions,
+#: so the GitHub rubric shipped with empty definitions — the judge prompt read
+#: "- Title Standards:" with nothing after the colon. Wording follows the paper's
+#: Table 3 descriptions.
+GITHUB_DEFINITIONS = {
+    "Title Standards": "Titles are clear, descriptive and concise, typically within 60-80 characters.",
+    "Category Title Naming": "Category titles use task-based gerunds and stay general and scalable.",
+    "Permission Declaration Standards": "Permissions are stated upfront in the form 'People with [role] can [action].'",
+    "Process Content Standards": "Procedures are presented as clear step-by-step instructions.",
+    "Next Steps Standards": "Follow-up links guide the reader to the next relevant topic.",
+    "Prerequisites Standards": "Warnings and requirements are listed before sensitive tasks.",
+    "Reference Content": "Reference information is presented as standalone articles or embedded sections.",
+    "Conceptual Content Guidelines": "Conceptual topics begin with 'About [topic]' and explain purpose and use cases.",
+    "Error Reference Content Guidelines": "Errors are documented so users can recognise and understand them, separately from troubleshooting.",
+    "Tutorial Content Guidelines": "Tutorials define audience and goals and use a clear developer-oriented tone with examples.",
+    "Getting Started Content Guidelines": "Quick starts are concise, step-based and ideally under 600 words.",
+    "Further Reading Standards": "A bulleted list of external or advanced resources is provided.",
+    "Content Type Consistency": "Each article stays within a single content type rather than mixing types.",
+    "Reuse Instead of Copying": "Existing content is reused by reference rather than duplicated.",
+    "Balanced Hierarchy": "Headings form a balanced hierarchy without skipped or overloaded levels.",
+    "Content Order": "Sections appear in the order a reader needs them.",
+    "Introduction Standards": "Introductions state what the article covers and who it is for.",
+    "Product Label Standards": "Product and feature names follow the documented label conventions.",
+}
+
+#: Printed category per dimension, taken from the paper's tables.
+PAPER_CATEGORY = {name: cat for cat, names in (PAPER_ISO + PAPER_GITHUB) for name in names}
+
+#: Printed label per dimension where the paper's wording differs from the judge's
+#: variable name (which is frozen because archived scores are keyed by it).
+PAPER_NAMES = {
+    "Representation of Interactive Elements": "Interactive Element Representation",
+    "Translation-Friendly": "Translation Friendly",
+}
+
+#: Dimensions printed in the paper's rubric tables.
+PAPER_TABLE_NAMES = (
+    {name for _category, names in PAPER_ISO for name in names}
+    | {name for _category, names in PAPER_GITHUB for name in names}
+)
+
 APPLIES_TO_KINDS = {
     "Inheritance/Polymorphism Contract": ["class", "method"],
 }
@@ -157,6 +226,9 @@ def _build(set_id, title, version, standards, description, axis_role, categories
                     definition=definition,
                     level=DOCUMENT_SET if name in docset else ENTITY,
                     applies_to_kinds=APPLIES_TO_KINDS.get(name),
+                    in_paper_table=(name in PAPER_TABLE_NAMES),
+                    paper_category=PAPER_CATEGORY.get(name, ""),
+                    paper_name=PAPER_NAMES.get(name, ""),
                     source="",
                     anchors=dict(anchors or {}),
                     note=note if name in docset else "",
@@ -197,7 +269,7 @@ def main() -> int:
         "so it is never used as the primary rubric.",
         "secondary",
         GITHUB_CATEGORIES,
-        {},
+        GITHUB_DEFINITIONS,
         docset={n for _, ns in GITHUB_CATEGORIES for n in ns},
         note="Document-set level specification; not a normative standard for docstrings.",
     )
