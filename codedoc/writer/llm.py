@@ -20,6 +20,11 @@ class LinguisticCore:
         #: it, so it is sent through ``extra_body``.
         self.max_output_tokens = 0
         self.use_max_completion_tokens = False
+        #: Transient upstream failures (429, 5xx, connection resets) are common when
+        #: many generations run at once against a proxy. Retrying with backoff keeps a
+        #: batch from losing documents to a momentary hiccup.
+        self.max_retries = 3
+        self.retry_backoff = 1.0
         self.history = []
         self.round = 10
         #: Optional per-call tag so concurrent callers can attribute usage to
@@ -47,15 +52,25 @@ class LinguisticCore:
                 kwargs["extra_body"] = {"max_completion_tokens": int(self.max_output_tokens)}
             else:
                 kwargs["max_tokens"] = int(self.max_output_tokens)
-        started = time.time()
-        try:
-            r = self.client.chat.completions.create(**kwargs)
-        except Exception as exc:
-            RECORDER.record(phase="generation", model=self.model,
-                            seconds=time.time() - started, ok=False,
-                            error=f"{type(exc).__name__}: {exc}",
-                            label=getattr(self, "label", ""))
-            raise
+        attempts = max(1, int(self.max_retries))
+        last_error: Exception | None = None
+        r = None
+        for attempt in range(attempts):
+            started = time.time()
+            try:
+                r = self.client.chat.completions.create(**kwargs)
+                break
+            except Exception as exc:  # noqa: BLE001 - retried below
+                last_error = exc
+                RECORDER.record(phase="generation", model=self.model,
+                                seconds=time.time() - started, ok=False,
+                                error=f"{type(exc).__name__}: {exc}",
+                                label=getattr(self, "label", ""))
+                if attempt + 1 >= attempts:
+                    raise
+                time.sleep(self.retry_backoff * (2 ** attempt))
+        if r is None:
+            raise last_error if last_error else RuntimeError("no response")
         if not stream:
             RECORDER.record_response("generation", self.model, r, time.time() - started,
                                      label=getattr(self, "label", ""))

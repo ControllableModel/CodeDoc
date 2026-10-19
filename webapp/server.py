@@ -80,6 +80,9 @@ DEFAULT_CONFIG = {
     "criteria": ["practice_docstring"],
     "language": "English",
     "relevant": True,
+    #: Concurrent generations. The endpoint latency dominates (about 25 s per entity on
+    #: gpt-6-luna), so throughput scales with this until the proxy starts throttling.
+    "workers": 6,
 }
 
 #: Analysis results and their dependency indices, keyed by request signature.
@@ -355,6 +358,7 @@ def generate_document(repo_name: str, custom_path: str, mode: str, limit: int, s
     core.model = config.get("model") or DEFAULT_CONFIG["model"]
     core.temperature = float(config.get("temperature", 1.0))
     core.max_output_tokens = int(config.get("max_completion_tokens") or 8000)
+    core.max_retries = int(config.get("max_retries") or 3)
     core.use_max_completion_tokens = bool(config.get("use_max_completion_tokens", True))
     # The writers record into the process-wide RECORDER. Tagging this call and
     # filtering by the tag is required under concurrency: a positional snapshot also
@@ -546,7 +550,7 @@ def graph_data(repo_name: str, custom_path: str, mode: str, limit: int, seed: in
     }
 
 
-def start_batch(spec: dict, config: dict, workers: int = 5) -> str:
+def start_batch(spec: dict, config: dict, workers: int = 0) -> str:
     """Generate documentation for every entity in the current selection.
 
     Entities are independent, so the batch runs concurrently: sequentially, a
@@ -556,6 +560,7 @@ def start_batch(spec: dict, config: dict, workers: int = 5) -> str:
     job_id = str(uuid.uuid4())
     entry = analyse(**{k: spec[k] for k in ("repo_name", "custom_path", "mode", "limit", "seed")})
     targets = [e["qname"] for e in entry["result"]["entities"]]
+    workers = int(workers or config.get("workers") or 6)
     with _LOCK:
         _JOBS[job_id] = {
             "status": "running",
@@ -564,6 +569,7 @@ def start_batch(spec: dict, config: dict, workers: int = 5) -> str:
             "progress": {"done": 0, "total": len(targets), "failed": 0,
                          "prompt_tokens": 0, "completion_tokens": 0,
                          "cached_tokens": 0, "cost": 0.0, "cost_cny": 0.0,
+                         "workers": workers,
                          "currency": (config.get("pricing") or {}).get("currency", "USD"),
                          "current": ""},
             "cancel": False,
@@ -652,6 +658,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
+        # No caching: the console is edited during use, and a stale bundle looks
+        # exactly like a bug in the page.
+        self.send_header("Cache-Control", "no-store, must-revalidate")
         self.end_headers()
         self.wfile.write(body)
 
@@ -783,7 +792,7 @@ class Handler(BaseHTTPRequestHandler):
                     "mode": body.get("mode", "full"),
                     "limit": int(body.get("limit") or 0),
                     "seed": int(body.get("seed") or 42),
-                }, config, workers=int(body.get("workers") or 5))
+                }, config, workers=int(body.get("workers") or 0))
                 self._json({"job": job_id})
             elif route == "/api/job_cancel":
                 with _LOCK:

@@ -200,7 +200,8 @@ function analysisParams() {
   const mode = $("mode").value;
   const limit = mode === "sample" ? parseInt($("limit").value, 10) || 60 : 0;
   const seed = parseInt($("seed").value, 10) || 42;
-  return { repo, customPath, mode, limit, seed };
+  const workers = parseInt($("workers")?.value, 10) || 6;
+  return { repo, customPath, mode, limit, seed, workers };
 }
 
 async function runAnalysis() {
@@ -369,9 +370,25 @@ function renderOutput() {
     }
     for (const [label, targets] of blocks) {
       const block = el("div", "rel-block");
-      block.appendChild(el("h3", "", `${label} · ${targets.length}`));
+      const withCode = targets.filter((item) => item && item.code).length;
+      block.appendChild(el("h3", "", `${label} · ${targets.length}`
+        + (withCode ? ` · ${withCode} 带源码` : "")));
       const list = el("ul");
-      for (const target of targets) list.appendChild(el("li", "", target));
+      for (const entry of targets) {
+        // Entries became {name, code, has_code} when relation targets started
+        // carrying source; rendering them as strings printed [object Object].
+        const item = el("li");
+        const name = typeof entry === "string" ? entry : (entry && entry.name) || "";
+        item.appendChild(el("span", "rel-name", name));
+        const code = typeof entry === "object" && entry ? entry.code : "";
+        if (code) {
+          const pre = document.createElement("pre");
+          pre.className = "rel-code";
+          pre.textContent = code;
+          item.appendChild(pre);
+        }
+        list.appendChild(item);
+      }
       block.appendChild(list);
       grid.appendChild(block);
     }
@@ -474,6 +491,7 @@ async function generateAll() {
   if (!confirm(`将为 ${total} 个实体生成文档（真实调用模型，按 ${pricing.currency || "USD"} ${priceMode} 费率估算约 ${money(guess, pricing.currency)}），继续？`)) return;
 
   $("batchBtn").disabled = true;
+  const batchStarted = Date.now();
   setStatus(`批量生成中：0/${total}`, "warn");
   try {
     const { job } = await api("/api/generate_all", {
@@ -481,6 +499,7 @@ async function generateAll() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         repo, path: customPath, mode, limit, seed,
+        workers: parseInt($("workers").value, 10) || 6,
         temperature: parseFloat($("cfgTemp").value) || 1,
         max_tokens: parseInt($("cfgMaxTokens").value, 10) || 16000,
         source_budget: parseInt($("cfgSourceBudget").value, 10) || 8000,
@@ -495,7 +514,10 @@ async function generateAll() {
       const progress = status.progress || {};
       last = status;
       const done = progress.done || 0;
+      const elapsed = (Date.now() - batchStarted) / 1000;
+      const rate = done > 0 ? (done / elapsed * 60).toFixed(1) : "…";
       setStatus(`批量生成：${done}/${progress.total || total} · ${money(progress.cost, progress.currency)}`
+        + ` · ${progress.workers || "?"} 并发 · ${rate} 实体/分钟`
         + (progress.failed ? ` · 失败 ${progress.failed}` : ""), "warn");
       $("usage").textContent = `本次会话：in ${(progress.prompt_tokens || 0).toLocaleString()}`
         + ` / out ${(progress.completion_tokens || 0).toLocaleString()} tokens · `

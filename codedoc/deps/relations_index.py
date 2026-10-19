@@ -207,7 +207,9 @@ def get_dep(
             snippet_lines = rel.snippet.splitlines()
             if len(snippet_lines) > relation_snippet_lines:
                 snippet_lines = snippet_lines[:relation_snippet_lines]
-            return {"name": index.label(rel.target), "code": "\n".join(snippet_lines)}
+            snippet_name = (rel.target if rel.kind == RelationKind.ATTRIBUTE_ACCESS
+                            else index.label(rel.target))
+            return {"name": snippet_name, "code": "\n".join(snippet_lines)}
         if (target_ctx is not None and index_in_block < relation_max_snippets
                 and rel.kind != RelationKind.ATTRIBUTE_ACCESS):
             body = target_ctx.source or ""
@@ -220,7 +222,10 @@ def get_dep(
                     f"# ... {len(lines) - relation_snippet_lines} more lines ..."
                 ]
             code = "\n".join(lines)
-        return {"name": index.label(rel.target), "code": code}
+        # An attribute name is not an entity: resolving it through the short-name
+        # index produced things like "_find_error_handler" -> "App._find_error_handler".
+        name = rel.target if rel.kind == RelationKind.ATTRIBUTE_ACCESS else index.label(rel.target)
+        return {"name": name, "code": code}
 
     relations = {
         BLOCK_LABELS[kind]: [relation_entry(rel, i) for i, rel in enumerate(ctx.get(kind))]
