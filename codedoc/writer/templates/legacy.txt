@@ -31,6 +31,8 @@ DOI: https://doi.org/10.48550/arXiv.2405.16555
 
 {used_by}
 
+{relations}
+
 Please follow the structure:
 # `name(args)`
 

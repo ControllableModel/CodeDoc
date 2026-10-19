@@ -58,7 +58,12 @@ def call_llm(args, msg):
         llm.call_robot = False
         llm.create_socket()
         if len(msg) > args.max_tokens:
-            msg = msg[:args.max_tokens]
+            # Guard, not a feature: the prompt should already be section-budgeted
+            # (see writer.prompt.clip_source). Warn loudly because truncating here
+            # silently drops whatever lands past the cut, including the criteria
+            # block or the dependency blocks.
+            print(f"  [WARN] prompt {len(msg)} chars exceeds --max_tokens "
+                  f"{args.max_tokens}; truncating — required structure may be lost")
         with open(str(TEMPLATES / "system.txt"), "r", encoding="utf-8") as f:
             sys_prompt = f.read()
         messages = [{"role": "system", "content": sys_prompt}, {"role": "user", "content": msg}]
@@ -85,12 +90,50 @@ def gen_doc(args, result):
         return ""
 
 
-def gen_class_summary(args, cls_name, methods):
-    if not args.process:
-        return ""
-    names = [m[3] for m in methods]
-    prompt = f"Summarize class {cls_name} with methods: {', '.join(names)}. 1-2 sentences, in {args.language}."
-    return call_llm(args, prompt)
+def _build_tasks(nav, members, source_path):
+    """Tasks for one file: (sort_key, dep, display_name, kind, owner).
+
+    Classes are first-class entities now. They were previously reduced to a
+    1-2 sentence summary generated from the list of method names, which discarded
+    exactly the information the dependency layer was extended to provide
+    (inheritance, subclasses, instantiation sites, override obligations).
+    """
+    tasks = []
+    for cls_name, cls_info in members.get('classes', {}).items():
+        cls_dep = get_dep(nav, cls_name, cls_info.get('key', ''), source_path)
+        if cls_dep and cls_dep.get('source_code'):
+            tasks.append(((-1, cls_name, -1), cls_dep, cls_name, 'class', cls_name))
+        for i, method in enumerate(cls_info.get('methods', [])):
+            dep = get_dep(nav, method['name'], method['key'], source_path)
+            if dep and dep.get('source_code'):
+                tasks.append(((0, cls_name, i), dep, method['name'], 'method', cls_name))
+    for i, fn in enumerate(members.get('functions', [])):
+        dep = get_dep(nav, fn['name'], fn['key'], source_path)
+        if dep and dep.get('source_code'):
+            tasks.append(((1, '', i), dep, fn['name'], 'function', None))
+    return tasks
+
+
+def _run_tasks(args, tasks):
+    """Generate documentation for every task, concurrently."""
+    docs = {}
+    lock = Lock()
+
+    def worker(task):
+        key, dep, name, kind, owner = task
+        info = format_dep(dep, args.relevant)
+        md = gen_doc(args, dep)
+        return key, info, md, name, kind, owner
+
+    with ThreadPoolExecutor(max_workers=10) as ex:
+        for fut in as_completed([ex.submit(worker, t) for t in tasks]):
+            try:
+                key, info, md, name, kind, owner = fut.result()
+                with lock:
+                    docs[key] = (info, md, name, kind, owner)
+            except Exception as exc:
+                print(f"  [ERROR] {exc}")
+    return docs
 
 
 def process_file(args, fname, finfo, nav, out_dir, target):
@@ -100,68 +143,31 @@ def process_file(args, fname, finfo, nav, out_dir, target):
     info_path.parent.mkdir(parents=True, exist_ok=True)
 
     members = finfo['members']
-    print(f"\n{fname}.py (classes: {len(members.get('classes', {}))}, funcs: {len(members.get('functions', []))})")
+    print(f"\n{fname}.py (classes: {len(members.get('classes', {}))}, "
+          f"funcs: {len(members.get('functions', []))})")
 
-    tasks = []
-    for cls_name, cls_info in members.get('classes', {}).items():
-        for i, m in enumerate(cls_info['methods']):
-            result = get_dep(nav, m['name'], m['key'], finfo['path'])
-            if result and result.get("source_code"):
-                tasks.append(((0, cls_name, i), result, m['name'], True, cls_name))
-
-    for i, fn in enumerate(members.get('functions', [])):
-        result = get_dep(nav, fn['name'], fn['key'], finfo['path'])
-        if result and result.get("source_code"):
-            tasks.append(((1, "", i), result, fn['name'], False, None))
-
+    tasks = _build_tasks(nav, members, finfo['path'])
     if not tasks:
         return None
 
-    docs = {}
-    lock = Lock()
-
-    def worker(task):
-        key, result, name, is_method, cls = task
-        info = format_dep(result, args.relevant)
-        md = gen_doc(args, result)
-        print(f"  [OK] {name}")
-        return key, info, md, name, is_method, cls
-
-    with ThreadPoolExecutor(max_workers=10) as ex:
-        for fut in as_completed([ex.submit(worker, t) for t in tasks]):
-            try:
-                key, info, md, name, is_method, cls = fut.result()
-                with lock:
-                    docs[key] = (info, md, name, is_method, cls)
-            except Exception as e:
-                print(f"  [ERROR] {e}")
+    docs = _run_tasks(args, tasks)
 
     info_lines = []
     md_lines = [f"# {fname}.py\n\n**Path:** `{finfo['path']}`\n\n---\n\n"]
     stats = {"cls": 0, "func": 0, "method": 0}
-    seen_cls = set()
-    cur_cls = None
+    emitted_cls = set()
     has_func_header = False
 
-    cls_docs = {}
     for key in sorted(docs.keys()):
-        info, md, name, is_method, cls = docs[key]
-        if is_method:
-            cls_docs.setdefault(cls, []).append((key, info, md, name))
-
-    for key in sorted(docs.keys()):
-        info, md, name, is_method, cls = docs[key]
-        if is_method:
-            if cls != cur_cls:
-                cur_cls = cls
-                md_lines.append(f"## Class: `{cls}`\n\n")
-                if cls in cls_docs:
-                    summary = gen_class_summary(args, cls, cls_docs[cls])
-                    if summary:
-                        md_lines.append(f"> {summary.strip()}\n\n")
-            if cls not in seen_cls:
-                stats["cls"] += 1
-                seen_cls.add(cls)
+        info, md, name, kind, owner = docs[key]
+        if kind == 'class':
+            stats["cls"] += 1
+            emitted_cls.add(name)
+            md_lines.append(f"## Class: `{name}`\n\n")
+        elif kind == 'method':
+            if owner not in emitted_cls:
+                emitted_cls.add(owner)
+                md_lines.append(f"## Class: `{owner}`\n\n")
             stats["method"] += 1
         else:
             if not has_func_header:
@@ -171,70 +177,25 @@ def process_file(args, fname, finfo, nav, out_dir, target):
         info_lines.append(info + "\n" + "=" * 50 + "\n\n")
         if md:
             md_lines.append(md + "\n\n")
-    print(md_lines)
+
     info_path.write_text("".join(info_lines), encoding="utf-8")
     md_path.write_text("".join(md_lines), encoding="utf-8")
     return stats
 
 
 def process_test_file(args, fname, finfo, output_path, nav):
-    """处理单个测试文件，生成文档到指定的md文件"""
+    """Process a single file and write its documentation to the given path."""
     members = finfo['members']
-    source_path = finfo['path']
-    
-    print(f"\n{fname}.py (classes: {len(members.get('classes', {}))}, funcs: {len(members.get('functions', []))})")
-    
-    # 调试：打印 nav 中的节点
-    print(f"  DEBUG: nav nodes = {list(nav.parser.nodes.keys())[:10]}...")
-    
-    tasks = []
-    for cls_name, cls_info in members.get('classes', {}).items():
-        for i, m in enumerate(cls_info['methods']):
-            print(f"  DEBUG: checking method key={m['key']}, name={m['name']}")
-            result = get_dep(nav, m['name'], m['key'], source_path)
-            if result and result.get("source_code"):
-                tasks.append(((0, cls_name, i), result, m['name'], True, cls_name))
-            else:
-                print(f"  DEBUG: no result for {m['key']}")
+    print(f"\n{fname}.py (classes: {len(members.get('classes', {}))}, "
+          f"funcs: {len(members.get('functions', []))})")
 
-    for i, fn in enumerate(members.get('functions', [])):
-        print(f"  DEBUG: checking func key={fn['key']}, name={fn['name']}")
-        result = get_dep(nav, fn['name'], fn['key'], source_path)
-        if result and result.get("source_code"):
-            tasks.append(((1, "", i), result, fn['name'], False, None))
-        else:
-            print(f"  DEBUG: no result for {fn['key']}")
-
+    tasks = _build_tasks(nav, members, finfo['path'])
     if not tasks:
         print(f"  No tasks for {fname}")
         return None
 
-    docs = {}
-    lock = Lock()
-
-    def worker(task):
-        key, result, name, is_method, cls = task
-        info = format_dep(result, args.relevant)
-        md = gen_doc(args, result)
-        print(f"  [OK] {name} (md_len={len(md) if md else 0})")
-        return key, info, md, name, is_method, cls
-
-    with ThreadPoolExecutor(max_workers=10) as ex:
-        for fut in as_completed([ex.submit(worker, t) for t in tasks]):
-            try:
-                key, info, md, name, is_method, cls = fut.result()
-                with lock:
-                    docs[key] = (info, md, name, is_method, cls)
-            except Exception as e:
-                print(f"  [ERROR] {e}")
-
-    md_lines = []
-    for key in sorted(docs.keys()):
-        info, md, name, is_method, cls = docs[key]
-        if md:
-            md_lines.append(md + "\n\n")
-
-    # 写入到tests目录的md文件
+    docs = _run_tasks(args, tasks)
+    md_lines = [md + "\n\n" for md in (docs[k][1] for k in sorted(docs.keys())) if md]
     Path(output_path).write_text("".join(md_lines), encoding="utf-8")
     print(f"  -> {output_path}")
     return len(docs)
@@ -249,7 +210,12 @@ def main():
     p.add_argument('--llm_url', type=str, default=os.getenv('LLM_URL', 'https://api.openai.com/v1'),
                    help='OpenAI-compatible API base URL (env: LLM_URL).')
     p.add_argument('--model', type=str, default=os.getenv('MODEL', 'gpt-5-mini'))
-    p.add_argument('--max_tokens', type=int, default=10000)
+    p.add_argument('--max_tokens', type=int, default=10000,
+                   help='Hard cap on the assembled prompt, in characters (safety guard). '
+                        'Sections should be budgeted before this point.')
+    p.add_argument('--source_budget', type=int, default=8000,
+                   help='Character budget for the source section of the prompt. Longer '
+                        'sources keep their head and tail with an explicit elision marker.')
     p.add_argument('--relevant', type=str2bool, default=True,
                    help='Include dependency context (True/False).')
     p.add_argument('--process', type=str2bool, default=True,

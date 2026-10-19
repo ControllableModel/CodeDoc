@@ -45,9 +45,14 @@ class RelationsIndex:
         self.contexts = contexts
         self._by_key: Dict[str, DependencyContext] = {}
         self._by_name: Dict[str, DependencyContext] = {}
+        #: short name ("method") -> contexts. Relation targets are recorded with
+        #: short names for readability, so lookups must tolerate them.
+        self._by_short: Dict[str, List[DependencyContext]] = {}
         for ctx in contexts:
             self._by_key[ctx.entity.qualified_name] = ctx
             self._by_name.setdefault(ctx.entity.name, ctx)
+            short = ctx.entity.name.split(".")[-1]
+            self._by_short.setdefault(short, []).append(ctx)
         #: stem -> {"path": str, "members": {...}} — the shape ``cli.py`` iterates
         self.files: Dict[str, Dict[str, object]] = self._build_files()
 
@@ -79,7 +84,19 @@ class RelationsIndex:
         return files
 
     def get(self, key: str = "", name: str = "") -> Optional[DependencyContext]:
-        return self._by_key.get(key) or self._by_name.get(name)
+        found = self._by_key.get(key) or self._by_name.get(name)
+        if found is not None:
+            return found
+        # fall back to a unique short-name match
+        candidates = self._by_short.get((name or key).split(".")[-1], [])
+        return candidates[0] if len(candidates) == 1 else None
+
+    def label(self, short: str) -> str:
+        """Qualified label for a relation target, when it is unambiguous."""
+        candidates = self._by_short.get(short.split(".")[-1], [])
+        if len(candidates) == 1:
+            return candidates[0].entity.name
+        return short
 
     def summary(self) -> Dict[str, int]:
         counts: Dict[str, int] = {}
@@ -107,7 +124,14 @@ def build_index(target: str, backend: Optional[str] = None) -> Optional[Relation
     return RelationsIndex(contexts, backend=f"{extractor.backend}")
 
 
-def get_dep(index: RelationsIndex, display: str, key: str, fpath: str) -> Optional[Dict[str, object]]:
+def get_dep(
+    index: RelationsIndex,
+    display: str,
+    key: str,
+    fpath: str,
+    snippet_lines: int = 20,
+    max_deps: int = 6,
+) -> Optional[Dict[str, object]]:
     """Return the writer-facing record for one entity.
 
     Keeps the historical keys (``real_name``/``source_code``/``uses``/``used_by``)
@@ -119,11 +143,30 @@ def get_dep(index: RelationsIndex, display: str, key: str, fpath: str) -> Option
     if ctx is None:
         return None
 
-    uses = [
-        {rel.target: rel.detail or rel.path or ""}
-        for rel in ctx.get(RelationKind.CALLS)
-    ]
-    used_by = [{rel.target: rel.path or ""} for rel in ctx.get(RelationKind.CALLED_BY)]
+    # Inject the dependency's *source*, not its path. The earlier pipeline put a
+    # path into a ```python fence, which told the model it was looking at code when
+    # it was looking at a filename.
+    def snippet(target: str) -> str:
+        dep_ctx = index.get(name=target)
+        if dep_ctx is None:
+            candidates = index._by_short.get(target.split(".")[-1], [])
+            dep_ctx = candidates[0] if len(candidates) == 1 else None
+        if dep_ctx is None or not dep_ctx.source:
+            return ""
+        lines = dep_ctx.source.splitlines()
+        if len(lines) > snippet_lines:
+            lines = lines[:snippet_lines] + [
+                f"# ... {len(lines) - snippet_lines} more lines ..."
+            ]
+        return "\n".join(lines)
+
+    # Dependency snippets are the bulk of the prompt, so both the per-dependency
+    # length and the number of rendered dependencies are bounded: uncapped, four
+    # dependency bodies left no budget for the entity itself.
+    calls = ctx.get(RelationKind.CALLS)[:max_deps]
+    callers = ctx.get(RelationKind.CALLED_BY)[:max_deps]
+    uses = [{index.label(rel.target): snippet(rel.target)} for rel in calls]
+    used_by = [{index.label(rel.target): snippet(rel.target)} for rel in callers]
     relations = {
         BLOCK_LABELS[kind]: [rel.target for rel in ctx.get(kind)]
         for kind in BLOCK_LABELS
