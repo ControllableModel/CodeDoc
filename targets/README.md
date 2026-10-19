@@ -18,6 +18,12 @@ Record, for every repository used in an experiment:
 | declared size class | so the Small/Medium/Large grouping is auditable |
 | #classes / #methods / #functions | recomputable with `scripts/probe_relations.py` |
 
-The size classes in the paper were derived from these counts; the earlier
-submission did not record commit SHAs, which reviewers flagged. See
-`docs/REPOSITORIES.md` for the current record.
+The ten evaluated repositories are already extracted here:
+
+    numpy  openui  ragflow  dify_api  flask-main  joblib  pyro  fairseq  sonnet  torch
+
+**Read `docs/PROVENANCE.md` first**: it records what each snapshot contains, which
+published entity counts reproduce and which do not, two defects in the archived
+evidence, why upstream commit SHAs are not recoverable, and the two
+`pyan3==1.1.1` failure modes that make one repository (fairseq) unanalysable.
+Provenance, not just presence, is what reviewers asked for.

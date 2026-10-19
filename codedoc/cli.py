@@ -61,19 +61,22 @@ class Analyzer:
 
     def _run_pyan(self):
         paths = [f['path'] for f in self.files.values()]
-        quoted = ' '.join(f'"{p}"' for p in paths)
-        # 使用 python -m pyan 代替 pyan3 命令
-        import sys
-        python_exe = sys.executable
-        cmd = f'"{python_exe}" -m pyan {quoted} --dot --no-defines --uses'
+        # pyan is invoked in-process (not via subprocess) so that the
+        # compatibility patch for pyan3's visit_AnnAssign crash applies; a
+        # subprocess could not see the patch. See codedoc/deps/pyan_compat.py.
+        from codedoc.deps.pyan_compat import preflight, run_pyan_dot
         try:
-            r = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            if r.returncode != 0:
-                print(f"pyan error: {r.stderr}")
-            return r.stdout if r.returncode == 0 else None
-        except Exception as e:
-            print(f"pyan exception: {e}")
-            return None
+            return run_pyan_dot(paths)
+        except RuntimeError as exc:
+            print(f"pyan error: {exc}")
+            print("  retrying with unparsable files excluded ...")
+            bad = set(preflight(paths))
+            if bad:
+                print(f"  excluded {len(bad)} file(s): {sorted(bad)[:5]}")
+            keep = [p for p in paths if p not in bad]
+            if len(keep) == len(paths):
+                raise
+            return run_pyan_dot(keep)
 
     def _parse(self, fpath):
         result = {"classes": {}, "functions": []}
