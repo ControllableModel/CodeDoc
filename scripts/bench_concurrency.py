@@ -23,6 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT_MD = ROOT / "results" / "analysis" / "concurrency_scaling.md"
 OUT_JSON = ROOT / "results" / "analysis" / "concurrency_scaling.json"
+TAG = ""
 
 
 def post(url: str, payload: dict) -> dict:
@@ -53,6 +54,7 @@ def run_once(base: str, repo: str, limit: int, seed: int, workers: int) -> dict:
     done = max(1, int(progress.get("done") or 0))
     return {
         "workers": workers,
+        "limit": limit,
         "elapsed_seconds": round(elapsed, 1),
         "done": progress.get("done", 0),
         "failed": progress.get("failed", 0),
@@ -73,14 +75,17 @@ def write_report(rows: list) -> None:
         "",
         "* endpoint: gpt-6-luna, priced in USD (standard / short context)",
         "* each configuration runs the same sampled entity set, so the work is identical",
+        "* wall time is quantised by ceil(limit/workers) waves, so a coarse entity count shows",
+        "  a saw-tooth rather than a smooth curve; read s/entity together with the wave count",
         "",
-        "| workers | wall (s) | entities | failed | entities/min | s/entity | cost/entity |",
-        "|---|---|---|---|---|---|---|",
+        "| workers | entities | waves | wall (s) | failed | entities/min | s/entity | cost/entity |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for row in rows:
+        waves = -(-int(row.get("done") or 0) // max(1, int(row["workers"])))
         header.append(
-            "| {workers} | {elapsed_seconds} | {done} | {failed} | {entities_per_minute} "
-            "| {seconds_per_entity} | ${cost_per_entity} |".format(**row)
+            "| {workers} | {done} | {waves} | {elapsed_seconds} | {failed} | {entities_per_minute} "
+            "| {seconds_per_entity} | ${cost_per_entity} |".format(waves=waves, **row)
         )
     if len(rows) >= 2:
         serial = next((r for r in rows if r["workers"] == 1), None)
@@ -91,8 +96,10 @@ def write_report(rows: list) -> None:
             header.append(
                 f"* speed-up over serial: {best['entities_per_minute'] / serial['entities_per_minute']:.1f}x"
             )
-    OUT_MD.write_text("\n".join(header) + "\n", encoding="utf-8")
-    OUT_JSON.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    target_md = OUT_MD.with_name(OUT_MD.stem + TAG + OUT_MD.suffix)
+    target_md.write_text("\n".join(header) + "\n", encoding="utf-8")
+    OUT_JSON.with_name(OUT_JSON.stem + TAG + OUT_JSON.suffix).write_text(
+        json.dumps(rows, indent=2), encoding="utf-8")
 
 
 def main() -> int:
@@ -102,12 +109,15 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=8)
     ap.add_argument("--seed", type=int, default=21)
     ap.add_argument("--workers", type=int, nargs="+", default=[1, 2, 4, 8])
+    ap.add_argument("--tag", default="", help="suffix for the result files, e.g. _16")
     args = ap.parse_args()
+    globals()["TAG"] = args.tag
 
     rows: list = []
-    if OUT_JSON.exists():
+    json_path = OUT_JSON.with_name(OUT_JSON.stem + TAG + OUT_JSON.suffix)
+    if json_path.exists():
         try:
-            rows = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+            rows = json.loads(json_path.read_text(encoding="utf-8"))
         except ValueError:
             rows = []
 
@@ -127,7 +137,7 @@ def main() -> int:
         print(f"  {row['elapsed_seconds']}s, {row['entities_per_minute']} entities/min, "
               f"failed={row['failed']}, ${row['cost_per_entity']}/entity")
     write_report(rows)
-    print(f"written: {OUT_MD}")
+    print(f"written: {OUT_MD.with_name(OUT_MD.stem + TAG + OUT_MD.suffix)}")
     return 0
 
 
