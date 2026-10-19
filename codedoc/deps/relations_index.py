@@ -169,10 +169,20 @@ def get_dep(
     # dependency set from the model while saving very little: names are ~30 chars,
     # bodies are ~1 KB each.
     def entries(relations):
-        return [
-            {index.label(rel.target): (snippet(rel.target) if i < max_snippets else "")}
-            for i, rel in enumerate(relations)
-        ]
+        """One entry per relation; extractor snippets win over the target's body.
+
+        For ``called_by`` the extractor supplies the *call site*, which is what shows
+        how the entity is used; the caller's whole body buries it.
+        """
+        out = []
+        for i, rel in enumerate(relations):
+            if i >= max_snippets:
+                out.append({index.label(rel.target): ""})
+            elif rel.snippet:
+                out.append({index.label(rel.target): rel.snippet})
+            else:
+                out.append({index.label(rel.target): snippet(rel.target)})
+        return out
 
     uses = entries(ctx.get(RelationKind.CALLS))
     used_by = entries(ctx.get(RelationKind.CALLED_BY))
@@ -191,6 +201,13 @@ def get_dep(
             candidates = index._by_short.get(rel.target.split(".")[-1], [])
             target_ctx = candidates[0] if len(candidates) == 1 else None
         code = ""
+        # An extractor-supplied snippet wins: it is deliberately more precise than
+        # "the target's body" (call-site context, attribute assignment).
+        if rel.snippet and index_in_block < relation_max_snippets:
+            snippet_lines = rel.snippet.splitlines()
+            if len(snippet_lines) > relation_snippet_lines:
+                snippet_lines = snippet_lines[:relation_snippet_lines]
+            return {"name": index.label(rel.target), "code": "\n".join(snippet_lines)}
         if (target_ctx is not None and index_in_block < relation_max_snippets
                 and rel.kind != RelationKind.ATTRIBUTE_ACCESS):
             body = target_ctx.source or ""

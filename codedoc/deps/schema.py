@@ -108,6 +108,10 @@ class Relation:
     #: ``target`` is a human label and can be ambiguous (two classes named
     #: Blueprint in different packages); source injection needs the exact entity.
     target_qname: str = ""
+    #: Source text the extractor wants injected for this relation, overriding what the
+    #: writer would derive from the target entity. Used for call-site context (the
+    #: caller's call expression, not the caller's body) and for attribute assignments.
+    snippet: str = ""
 
     def __post_init__(self) -> None:
         if self.kind not in RelationKind.ALL:

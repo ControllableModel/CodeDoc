@@ -46,8 +46,14 @@ CONFIG_PATH = WEBAPP / "config.local.json"
 
 DEFAULT_CONFIG = {
     "api_key": "",
-    "base_url": "https://api.deepseek.com/v1",
-    "model": "deepseek-chat",
+    "base_url": "https://apic1.ohmycdn.com/v1",
+    "model": "gpt-6-luna",
+    "use_max_completion_tokens": True,
+    "max_completion_tokens": 8000,
+    #: Prices are per million tokens and must be set for whatever endpoint is used;
+    #: the defaults below are DeepSeek list prices and are only a rough orientation.
+    "price_in_per_m": 2.0,
+    "price_out_per_m": 8.0,
     "temperature": 1.0,
     "judge_temperature": 0.0,
     "max_tokens": 40000,
@@ -298,6 +304,8 @@ def generate_document(repo_name: str, custom_path: str, mode: str, limit: int, s
     core.LLM_url = config.get("base_url") or DEFAULT_CONFIG["base_url"]
     core.model = config.get("model") or DEFAULT_CONFIG["model"]
     core.temperature = float(config.get("temperature", 1.0))
+    core.max_output_tokens = int(config.get("max_completion_tokens") or 8000)
+    core.use_max_completion_tokens = bool(config.get("use_max_completion_tokens", True))
     # The writers record into the process-wide RECORDER. Tagging this call and
     # filtering by the tag is required under concurrency: a positional snapshot also
     # captures records written by sibling threads, which inflated batch accounting
@@ -323,7 +331,9 @@ def generate_document(repo_name: str, custom_path: str, mode: str, limit: int, s
 
     prompt_tokens = int(usage.get("prompt_tokens") or 0)
     completion_tokens = int(usage.get("completion_tokens") or 0)
-    cost = prompt_tokens / 1e6 * 2.0 + completion_tokens / 1e6 * 8.0
+    price_in = float(config.get("price_in_per_m") or 2.0)
+    price_out = float(config.get("price_out_per_m") or 8.0)
+    cost = prompt_tokens / 1e6 * price_in + completion_tokens / 1e6 * price_out
     return {
         "qname": qname,
         "document": document or "",

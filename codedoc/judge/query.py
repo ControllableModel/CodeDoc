@@ -22,18 +22,20 @@ class LLM_Remote_query:
         #: unparseable JSON (observed: 2/38 documents in the first benchmark run).
         self.judge_temperature = 0.0
         self.max_token = 1024
+        #: See writer.llm: newer models need ``max_completion_tokens`` via extra_body.
+        self.use_max_completion_tokens = False
 
     def multi_query(self, question):
         self.MESSAGE_HISTORY.append({"role": "user", "content": question})
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_url)
         _t0 = time.time()
-        answer = self.client.chat.completions.create(
-                model=self.model,
-                messages=self.MESSAGE_HISTORY,
-                stream=False,
-                temperature=self.temperature,
-                max_tokens=self.max_token,
-            )
+        _kwargs = dict(model=self.model, messages=self.MESSAGE_HISTORY, stream=False,
+                       temperature=self.temperature)
+        if self.use_max_completion_tokens:
+            _kwargs["extra_body"] = {"max_completion_tokens": int(self.max_token)}
+        else:
+            _kwargs["max_tokens"] = int(self.max_token)
+        answer = self.client.chat.completions.create(**_kwargs)
         RECORDER.record_response("judge_multi", self.model, answer, time.time() - _t0)
         ans = answer.choices[0].message.content
         self.MESSAGE_HISTORY.append({"role": "assistant", "content": ans})
@@ -47,13 +49,13 @@ class LLM_Remote_query:
             time.sleep(2)
             try:
                 _t0 = time.time()
-                answer = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=self.MESSAGE_HISTORY,
-                    stream=False,
-                    temperature=self.judge_temperature,
-                    max_tokens=self.max_token,
-                )
+                _kwargs = dict(model=self.model, messages=self.MESSAGE_HISTORY, stream=False,
+                               temperature=self.judge_temperature)
+                if self.use_max_completion_tokens:
+                    _kwargs["extra_body"] = {"max_completion_tokens": int(self.max_token)}
+                else:
+                    _kwargs["max_tokens"] = int(self.max_token)
+                answer = self.client.chat.completions.create(**_kwargs)
                 RECORDER.record_response("judge_solo", self.model, answer, time.time() - _t0)
                 count = 0
             except:
