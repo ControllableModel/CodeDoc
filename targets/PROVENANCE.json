@@ -1,0 +1,123 @@
+{
+  "dify_api": {
+    "name": "dify_api",
+    "upstream": "https://github.com/langgenius/dify",
+    "commit": "67887de9e427da2892282ce878d8f53c1c18f080",
+    "branch": "main",
+    "committed_date": "2026-10-19T07:46:07Z",
+    "core_package": "api",
+    "extracted_at": "2026-10-19T08:27:05Z",
+    "files": 2417,
+    "bytes": 20122489,
+    "kept_prefix": "api"
+  },
+  "fairseq": {
+    "name": "fairseq",
+    "upstream": "https://github.com/facebookresearch/fairseq",
+    "commit": "3d262bb25690e4eb2e7d3c1309b1e9c406ca4b99",
+    "branch": "main",
+    "committed_date": "2025-09-30T11:16:06Z",
+    "core_package": "fairseq",
+    "extracted_at": "2026-10-19T08:27:18Z",
+    "files": 476,
+    "bytes": 3751994,
+    "kept_prefix": "fairseq"
+  },
+  "flask-main": {
+    "name": "flask-main",
+    "upstream": "https://github.com/pallets/flask",
+    "commit": "d086db856be187255b8ec61ef409357393020f32",
+    "branch": "main",
+    "committed_date": "2026-10-07T14:02:54Z",
+    "core_package": "src/flask",
+    "extracted_at": "2026-10-19T08:27:08Z",
+    "files": 26,
+    "bytes": 348137,
+    "kept_prefix": "src/flask"
+  },
+  "joblib": {
+    "name": "joblib",
+    "upstream": "https://github.com/joblib/joblib",
+    "commit": "878c9e05995b4425079e8f204b3502f5658a67e5",
+    "branch": "main",
+    "committed_date": "2026-10-16T08:45:34Z",
+    "core_package": "joblib",
+    "extracted_at": "2026-10-19T08:26:37Z",
+    "files": 45,
+    "bytes": 576107,
+    "kept_prefix": "joblib"
+  },
+  "numpy": {
+    "name": "numpy",
+    "upstream": "https://github.com/numpy/numpy",
+    "commit": "3e225b263fd62b68f657b2ad4522932618247aa8",
+    "branch": "main",
+    "committed_date": "2026-10-18T22:56:33Z",
+    "core_package": "numpy",
+    "extracted_at": "2026-10-19T08:26:46Z",
+    "files": 893,
+    "bytes": 20118939,
+    "kept_prefix": "numpy"
+  },
+  "openui": {
+    "name": "openui",
+    "upstream": "https://github.com/wandb/openui",
+    "commit": "42d7ab4ab6650433486dfb12eb3783c393a3e475",
+    "branch": "main",
+    "committed_date": "2026-06-30T15:25:23Z",
+    "core_package": "backend/openui",
+    "extracted_at": "2026-10-19T08:26:50Z",
+    "files": 38,
+    "bytes": 2403307,
+    "kept_prefix": "backend/openui"
+  },
+  "pyro": {
+    "name": "pyro",
+    "upstream": "https://github.com/pyro-ppl/pyro",
+    "commit": "a31bc1784707268cd79df77ead4c7a47062f0193",
+    "branch": "dev",
+    "committed_date": "2026-10-03T17:44:15Z",
+    "core_package": "pyro",
+    "extracted_at": "2026-10-19T08:27:13Z",
+    "files": 309,
+    "bytes": 2447101,
+    "kept_prefix": "pyro"
+  },
+  "ragflow": {
+    "name": "ragflow",
+    "upstream": "https://github.com/infiniflow/ragflow",
+    "commit": "efbb800743098c37fde60a48aad416d583e55eac",
+    "branch": "pinned@api/ragflow_server.py",
+    "committed_date": "2026-09-28T10:01:17Z",
+    "core_package": "api",
+    "extracted_at": "2026-10-19T08:28:01Z",
+    "files": 21,
+    "bytes": 135952,
+    "kept_prefix": "api",
+    "pinned_path": "api/ragflow_server.py"
+  },
+  "sonnet": {
+    "name": "sonnet",
+    "upstream": "https://github.com/google-deepmind/sonnet",
+    "commit": "8e7158b2beb8c8269b1b322601214083afc5607f",
+    "branch": "v2",
+    "committed_date": "2026-09-29T09:14:50Z",
+    "core_package": "sonnet",
+    "extracted_at": "2026-10-19T08:27:23Z",
+    "files": 267,
+    "bytes": 33274125,
+    "kept_prefix": "sonnet"
+  },
+  "torch": {
+    "name": "torch",
+    "upstream": "https://github.com/pytorch/pytorch",
+    "commit": "25a44754189251b6259196617f14a002a4d87d15",
+    "branch": "main",
+    "committed_date": "2026-10-19T08:00:08Z",
+    "core_package": "torch",
+    "extracted_at": "2026-10-19T08:27:37Z",
+    "files": 4559,
+    "bytes": 68603879,
+    "kept_prefix": "torch"
+  }
+}

@@ -1,0 +1,456 @@
+{
+  "numpy": {
+    "measure": {
+      "classes": 178,
+      "methods": 878,
+      "functions": 1827,
+      "documentable": 2705,
+      "files": 175,
+      "parse_errors": 8,
+      "bases_declared": 98,
+      "bases_resolved": 41,
+      "calls": 14635,
+      "calls_resolved": 2686
+    },
+    "coverage": {
+      "files_parsed": 175,
+      "parse_errors": [
+        [
+          "targets\\numpy\\_typing\\_array.py",
+          "SyntaxError: invalid syntax (_array.py, line 5)"
+        ],
+        [
+          "targets\\numpy\\_typing\\_array_like.py",
+          "SyntaxError: invalid syntax (_array_like.py, line 21)"
+        ],
+        [
+          "targets\\numpy\\_typing\\_char_codes.py",
+          "SyntaxError: invalid syntax (_char_codes.py, line 3)"
+        ],
+        [
+          "targets\\numpy\\_typing\\_dtype_like.py",
+          "SyntaxError: invalid syntax (_dtype_like.py, line 21)"
+        ],
+        [
+          "targets\\numpy\\_typing\\_nbit.py",
+          "SyntaxError: invalid syntax (_nbit.py, line 5)"
+        ],
+        [
+          "targets\\numpy\\_typing\\_scalars.py",
+          "SyntaxError: invalid syntax (_scalars.py, line 7)"
+        ],
+        [
+          "targets\\numpy\\_typing\\_shape.py",
+          "SyntaxError: invalid syntax (_shape.py, line 4)"
+        ],
+        [
+          "targets\\numpy\\lib\\_polynomial_impl.py",
+          "SyntaxError: invalid syntax (_polynomial_impl.py, line 1096)"
+        ]
+      ],
+      "n_parse_errors": 8,
+      "classes": 178,
+      "bases_declared": 98,
+      "bases_resolved": 41,
+      "base_resolution_rate": 0.41836734693877553,
+      "calls": 14635,
+      "calls_resolved": 2686,
+      "call_resolution_rate": 0.18353262726340963
+    },
+    "relations": {
+      "calls": 2039,
+      "called_by": 1880,
+      "inherits": 41,
+      "subclassed_by": 41,
+      "instantiated_at": 159,
+      "overrides": 52,
+      "overridden_by": 88,
+      "dispatch_candidates": 69,
+      "attribute_access": 0
+    },
+    "seconds": 2.0
+  },
+  "openui": {
+    "measure": {
+      "classes": 27,
+      "methods": 66,
+      "functions": 72,
+      "documentable": 138,
+      "files": 30,
+      "parse_errors": 0,
+      "bases_declared": 23,
+      "bases_resolved": 7,
+      "calls": 867,
+      "calls_resolved": 122
+    },
+    "coverage": {
+      "files_parsed": 30,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 27,
+      "bases_declared": 23,
+      "bases_resolved": 7,
+      "base_resolution_rate": 0.30434782608695654,
+      "calls": 867,
+      "calls_resolved": 122,
+      "call_resolution_rate": 0.14071510957324107
+    },
+    "relations": {
+      "calls": 82,
+      "called_by": 75,
+      "inherits": 7,
+      "subclassed_by": 7,
+      "instantiated_at": 7,
+      "overrides": 0,
+      "overridden_by": 0,
+      "dispatch_candidates": 0,
+      "attribute_access": 0
+    },
+    "seconds": 0.1
+  },
+  "ragflow": {
+    "measure": {
+      "classes": 4,
+      "methods": 27,
+      "functions": 7,
+      "documentable": 34,
+      "files": 3,
+      "parse_errors": 0,
+      "bases_declared": 1,
+      "bases_resolved": 0,
+      "calls": 220,
+      "calls_resolved": 45
+    },
+    "coverage": {
+      "files_parsed": 3,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 4,
+      "bases_declared": 1,
+      "bases_resolved": 0,
+      "base_resolution_rate": 0.0,
+      "calls": 220,
+      "calls_resolved": 45,
+      "call_resolution_rate": 0.20454545454545456
+    },
+    "relations": {
+      "calls": 40,
+      "called_by": 37,
+      "inherits": 0,
+      "subclassed_by": 0,
+      "instantiated_at": 3,
+      "overrides": 0,
+      "overridden_by": 0,
+      "dispatch_candidates": 0,
+      "attribute_access": 0
+    },
+    "seconds": 0.0
+  },
+  "dify_api": {
+    "measure": {
+      "classes": 6035,
+      "methods": 10322,
+      "functions": 2767,
+      "documentable": 13089,
+      "files": 2107,
+      "parse_errors": 136,
+      "bases_declared": 5331,
+      "bases_resolved": 1566,
+      "calls": 89300,
+      "calls_resolved": 19591
+    },
+    "coverage": {
+      "files_parsed": 2107,
+      "parse_errors": [
+        [
+          "targets\\dify_api\\clients\\agent_backend\\event_adapter.py",
+          "SyntaxError: invalid syntax (event_adapter.py, line 102)"
+        ],
+        [
+          "targets\\dify_api\\clients\\agent_backend\\request_builder.py",
+          "SyntaxError: invalid syntax (request_builder.py, line 57)"
+        ],
+        [
+          "targets\\dify_api\\commands\\retention.py",
+          "SyntaxError: expected '(' (retention.py, line 149)"
+        ],
+        [
+          "targets\\dify_api\\contexts\\wrapper.py",
+          "SyntaxError: invalid syntax (wrapper.py, line 11)"
+        ],
+        [
+          "targets\\dify_api\\controllers\\common\\fields.py",
+          "SyntaxError: invalid syntax (fields.py, line 11)"
+        ],
+        [
+          "targets\\dify_api\\controllers\\common\\schema.py",
+          "SyntaxError: expected '(' (schema.py, line 245)"
+        ],
+        [
+          "targets\\dify_api\\controllers\\common\\session.py",
+          "SyntaxError: expected '(' (session.py, line 21)"
+        ],
+        [
+          "targets\\dify_api\\controllers\\common\\wraps.py",
+          "SyntaxError: expected '(' (wraps.py, line 11)"
+        ],
+        [
+          "targets\\dify_api\\controllers\\console\\admin.py",
+          "SyntaxError: expected '(' (admin.py, line 11)"
+        ],
+        [
+          "targets\\dify_api\\controllers\\console\\app\\agent_config_inspector.py",
+          "SyntaxError: expected '(' (agent_config_inspector.py, line 276)"
+        ]
+      ],
+      "n_parse_errors": 136,
+      "classes": 6035,
+      "bases_declared": 5331,
+      "bases_resolved": 1566,
+      "base_resolution_rate": 0.29375351716375914,
+      "calls": 89300,
+      "calls_resolved": 19591,
+      "call_resolution_rate": 0.21938409854423294
+    },
+    "relations": {
+      "calls": 17139,
+      "called_by": 12037,
+      "inherits": 1566,
+      "subclassed_by": 1566,
+      "instantiated_at": 5102,
+      "overrides": 1230,
+      "overridden_by": 1793,
+      "dispatch_candidates": 12764,
+      "attribute_access": 0
+    },
+    "seconds": 75.6
+  },
+  "flask-main": {
+    "measure": {
+      "classes": 47,
+      "methods": 287,
+      "functions": 97,
+      "documentable": 384,
+      "files": 24,
+      "parse_errors": 0,
+      "bases_declared": 39,
+      "bases_resolved": 18,
+      "calls": 1196,
+      "calls_resolved": 203
+    },
+    "coverage": {
+      "files_parsed": 24,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 47,
+      "bases_declared": 39,
+      "bases_resolved": 18,
+      "base_resolution_rate": 0.46153846153846156,
+      "calls": 1196,
+      "calls_resolved": 203,
+      "call_resolution_rate": 0.1697324414715719
+    },
+    "relations": {
+      "calls": 181,
+      "called_by": 159,
+      "inherits": 18,
+      "subclassed_by": 18,
+      "instantiated_at": 22,
+      "overrides": 39,
+      "overridden_by": 52,
+      "dispatch_candidates": 155,
+      "attribute_access": 0
+    },
+    "seconds": 1.2
+  },
+  "joblib": {
+    "measure": {
+      "classes": 109,
+      "methods": 459,
+      "functions": 181,
+      "documentable": 640,
+      "files": 44,
+      "parse_errors": 0,
+      "bases_declared": 90,
+      "bases_resolved": 42,
+      "calls": 2729,
+      "calls_resolved": 505
+    },
+    "coverage": {
+      "files_parsed": 44,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 109,
+      "bases_declared": 90,
+      "bases_resolved": 42,
+      "base_resolution_rate": 0.4666666666666667,
+      "calls": 2729,
+      "calls_resolved": 505,
+      "call_resolution_rate": 0.18504946866984243
+    },
+    "relations": {
+      "calls": 444,
+      "called_by": 364,
+      "inherits": 41,
+      "subclassed_by": 41,
+      "instantiated_at": 80,
+      "overrides": 65,
+      "overridden_by": 106,
+      "dispatch_candidates": 125,
+      "attribute_access": 0
+    },
+    "seconds": 2.0
+  },
+  "pyro": {
+    "measure": {
+      "classes": 539,
+      "methods": 2103,
+      "functions": 754,
+      "documentable": 2857,
+      "files": 306,
+      "parse_errors": 0,
+      "bases_declared": 513,
+      "bases_resolved": 211,
+      "calls": 16624,
+      "calls_resolved": 1469
+    },
+    "coverage": {
+      "files_parsed": 306,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 539,
+      "bases_declared": 513,
+      "bases_resolved": 211,
+      "base_resolution_rate": 0.41130604288499023,
+      "calls": 16624,
+      "calls_resolved": 1469,
+      "call_resolution_rate": 0.08836621751684312
+    },
+    "relations": {
+      "calls": 1295,
+      "called_by": 1034,
+      "inherits": 203,
+      "subclassed_by": 203,
+      "instantiated_at": 261,
+      "overrides": 408,
+      "overridden_by": 388,
+      "dispatch_candidates": 4043,
+      "attribute_access": 0
+    },
+    "seconds": 19.5
+  },
+  "fairseq": {
+    "measure": {
+      "classes": 786,
+      "methods": 3589,
+      "functions": 854,
+      "documentable": 4443,
+      "files": 442,
+      "parse_errors": 0,
+      "bases_declared": 755,
+      "bases_resolved": 128,
+      "calls": 27816,
+      "calls_resolved": 2197
+    },
+    "coverage": {
+      "files_parsed": 442,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 786,
+      "bases_declared": 755,
+      "bases_resolved": 128,
+      "base_resolution_rate": 0.1695364238410596,
+      "calls": 27816,
+      "calls_resolved": 2197,
+      "call_resolution_rate": 0.07898331895312051
+    },
+    "relations": {
+      "calls": 1875,
+      "called_by": 1616,
+      "inherits": 128,
+      "subclassed_by": 128,
+      "instantiated_at": 259,
+      "overrides": 263,
+      "overridden_by": 401,
+      "dispatch_candidates": 669,
+      "attribute_access": 0
+    },
+    "seconds": 19.7
+  },
+  "sonnet": {
+    "measure": {
+      "classes": 321,
+      "methods": 1021,
+      "functions": 263,
+      "documentable": 1284,
+      "files": 133,
+      "parse_errors": 0,
+      "bases_declared": 377,
+      "bases_resolved": 96,
+      "calls": 7401,
+      "calls_resolved": 486
+    },
+    "coverage": {
+      "files_parsed": 133,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 321,
+      "bases_declared": 377,
+      "bases_resolved": 96,
+      "base_resolution_rate": 0.2546419098143236,
+      "calls": 7401,
+      "calls_resolved": 486,
+      "call_resolution_rate": 0.06566680178354277
+    },
+    "relations": {
+      "calls": 417,
+      "called_by": 292,
+      "inherits": 96,
+      "subclassed_by": 96,
+      "instantiated_at": 125,
+      "overrides": 94,
+      "overridden_by": 101,
+      "dispatch_candidates": 775,
+      "attribute_access": 0
+    },
+    "seconds": 4.8
+  },
+  "torch": {
+    "measure": {
+      "classes": 5371,
+      "methods": 24711,
+      "functions": 21983,
+      "documentable": 46694,
+      "files": 2318,
+      "parse_errors": 0,
+      "bases_declared": 3706,
+      "bases_resolved": 1924,
+      "calls": 307986,
+      "calls_resolved": 51812
+    },
+    "coverage": {
+      "files_parsed": 2318,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 5371,
+      "bases_declared": 3706,
+      "bases_resolved": 1924,
+      "base_resolution_rate": 0.519158121964382,
+      "calls": 307986,
+      "calls_resolved": 51812,
+      "call_resolution_rate": 0.1682284259674141
+    },
+    "relations": {
+      "calls": 40485,
+      "called_by": 35495,
+      "inherits": 1916,
+      "subclassed_by": 1916,
+      "instantiated_at": 4990,
+      "overrides": 5987,
+      "overridden_by": 5734,
+      "dispatch_candidates": 84577,
+      "attribute_access": 0
+    },
+    "seconds": 371.6
+  }
+}

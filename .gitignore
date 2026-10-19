@@ -69,6 +69,7 @@ repositories/
 # ---------------------------------------------------------------------------
 targets/*
 !targets/README.md
+!targets/PROVENANCE.json
 outputs/*
 !outputs/README.md
 

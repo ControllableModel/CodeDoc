@@ -1,0 +1,882 @@
+[
+  {
+    "repo": "numpy",
+    "backend": "ast",
+    "measure": {
+      "classes": 178,
+      "methods": 878,
+      "functions": 1812,
+      "documentable": 2690,
+      "files": 174,
+      "parse_errors": 9,
+      "bases_declared": 98,
+      "bases_resolved": 41,
+      "calls": 14499,
+      "calls_resolved": 2636
+    },
+    "elapsed_s": 1.6,
+    "contexts": 2868,
+    "relations": {
+      "calls": 2018,
+      "called_by": 1859,
+      "inherits": 41,
+      "subclassed_by": 41,
+      "instantiated_at": 159,
+      "overrides": 52,
+      "overridden_by": 88,
+      "dispatch_candidates": 69,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 174,
+      "parse_errors": [
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\_typing\\_array.py",
+          "SyntaxError: invalid syntax (_array.py, line 5)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\_typing\\_array_like.py",
+          "SyntaxError: invalid syntax (_array_like.py, line 21)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\_typing\\_char_codes.py",
+          "SyntaxError: invalid syntax (_char_codes.py, line 3)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\_typing\\_dtype_like.py",
+          "SyntaxError: invalid syntax (_dtype_like.py, line 21)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\_typing\\_nbit.py",
+          "SyntaxError: invalid syntax (_nbit.py, line 5)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\_typing\\_scalars.py",
+          "SyntaxError: invalid syntax (_scalars.py, line 7)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\_typing\\_shape.py",
+          "SyntaxError: invalid syntax (_shape.py, line 4)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\lib\\_arraypad_impl.py",
+          "SyntaxError: invalid syntax (_arraypad_impl.py, line 810)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\numpy\\lib\\_polynomial_impl.py",
+          "SyntaxError: invalid syntax (_polynomial_impl.py, line 1096)"
+        ]
+      ],
+      "n_parse_errors": 9,
+      "classes": 178,
+      "bases_declared": 98,
+      "bases_resolved": 41,
+      "base_resolution_rate": 0.41836734693877553,
+      "calls": 14499,
+      "calls_resolved": 2636,
+      "call_resolution_rate": 0.1818056417683978
+    }
+  },
+  {
+    "repo": "numpy",
+    "backend": "pyright",
+    "measure": {
+      "classes": 178,
+      "methods": 878,
+      "functions": 1812,
+      "documentable": 2690,
+      "files": 174,
+      "bases_declared": 98
+    },
+    "elapsed_s": 706.2,
+    "contexts": 428,
+    "relations": {
+      "calls": 988,
+      "called_by": 155,
+      "inherits": 41,
+      "subclassed_by": 41,
+      "instantiated_at": 0,
+      "overrides": 6,
+      "overridden_by": 45,
+      "dispatch_candidates": 6,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.546,
+    "stats": {
+      "bases_resolved_internal": 41,
+      "hierarchy_items": 250,
+      "external_calls": 823,
+      "entities_queried": 250,
+      "entities_total": 2690,
+      "sampled": 1,
+      "external_bases": 57
+    }
+  },
+  {
+    "repo": "openui",
+    "backend": "ast",
+    "measure": {
+      "classes": 27,
+      "methods": 66,
+      "functions": 72,
+      "documentable": 138,
+      "files": 30,
+      "parse_errors": 0,
+      "bases_declared": 23,
+      "bases_resolved": 7,
+      "calls": 867,
+      "calls_resolved": 122
+    },
+    "elapsed_s": 0.1,
+    "contexts": 165,
+    "relations": {
+      "calls": 82,
+      "called_by": 75,
+      "inherits": 7,
+      "subclassed_by": 7,
+      "instantiated_at": 7,
+      "overrides": 0,
+      "overridden_by": 0,
+      "dispatch_candidates": 0,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 30,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 27,
+      "bases_declared": 23,
+      "bases_resolved": 7,
+      "base_resolution_rate": 0.30434782608695654,
+      "calls": 867,
+      "calls_resolved": 122,
+      "call_resolution_rate": 0.14071510957324107
+    }
+  },
+  {
+    "repo": "openui",
+    "backend": "pyright",
+    "measure": {
+      "classes": 27,
+      "methods": 66,
+      "functions": 72,
+      "documentable": 138,
+      "files": 30,
+      "bases_declared": 23
+    },
+    "elapsed_s": 3.1,
+    "contexts": 165,
+    "relations": {
+      "calls": 620,
+      "called_by": 111,
+      "inherits": 7,
+      "subclassed_by": 7,
+      "instantiated_at": 0,
+      "overrides": 0,
+      "overridden_by": 0,
+      "dispatch_candidates": 0,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.545,
+    "stats": {
+      "bases_resolved_internal": 7,
+      "hierarchy_items": 138,
+      "external_calls": 517,
+      "entities_queried": 138,
+      "entities_total": 138,
+      "sampled": 0,
+      "external_bases": 16
+    }
+  },
+  {
+    "repo": "ragflow",
+    "backend": "ast",
+    "measure": {
+      "classes": 4,
+      "methods": 27,
+      "functions": 7,
+      "documentable": 34,
+      "files": 3,
+      "parse_errors": 0,
+      "bases_declared": 1,
+      "bases_resolved": 0,
+      "calls": 220,
+      "calls_resolved": 45
+    },
+    "elapsed_s": 0.0,
+    "contexts": 38,
+    "relations": {
+      "calls": 40,
+      "called_by": 37,
+      "inherits": 0,
+      "subclassed_by": 0,
+      "instantiated_at": 3,
+      "overrides": 0,
+      "overridden_by": 0,
+      "dispatch_candidates": 0,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 3,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 4,
+      "bases_declared": 1,
+      "bases_resolved": 0,
+      "base_resolution_rate": 0.0,
+      "calls": 220,
+      "calls_resolved": 45,
+      "call_resolution_rate": 0.20454545454545456
+    }
+  },
+  {
+    "repo": "ragflow",
+    "backend": "pyright",
+    "measure": {
+      "classes": 4,
+      "methods": 27,
+      "functions": 7,
+      "documentable": 34,
+      "files": 3,
+      "bases_declared": 1
+    },
+    "elapsed_s": 1.1,
+    "contexts": 38,
+    "relations": {
+      "calls": 191,
+      "called_by": 38,
+      "inherits": 0,
+      "subclassed_by": 0,
+      "instantiated_at": 0,
+      "overrides": 0,
+      "overridden_by": 0,
+      "dispatch_candidates": 0,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.554,
+    "stats": {
+      "hierarchy_items": 33,
+      "external_calls": 154,
+      "hierarchy_missing": 1,
+      "entities_queried": 34,
+      "entities_total": 34,
+      "sampled": 0,
+      "external_bases": 1
+    }
+  },
+  {
+    "repo": "dify_api",
+    "backend": "ast",
+    "measure": {
+      "classes": 5386,
+      "methods": 7991,
+      "functions": 2436,
+      "documentable": 10427,
+      "files": 1961,
+      "parse_errors": 282,
+      "bases_declared": 4785,
+      "bases_resolved": 1388,
+      "calls": 70007,
+      "calls_resolved": 13156
+    },
+    "elapsed_s": 12.9,
+    "contexts": 15813,
+    "relations": {
+      "calls": 11556,
+      "called_by": 7785,
+      "inherits": 1388,
+      "subclassed_by": 1388,
+      "instantiated_at": 3771,
+      "overrides": 997,
+      "overridden_by": 1477,
+      "dispatch_candidates": 9652,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 1961,
+      "parse_errors": [
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\clients\\agent_backend\\client.py",
+          "SyntaxError: invalid syntax (client.py, line 173)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\clients\\agent_backend\\event_adapter.py",
+          "SyntaxError: invalid syntax (event_adapter.py, line 102)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\clients\\agent_backend\\fake_client.py",
+          "SyntaxError: invalid syntax (fake_client.py, line 112)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\clients\\agent_backend\\request_builder.py",
+          "SyntaxError: invalid syntax (request_builder.py, line 57)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\commands\\retention.py",
+          "SyntaxError: invalid syntax (retention.py, line 149)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\commands\\storage.py",
+          "SyntaxError: invalid syntax (storage.py, line 155)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\configs\\app_config.py",
+          "SyntaxError: invalid syntax (app_config.py, line 40)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\contexts\\wrapper.py",
+          "SyntaxError: invalid syntax (wrapper.py, line 11)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\controllers\\common\\fields.py",
+          "SyntaxError: invalid syntax (fields.py, line 11)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\dify_api\\controllers\\common\\human_input.py",
+          "SyntaxError: invalid syntax (human_input.py, line 50)"
+        ]
+      ],
+      "n_parse_errors": 282,
+      "classes": 5386,
+      "bases_declared": 4785,
+      "bases_resolved": 1388,
+      "base_resolution_rate": 0.29007314524555905,
+      "calls": 70007,
+      "calls_resolved": 13156,
+      "call_resolution_rate": 0.1879240647363835
+    }
+  },
+  {
+    "repo": "dify_api",
+    "backend": "pyright",
+    "measure": {
+      "classes": 5386,
+      "methods": 7991,
+      "functions": 2436,
+      "documentable": 10427,
+      "files": 1961,
+      "bases_declared": 4785
+    },
+    "elapsed_s": 110.3,
+    "contexts": 5636,
+    "relations": {
+      "calls": 947,
+      "called_by": 207,
+      "inherits": 1388,
+      "subclassed_by": 1388,
+      "instantiated_at": 0,
+      "overrides": 10,
+      "overridden_by": 506,
+      "dispatch_candidates": 14,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.588,
+    "stats": {
+      "bases_resolved_internal": 1388,
+      "hierarchy_items": 250,
+      "external_calls": 664,
+      "entities_queried": 250,
+      "entities_total": 10427,
+      "sampled": 1,
+      "external_bases": 3397
+    }
+  },
+  {
+    "repo": "flask-main",
+    "backend": "ast",
+    "measure": {
+      "classes": 47,
+      "methods": 287,
+      "functions": 97,
+      "documentable": 384,
+      "files": 24,
+      "parse_errors": 0,
+      "bases_declared": 39,
+      "bases_resolved": 18,
+      "calls": 1196,
+      "calls_resolved": 203
+    },
+    "elapsed_s": 0.2,
+    "contexts": 431,
+    "relations": {
+      "calls": 181,
+      "called_by": 159,
+      "inherits": 18,
+      "subclassed_by": 18,
+      "instantiated_at": 22,
+      "overrides": 39,
+      "overridden_by": 52,
+      "dispatch_candidates": 155,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 24,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 47,
+      "bases_declared": 39,
+      "bases_resolved": 18,
+      "base_resolution_rate": 0.46153846153846156,
+      "calls": 1196,
+      "calls_resolved": 203,
+      "call_resolution_rate": 0.1697324414715719
+    }
+  },
+  {
+    "repo": "flask-main",
+    "backend": "pyright",
+    "measure": {
+      "classes": 47,
+      "methods": 287,
+      "functions": 97,
+      "documentable": 384,
+      "files": 24,
+      "bases_declared": 39
+    },
+    "elapsed_s": 5.9,
+    "contexts": 297,
+    "relations": {
+      "calls": 953,
+      "called_by": 238,
+      "inherits": 18,
+      "subclassed_by": 18,
+      "instantiated_at": 0,
+      "overrides": 33,
+      "overridden_by": 43,
+      "dispatch_candidates": 148,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.571,
+    "stats": {
+      "bases_resolved_internal": 18,
+      "hierarchy_items": 250,
+      "external_calls": 715,
+      "entities_queried": 250,
+      "entities_total": 384,
+      "sampled": 1,
+      "external_bases": 21
+    }
+  },
+  {
+    "repo": "joblib",
+    "backend": "ast",
+    "measure": {
+      "classes": 109,
+      "methods": 459,
+      "functions": 181,
+      "documentable": 640,
+      "files": 44,
+      "parse_errors": 0,
+      "bases_declared": 90,
+      "bases_resolved": 42,
+      "calls": 2729,
+      "calls_resolved": 505
+    },
+    "elapsed_s": 0.4,
+    "contexts": 749,
+    "relations": {
+      "calls": 444,
+      "called_by": 364,
+      "inherits": 41,
+      "subclassed_by": 41,
+      "instantiated_at": 80,
+      "overrides": 65,
+      "overridden_by": 106,
+      "dispatch_candidates": 125,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 44,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 109,
+      "bases_declared": 90,
+      "bases_resolved": 42,
+      "base_resolution_rate": 0.4666666666666667,
+      "calls": 2729,
+      "calls_resolved": 505,
+      "call_resolution_rate": 0.18504946866984243
+    }
+  },
+  {
+    "repo": "joblib",
+    "backend": "pyright",
+    "measure": {
+      "classes": 109,
+      "methods": 459,
+      "functions": 181,
+      "documentable": 640,
+      "files": 44,
+      "bases_declared": 90
+    },
+    "elapsed_s": 8.3,
+    "contexts": 359,
+    "relations": {
+      "calls": 868,
+      "called_by": 178,
+      "inherits": 41,
+      "subclassed_by": 41,
+      "instantiated_at": 0,
+      "overrides": 34,
+      "overridden_by": 77,
+      "dispatch_candidates": 64,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.55,
+    "stats": {
+      "bases_resolved_internal": 41,
+      "hierarchy_items": 249,
+      "external_calls": 710,
+      "hierarchy_missing": 1,
+      "entities_queried": 250,
+      "entities_total": 640,
+      "sampled": 1,
+      "external_bases": 48
+    }
+  },
+  {
+    "repo": "pyro",
+    "backend": "ast",
+    "measure": {
+      "classes": 539,
+      "methods": 2103,
+      "functions": 754,
+      "documentable": 2857,
+      "files": 306,
+      "parse_errors": 0,
+      "bases_declared": 513,
+      "bases_resolved": 211,
+      "calls": 16624,
+      "calls_resolved": 1469
+    },
+    "elapsed_s": 2.2,
+    "contexts": 3396,
+    "relations": {
+      "calls": 1295,
+      "called_by": 1034,
+      "inherits": 203,
+      "subclassed_by": 203,
+      "instantiated_at": 261,
+      "overrides": 408,
+      "overridden_by": 388,
+      "dispatch_candidates": 4043,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 306,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 539,
+      "bases_declared": 513,
+      "bases_resolved": 211,
+      "base_resolution_rate": 0.41130604288499023,
+      "calls": 16624,
+      "calls_resolved": 1469,
+      "call_resolution_rate": 0.08836621751684312
+    }
+  },
+  {
+    "repo": "pyro",
+    "backend": "pyright",
+    "measure": {
+      "classes": 539,
+      "methods": 2103,
+      "functions": 754,
+      "documentable": 2857,
+      "files": 306,
+      "bases_declared": 513
+    },
+    "elapsed_s": 40.2,
+    "contexts": 789,
+    "relations": {
+      "calls": 772,
+      "called_by": 198,
+      "inherits": 203,
+      "subclassed_by": 203,
+      "instantiated_at": 0,
+      "overrides": 53,
+      "overridden_by": 161,
+      "dispatch_candidates": 590,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.582,
+    "stats": {
+      "bases_resolved_internal": 203,
+      "hierarchy_items": 250,
+      "external_calls": 555,
+      "entities_queried": 250,
+      "entities_total": 2857,
+      "sampled": 1,
+      "external_bases": 302
+    }
+  },
+  {
+    "repo": "fairseq",
+    "backend": "ast",
+    "measure": {
+      "classes": 786,
+      "methods": 3589,
+      "functions": 854,
+      "documentable": 4443,
+      "files": 442,
+      "parse_errors": 0,
+      "bases_declared": 755,
+      "bases_resolved": 128,
+      "calls": 27816,
+      "calls_resolved": 2197
+    },
+    "elapsed_s": 3.6,
+    "contexts": 5229,
+    "relations": {
+      "calls": 1875,
+      "called_by": 1616,
+      "inherits": 128,
+      "subclassed_by": 128,
+      "instantiated_at": 259,
+      "overrides": 263,
+      "overridden_by": 401,
+      "dispatch_candidates": 669,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 442,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 786,
+      "bases_declared": 755,
+      "bases_resolved": 128,
+      "base_resolution_rate": 0.1695364238410596,
+      "calls": 27816,
+      "calls_resolved": 2197,
+      "call_resolution_rate": 0.07898331895312051
+    }
+  },
+  {
+    "repo": "fairseq",
+    "backend": "pyright",
+    "measure": {
+      "classes": 786,
+      "methods": 3589,
+      "functions": 854,
+      "documentable": 4443,
+      "files": 442,
+      "bases_declared": 755
+    },
+    "elapsed_s": 44.4,
+    "contexts": 1036,
+    "relations": {
+      "calls": 724,
+      "called_by": 105,
+      "inherits": 128,
+      "subclassed_by": 128,
+      "instantiated_at": 0,
+      "overrides": 16,
+      "overridden_by": 166,
+      "dispatch_candidates": 10,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.541,
+    "stats": {
+      "bases_resolved_internal": 128,
+      "hierarchy_items": 250,
+      "external_calls": 615,
+      "entities_queried": 250,
+      "entities_total": 4443,
+      "sampled": 1,
+      "external_bases": 627
+    }
+  },
+  {
+    "repo": "sonnet",
+    "backend": "ast",
+    "measure": {
+      "classes": 321,
+      "methods": 1021,
+      "functions": 263,
+      "documentable": 1284,
+      "files": 133,
+      "parse_errors": 0,
+      "bases_declared": 377,
+      "bases_resolved": 96,
+      "calls": 7401,
+      "calls_resolved": 486
+    },
+    "elapsed_s": 1.3,
+    "contexts": 1605,
+    "relations": {
+      "calls": 417,
+      "called_by": 292,
+      "inherits": 96,
+      "subclassed_by": 96,
+      "instantiated_at": 125,
+      "overrides": 94,
+      "overridden_by": 101,
+      "dispatch_candidates": 775,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 133,
+      "parse_errors": [],
+      "n_parse_errors": 0,
+      "classes": 321,
+      "bases_declared": 377,
+      "bases_resolved": 96,
+      "base_resolution_rate": 0.2546419098143236,
+      "calls": 7401,
+      "calls_resolved": 486,
+      "call_resolution_rate": 0.06566680178354277
+    }
+  },
+  {
+    "repo": "sonnet",
+    "backend": "pyright",
+    "measure": {
+      "classes": 321,
+      "methods": 1021,
+      "functions": 263,
+      "documentable": 1284,
+      "files": 133,
+      "bases_declared": 377
+    },
+    "elapsed_s": 9.7,
+    "contexts": 571,
+    "relations": {
+      "calls": 658,
+      "called_by": 96,
+      "inherits": 96,
+      "subclassed_by": 96,
+      "instantiated_at": 0,
+      "overrides": 5,
+      "overridden_by": 32,
+      "dispatch_candidates": 2,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.574,
+    "stats": {
+      "bases_resolved_internal": 96,
+      "hierarchy_items": 250,
+      "external_calls": 489,
+      "entities_queried": 250,
+      "entities_total": 1284,
+      "sampled": 1,
+      "external_bases": 281
+    }
+  },
+  {
+    "repo": "torch",
+    "backend": "ast",
+    "measure": {
+      "classes": 5117,
+      "methods": 23336,
+      "functions": 20998,
+      "documentable": 44334,
+      "files": 2289,
+      "parse_errors": 29,
+      "bases_declared": 3529,
+      "bases_resolved": 1777,
+      "calls": 288307,
+      "calls_resolved": 46397
+    },
+    "elapsed_s": 63.4,
+    "contexts": 49451,
+    "relations": {
+      "calls": 36595,
+      "called_by": 32291,
+      "inherits": 1769,
+      "subclassed_by": 1769,
+      "instantiated_at": 4304,
+      "overrides": 5179,
+      "overridden_by": 5154,
+      "dispatch_candidates": 77085,
+      "attribute_access": 0
+    },
+    "coverage": {
+      "files_parsed": 2289,
+      "parse_errors": [
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_dynamo\\decorators.py",
+          "SyntaxError: invalid syntax (decorators.py, line 1072)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_dynamo\\variables\\builder.py",
+          "SyntaxError: invalid syntax (builder.py, line 443)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_dynamo\\variables\\constant.py",
+          "SyntaxError: invalid syntax (constant.py, line 80)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_dynamo\\variables\\torch.py",
+          "SyntaxError: invalid syntax (torch.py, line 3180)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_export\\non_strict_utils.py",
+          "SyntaxError: invalid syntax (non_strict_utils.py, line 316)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_functorch\\_aot_autograd\\frontend_utils.py",
+          "SyntaxError: invalid syntax (frontend_utils.py, line 124)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_functorch\\_aot_autograd\\functional_utils.py",
+          "SyntaxError: invalid syntax (functional_utils.py, line 53)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_functorch\\_aot_autograd\\graph_capture_wrappers.py",
+          "SyntaxError: invalid syntax (graph_capture_wrappers.py, line 676)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_functorch\\_aot_autograd\\graph_compile.py",
+          "SyntaxError: invalid syntax (graph_compile.py, line 790)"
+        ],
+        [
+          "E:\\Pycharm_projects\\CodeEval\\targets\\torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "SyntaxError: invalid syntax (subclass_codegen.py, line 116)"
+        ]
+      ],
+      "n_parse_errors": 29,
+      "classes": 5117,
+      "bases_declared": 3529,
+      "bases_resolved": 1777,
+      "base_resolution_rate": 0.5035420799093228,
+      "calls": 288307,
+      "calls_resolved": 46397,
+      "call_resolution_rate": 0.1609291484424589
+    }
+  },
+  {
+    "repo": "torch",
+    "backend": "pyright",
+    "measure": {
+      "classes": 5117,
+      "methods": 23336,
+      "functions": 20998,
+      "documentable": 44334,
+      "files": 2289,
+      "bases_declared": 3529
+    },
+    "elapsed_s": 280.2,
+    "contexts": 5367,
+    "relations": {
+      "calls": 462,
+      "called_by": 90,
+      "inherits": 1768,
+      "subclassed_by": 1768,
+      "instantiated_at": 0,
+      "overrides": 2,
+      "overridden_by": 1527,
+      "dispatch_candidates": 60,
+      "attribute_access": 0
+    },
+    "call_resolution": 0.557,
+    "stats": {
+      "bases_resolved_internal": 1768,
+      "hierarchy_items": 250,
+      "external_calls": 368,
+      "entities_queried": 250,
+      "entities_total": 44334,
+      "sampled": 1,
+      "external_bases": 1753
+    }
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "numpy": {
+    "error": "RuntimeError: pyan failed: SyntaxError: invalid syntax (_dtype_like.py, line 21)"
+  },
+  "openui": {
+    "classes": 23,
+    "methods": 56,
+    "functions": 33,
+    "documentable": 89,
+    "total_incl_classes": 112,
+    "seconds": 0.6
+  },
+  "ragflow": {
+    "classes": 4,
+    "methods": 13,
+    "functions": 6,
+    "documentable": 19,
+    "total_incl_classes": 23,
+    "seconds": 0.1
+  },
+  "dify_api": {
+    "error": "RuntimeError: pyan failed: SyntaxError: invalid syntax (app_config.py, line 40)"
+  },
+  "flask-main": {
+    "classes": 44,
+    "methods": 247,
+    "functions": 69,
+    "documentable": 316,
+    "total_incl_classes": 360,
+    "seconds": 1.6
+  },
+  "joblib": {
+    "error": "RuntimeError: pyan failed: KeyError: <Node import:joblib.externals.loky.context.get_context>"
+  },
+  "pyro": {
+    "classes": 446,
+    "methods": 1771,
+    "functions": 494,
+    "documentable": 2265,
+    "total_incl_classes": 2711,
+    "seconds": 28.6
+  },
+  "fairseq": {
+    "error": "RuntimeError: pyan failed: KeyError: <Node import:fairseq.fairseq_task.LegacyFairseqTask>"
+  },
+  "sonnet": {
+    "classes": 308,
+    "methods": 1003,
+    "functions": 164,
+    "documentable": 1167,
+    "total_incl_classes": 1475,
+    "seconds": 9.0
+  },
+  "torch": {
+    "error": "RuntimeError: pyan failed: ValueError: Unknown scope 'torch.fx.experimental.proxy_tensor.get_proxy_slot.lambda'"
+  }
+}
