@@ -61,6 +61,8 @@ You are an AI documentation assistant. Generate clear, accurate documentation fo
 
 {used_by}
 
+{relations}
+
 ---
 ## Required Output Structure
 

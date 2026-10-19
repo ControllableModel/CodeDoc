@@ -1,0 +1,77 @@
+# Flask.__init__
+## Path
+`E:\Pycharm_projects\CodeEval\targets\flask-main\app.py`
+
+## Definition
+```python
+    def __init__(
+        self,
+        import_name: str,
+        static_url_path: str | None = None,
+        static_folder: str | os.PathLike[str] | None = "static",
+        static_host: str | None = None,
+        host_matching: bool = False,
+        subdomain_matching: bool = False,
+        template_folder: str | os.PathLike[str] | None = "templates",
+        instance_path: str | None = None,
+        instance_relative_config: bool = False,
+        root_path: str | None = None,
+    ):
+        super().__init__(
+            import_name=import_name,
+            static_url_path=static_url_path,
+            static_folder=static_folder,
+            static_host=static_host,
+            host_matching=host_matching,
+            subdomain_matching=subdomain_matching,
+            template_folder=template_folder,
+            instance_path=instance_path,
+            instance_relative_config=instance_relative_config,
+            root_path=root_path,
+        )
+
+        #: The Click command group for registering CLI commands for this
+        #: object. The commands are available from the ``flask`` command
+        #: once the application has been discovered and blueprints have
+        #: been registered.
+        self.cli = cli.AppGroup()
+
+        # Set the name of the Click group in case someone wants to add
+        # the app's commands to another CLI tool.
+        self.cli.name = self.name
+
+        # Add a static route using the provided static_url_path, static_host,
+        # and static_folder if there is a configured static_folder.
+        # Note we do this without checking if static_folder exists.
+        # For one, it might be created while the server is running (e.g. during
+        # development). Also, Google App Engine stores static files somewhere
+        if self.has_static_folder:
+            assert bool(static_host) == host_matching, (
+                "Invalid static_host/host_matching combination"
+            )
+            # Use a weakref to avoid creating a reference cycle between the app
+            # and the view function (see #3761).
+            self_ref = weakref.ref(self)
+            self.add_url_rule(
+                f"{self.static_url_path}/<path:filename>",
+                endpoint="static",
+                host=static_host,
+                view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore
+            )
+```
+
+## Uses
+### AppGroup
+```python
+E:\Pycharm_projects\CodeEval\targets\flask-main\cli.py
+```
+### add_url_rule
+```python
+E:\Pycharm_projects\CodeEval\targets\flask-main\sansio\app.py
+```
+
+
+## Overrides
+- `App.__init__`- `Scaffold.__init__`
+## Dispatch candidates
+- `App.__init__`- `Blueprint.__init__`

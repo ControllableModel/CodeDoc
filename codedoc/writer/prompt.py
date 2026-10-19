@@ -17,7 +17,53 @@ from typing import Dict, List
 
 from codedoc.deps.schema import DependencyContext, RelationKind
 
-__all__ = ["build_prompt", "format_dep", "build_context_blocks", "render_relations"]
+__all__ = [
+    "build_prompt", "format_dep", "build_context_blocks", "render_relations",
+    "clip_source",
+]
+
+#: Default budget for the source section, in characters.
+#:
+#: The previous pipeline truncated the *whole* message to 10,000 characters in
+#: ``call_llm``. For a 1,500-line class that meant the dependency blocks, the
+#: required output structure and even the tail of the source were silently
+#: dropped. Clipping the source section explicitly keeps every other section
+#: intact and makes the elision visible in the prompt and in the audit record.
+DEFAULT_SOURCE_BUDGET = 8000
+
+
+def clip_source(code: str, budget: int = DEFAULT_SOURCE_BUDGET) -> str:
+    """Trim a source section to ``budget`` characters, keeping head and tail.
+
+    The signature and the trailing code (imports, returns, decorators) are the
+    parts a documentation writer needs most, so both ends are kept and the middle
+    is elided with an explicit marker that states how many lines were removed.
+    """
+    if budget <= 0 or len(code) <= budget:
+        return code
+    lines = code.splitlines()
+    marker_reserve = 120
+    head_budget = int((budget - marker_reserve) * 0.6)
+    tail_budget = budget - marker_reserve - head_budget
+
+    head, used = [], 0
+    for line in lines:
+        if used + len(line) + 1 > head_budget:
+            break
+        head.append(line)
+        used += len(line) + 1
+
+    tail, used = [], 0
+    for line in reversed(lines[len(head):]):
+        if used + len(line) + 1 > tail_budget:
+            break
+        tail.append(line)
+        used += len(line) + 1
+    tail.reverse()
+
+    elided = len(lines) - len(head) - len(tail)
+    marker = f"# ... {elided} lines elided (source exceeds the {budget}-char budget) ..."
+    return "\n".join(head + [marker] + tail)
 
 
 def _build_section(items: List[Dict[str, str]], title: str) -> str:
@@ -51,6 +97,7 @@ def render_relations(info: Dict[str, object]) -> str:
 
 def format_dep(info: Dict[str, object], include_deps: bool = True) -> str:
     """The ``.info`` audit record: what exactly reached the prompt."""
+    source = clip_source(str(info["source_code"]))
     uses = _build_section(info["uses"], "Uses") if include_deps else ""          # type: ignore[arg-type]
     used_by = _build_section(info["used_by"], "Used by") if include_deps else ""  # type: ignore[arg-type]
     relations = render_relations(info) if include_deps else ""
@@ -60,7 +107,7 @@ def format_dep(info: Dict[str, object], include_deps: bool = True) -> str:
 
 ## Definition
 ```python
-{info["source_code"]}
+{source}
 ```
 
 {uses}
@@ -69,56 +116,60 @@ def format_dep(info: Dict[str, object], include_deps: bool = True) -> str:
 
 
 def build_prompt(info: Dict[str, object], args) -> str:
-    """Assemble the generation prompt for one entity."""
+    """Assemble the generation prompt for one entity.
+
+    The source section is budgeted *from the total prompt cap*, not from a fixed
+    constant: the criteria template alone is ~4 KB, so a fixed 8 KB source budget
+    still overflowed the 10 KB guard and the overflow truncated the tail of the
+    prompt (the required output structure). Everything except the source section is
+    mandatory, so it gets whatever budget remains, split between head and tail with
+    an explicit elision marker.
+    """
     uses = _build_section(info["uses"], "Dependencies") if args.relevant else ""      # type: ignore[arg-type]
     used_by = _build_section(info["used_by"], "Dependents") if args.relevant else ""  # type: ignore[arg-type]
     relations = render_relations(info) if args.relevant else ""
+    source_text = str(info["source_code"])
+    cap = int(getattr(args, "max_tokens", 0) or 0)
+    configured = int(getattr(args, "source_budget", 0) or DEFAULT_SOURCE_BUDGET)
 
     # Ablation / IDE-style baseline: no criteria template.
     if args.prompt_template is None:
-        return f"""Generate documentation for the following code in {args.language}.
-
-Code to document:
-```python
-{info["source_code"]}
-```
-uses:
-{uses}
-
-used_by:
-{used_by}
-{relations}
-
-Provide clear and concise documentation."""
+        scaffold = (
+            f"Generate documentation for the following code in {args.language}.\n\n"
+            f"Code to document:\n```python\n\n```\nuses:\n{uses}\n\n"
+            f"used_by:\n{used_by}\n{relations}\n\nProvide clear and concise documentation."
+        )
+        budget = configured if not cap else max(400, min(configured, cap - len(scaffold) - 100))
+        return scaffold.replace(
+            "```python\n\n```", "```python\n" + clip_source(source_text, budget) + "\n```"
+        )
 
     try:
         with open(args.prompt_template, "r", encoding="utf-8") as fh:
             template = fh.read()
     except FileNotFoundError:
-        return (
-            f"Generate docs for {info['real_name']}\n\n{info['source_code']}\n\n"
-            f"{uses}\n{used_by}\n{relations}"
-        )
+        template = "Generate docs for {real_name}\n\n{source_code}\n\n{uses}\n{used_by}\n{relations}"
+
+    # Budget the source from what the template and the other sections leave over.
+    overhead = len(template) + len(uses) + len(used_by) + len(relations) + 200
+    budget = configured if not cap else max(400, min(configured, cap - overhead))
+    source = clip_source(source_text, budget)
+
+    values = dict(
+        real_name=info["real_name"],
+        path=info["path"],
+        source_code=source,
+        uses=uses,
+        used_by=used_by,
+        relations=relations,
+        language=args.language,
+    )
     try:
-        return template.format(
-            real_name=info["real_name"],
-            path=info["path"],
-            source_code=info["source_code"],
-            uses=uses,
-            used_by=used_by,
-            relations=relations,
-            language=args.language,
-        )
+        return template.format(**values)
     except KeyError:
-        # Template predates the ``relations`` placeholder; still usable.
-        return template.format(
-            real_name=info["real_name"],
-            path=info["path"],
-            source_code=info["source_code"],
-            uses=uses,
-            used_by=used_by,
-            language=args.language,
-        )
+        # Template predates one of the placeholders (e.g. ``relations``).
+        values.pop("relations", None)
+        return template.format(**values)
 
 
 def build_context_blocks(context: DependencyContext) -> Dict[str, str]:

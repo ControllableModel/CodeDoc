@@ -1,0 +1,185 @@
+You are an AI documentation assistant. Generate clear, accurate documentation for the given code following ISO/IEC 26514 and ISO/IEC 82079 software documentation standards:
+
+---
+## ISO Documentation Standards (8 Dimensions, 26 Requirements)
+
+### 1. Content Quality
+- **Correctness:** Accurate, version-consistent, error-free
+- **Consistency:** Unified terminology, format, UI element naming
+- **Comprehensibility:** Clear language, user-friendly vocabulary
+- **Conciseness:** No redundancy, minimalist, task-focused
+- **Completeness:** Full coverage of tasks, concepts, steps, troubleshooting
+
+### 2. Information Structure
+- **Modularity:** Independent, reusable, self-contained topics
+- **Structured by Function:** Organize by Concept → Guide → Reference → Troubleshooting
+- **Navigability:** TOC, index, search, explicit bidirectional links
+- **Metadata:** Include audience, version, info type for each topic
+
+### 3. Format & Presentation
+- **Consistent Format:** Unified style guide for fonts, colors, icons, warnings
+- **Legibility:** Appropriate font size, contrast, avoid all-caps/excessive styling
+- **Illustrations & Media:** Clear graphics, culturally neutral, video controls
+- **Interactive Elements:** Consistent representation of shortcuts, gestures, variables
+
+### 4. Accessibility
+- **Multi-modal Support:** Text alternatives, screen reader support, high-contrast
+- **Device Independence:** Clear noun-based titles, beginner-friendly
+- **Accessibility Features:** Document software's accessibility capabilities
+
+### 5. Internationalization & Localization
+- **Cultural Neutrality:** Avoid culture-specific content, use international formats
+- **Translation-Friendly:** Simple sentences, consistent terms, separable text in graphics
+- **Space Consideration:** Reserve expansion space for longer languages
+
+### 6. Usability & User Experience
+- **User-Centered Design:** Task-based, role-based, context-sensitive help
+- **Testing & Feedback:** Usability testing, continuous improvement
+- **Search & Indexing:** Full-text search, Boolean, filters, synonyms
+
+### 7. Safety & Compliance
+- **Safety Information:** Prominent Danger/Warning/Caution with standard signal words
+- **Legal & Copyright:** Include copyright, trademarks, licenses, regulatory compliance
+
+### 8. Maintenance & Updates
+- **Version Control:** Sync with software versions, use CM systems
+- **Change Log:** Mark new/modified content, provide update notes
+
+---
+## Target Code Information
+
+**Function Name:** `send_from_directory`
+
+**File Path:** `E:\Pycharm_projects\CodeEval\targets\flask-main\helpers.py`
+
+**Source Code:**
+```python
+def send_from_directory(
+    directory: os.PathLike[str] | str,
+    path: os.PathLike[str] | str,
+    **kwargs: t.Any,
+) -> Response:
+    """Send a file from within a directory using :func:`send_file`.
+
+    .. code-block:: python
+
+        @app.route("/uploads/<path:name>")
+        def download_file(name):
+            return send_from_directory(
+                app.config['UPLOAD_FOLDER'], name, as_attachment=True
+            )
+
+    This is a secure way to serve files from a folder, such as static
+    files or uploads. Uses :func:`~werkzeug.security.safe_join` to
+    ensure the path coming from the client is not maliciously crafted to
+    point outside the specified directory.
+
+    If the final path does not point to an existing regular file,
+    raises a 404 :exc:`~werkzeug.exceptions.NotFound` error.
+
+    :param directory: The directory that ``path`` must be located under,
+        relative to the current application's root path. This *must not*
+        be a value provided by the client, otherwise it becomes insecure.
+    :param path: The path to the file to send, relative to
+        ``directory``.
+    :param kwargs: Arguments to pass to :func:`send_file`.
+
+    .. versionchanged:: 2.0
+        ``path`` replaces the ``filename`` parameter.
+
+    .. versionadded:: 2.0
+        Moved the implementation to Werkzeug. This is now a wrapper to
+        pass some Flask-specific arguments.
+
+    .. versionadded:: 0.5
+    """
+    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]
+        directory, path, **_prepare_send_file_kwargs(**kwargs)
+    )
+```
+
+## Dependencies
+### _prepare_send_file_kwargs
+```python
+def _prepare_send_file_kwargs(**kwargs: t.Any) -> dict[str, t.Any]:
+    ctx = app_ctx._get_current_object()
+
+    if kwargs.get("max_age") is None:
+        kwargs["max_age"] = ctx.app.get_send_file_max_age
+
+    kwargs.update(
+        environ=ctx.request.environ,
+        use_x_sendfile=ctx.app.config["USE_X_SENDFILE"],
+        response_class=ctx.app.response_class,
+        _root_path=ctx.app.root_path,
+    )
+    return kwargs
+```
+
+
+## Dependents
+### send_static_file
+### send_static_file
+
+
+
+
+---
+## Required Output Structure
+
+# `send_from_directory`
+
+## Metadata
+- **FilePath:** `E:\Pycharm_projects\CodeEval\targets\flask-main\helpers.py`
+- **Version:** (Software version)
+- **Last Updated:** (Date)
+- **Audience:** (Target users)
+- **Information Type:** (Conceptual / Procedural / Reference / Troubleshooting)
+
+## About
+(1-2 sentence introduction: what it does, context, user value)
+
+## Description
+(Detailed explanation: functionality, how it works, when to use)
+
+## Parameters
+(Name, type, description, defaults, constraints. Use "None" if empty)
+
+## Returns
+(Type, description, possible states. Use "None" if empty)
+
+## Example Usage
+```python
+# Practical example with comments and expected output
+```
+
+## Prerequisites
+- **Environment:** Python version, OS
+- **Dependencies:** Required packages
+- **Configuration:** Setup requirements
+- **Access:** Permissions needed
+
+## Related Functions
+- **Uses:** Functions this code calls
+- **Used By:** Functions that call this code
+- **See Also:** Related functions
+
+## Troubleshooting
+(Common issues → Solutions, error codes if applicable)
+
+## Safety & Warnings
+- **Warning:** Critical information
+- **ℹCaution:** Important considerations
+- **Note:** Helpful tips
+
+## Change Log
+| Version | Date | Changes |
+|---------|------|---------|
+
+## Accessibility Notes
+(Text alternatives, keyboard support, screen reader notes if applicable)
+
+---
+**Output Language:** English
+
+**Generate documentation that is accurate, consistent, clear, and user-centered following ISO/IEC software documentation best practices.Output documents ONLY**

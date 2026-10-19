@@ -1,0 +1,207 @@
+You are an AI documentation assistant. Generate clear, accurate documentation for the given code following ISO/IEC 26514 and ISO/IEC 82079 software documentation standards:
+
+---
+## ISO Documentation Standards (8 Dimensions, 26 Requirements)
+
+### 1. Content Quality
+- **Correctness:** Accurate, version-consistent, error-free
+- **Consistency:** Unified terminology, format, UI element naming
+- **Comprehensibility:** Clear language, user-friendly vocabulary
+- **Conciseness:** No redundancy, minimalist, task-focused
+- **Completeness:** Full coverage of tasks, concepts, steps, troubleshooting
+
+### 2. Information Structure
+- **Modularity:** Independent, reusable, self-contained topics
+- **Structured by Function:** Organize by Concept → Guide → Reference → Troubleshooting
+- **Navigability:** TOC, index, search, explicit bidirectional links
+- **Metadata:** Include audience, version, info type for each topic
+
+### 3. Format & Presentation
+- **Consistent Format:** Unified style guide for fonts, colors, icons, warnings
+- **Legibility:** Appropriate font size, contrast, avoid all-caps/excessive styling
+- **Illustrations & Media:** Clear graphics, culturally neutral, video controls
+- **Interactive Elements:** Consistent representation of shortcuts, gestures, variables
+
+### 4. Accessibility
+- **Multi-modal Support:** Text alternatives, screen reader support, high-contrast
+- **Device Independence:** Clear noun-based titles, beginner-friendly
+- **Accessibility Features:** Document software's accessibility capabilities
+
+### 5. Internationalization & Localization
+- **Cultural Neutrality:** Avoid culture-specific content, use international formats
+- **Translation-Friendly:** Simple sentences, consistent terms, separable text in graphics
+- **Space Consideration:** Reserve expansion space for longer languages
+
+### 6. Usability & User Experience
+- **User-Centered Design:** Task-based, role-based, context-sensitive help
+- **Testing & Feedback:** Usability testing, continuous improvement
+- **Search & Indexing:** Full-text search, Boolean, filters, synonyms
+
+### 7. Safety & Compliance
+- **Safety Information:** Prominent Danger/Warning/Caution with standard signal words
+- **Legal & Copyright:** Include copyright, trademarks, licenses, regulatory compliance
+
+### 8. Maintenance & Updates
+- **Version Control:** Sync with software versions, use CM systems
+- **Change Log:** Mark new/modified content, provide update notes
+
+---
+## Target Code Information
+
+**Function Name:** `Flask.__init__`
+
+**File Path:** `E:\Pycharm_projects\CodeEval\targets\flask-main\app.py`
+
+**Source Code:**
+```python
+    def __init__(
+        self,
+        import_name: str,
+        static_url_path: str | None = None,
+        static_folder: str | os.PathLike[str] | None = "static",
+        static_host: str | None = None,
+        host_matching: bool = False,
+        subdomain_matching: bool = False,
+        template_folder: str | os.PathLike[str] | None = "templates",
+        instance_path: str | None = None,
+        instance_relative_config: bool = False,
+        root_path: str | None = None,
+    ):
+        super().__init__(
+            import_name=import_name,
+            static_url_path=static_url_path,
+            static_folder=static_folder,
+            static_host=static_host,
+            host_matching=host_matching,
+            subdomain_matching=subdomain_matching,
+            template_folder=template_folder,
+            instance_path=instance_path,
+            instance_relative_config=instance_relative_config,
+            root_path=root_path,
+        )
+
+        #: The Click command group for registering CLI commands for this
+        #: object. The commands are available from the ``flask`` command
+        #: once the application has been discovered and blueprints have
+        #: been registered.
+        self.cli = cli.AppGroup()
+
+        # Set the name of the Click group in case someone wants to add
+        # the app's commands to another CLI tool.
+        self.cli.name = self.name
+
+        # Add a static route using the provided static_url_path, static_host,
+        # and static_folder if there is a configured static_folder.
+        # Note we do this without checking if static_folder exists.
+        # For one, it might be created while the server is running (e.g. during
+        # development). Also, Google App Engine stores static files somewhere
+        if self.has_static_folder:
+            assert bool(static_host) == host_matching, (
+                "Invalid static_host/host_matching combination"
+            )
+            # Use a weakref to avoid creating a reference cycle between the app
+            # and the view function (see #3761).
+            self_ref = weakref.ref(self)
+            self.add_url_rule(
+                f"{self.static_url_path}/<path:filename>",
+                endpoint="static",
+                host=static_host,
+                view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore
+            )
+```
+
+## Dependencies
+### AppGroup
+```python
+class AppGroup(click.Group):
+    """This works similar to a regular click :class:`~click.Group` but it
+    changes the behavior of the :meth:`command` decorator so that it
+    automatically wraps the functions in :func:`with_appcontext`.
+
+    Not to be confused with :class:`FlaskGroup`.
+    """
+
+    def command(  # type: ignore[override]
+        self, *args: t.Any, **kwargs: t.Any
+    ) -> t.Callable[[t.Callable[..., t.Any]], click.Command]:
+        """This works exactly like the method of the same name on a regular
+        :class:`click.Group` but it wraps callbacks in :func:`with_appcontext`
+        unless it's disabled by passing ``with_appcontext=False``.
+        """
+        wrap_for_ctx = kwargs.pop("with_appcontext", True)
+
+        def decorator(f: t.Callable[..., t.Any]) -> click.Command:
+            if wrap_for_ctx:
+                f = with_appcontext(f)
+# ... 13 more lines ...
+```
+### add_url_rule
+
+
+
+
+## Overrides
+- `App.__init__`- `Scaffold.__init__`
+## Dispatch candidates
+- `App.__init__`- `Blueprint.__init__`
+
+
+---
+## Required Output Structure
+
+# `Flask.__init__`
+
+## Metadata
+- **FilePath:** `E:\Pycharm_projects\CodeEval\targets\flask-main\app.py`
+- **Version:** (Software version)
+- **Last Updated:** (Date)
+- **Audience:** (Target users)
+- **Information Type:** (Conceptual / Procedural / Reference / Troubleshooting)
+
+## About
+(1-2 sentence introduction: what it does, context, user value)
+
+## Description
+(Detailed explanation: functionality, how it works, when to use)
+
+## Parameters
+(Name, type, description, defaults, constraints. Use "None" if empty)
+
+## Returns
+(Type, description, possible states. Use "None" if empty)
+
+## Example Usage
+```python
+# Practical example with comments and expected output
+```
+
+## Prerequisites
+- **Environment:** Python version, OS
+- **Dependencies:** Required packages
+- **Configuration:** Setup requirements
+- **Access:** Permissions needed
+
+## Related Functions
+- **Uses:** Functions this code calls
+- **Used By:** Functions that call this code
+- **See Also:** Related functions
+
+## Troubleshooting
+(Common issues → Solutions, error codes if applicable)
+
+## Safety & Warnings
+- **Warning:** Critical information
+- **ℹCaution:** Important considerations
+- **Note:** Helpful tips
+
+## Change Log
+| Version | Date | Changes |
+|---------|------|---------|
+
+## Accessibility Notes
+(Text alternatives, keyboard support, screen reader notes if applicable)
+
+---
+**Output Language:** English
+
+**Generate documentation that is accurate, consistent, clear, and user-centered following ISO/IEC software documentation best practices.Output documents ONLY**
