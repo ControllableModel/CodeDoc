@@ -1,0 +1,65 @@
+{
+  "numpy": {
+    "classes": 11,
+    "methods": 12,
+    "functions": 18,
+    "documentable": 30,
+    "total_incl_classes": 41
+  },
+  "openui": {
+    "classes": 7,
+    "methods": 10,
+    "functions": 11,
+    "documentable": 21,
+    "total_incl_classes": 28
+  },
+  "ragflow": {
+    "classes": 2,
+    "methods": 3,
+    "functions": 10,
+    "documentable": 13,
+    "total_incl_classes": 15
+  },
+  "dify_api": {
+    "classes": 3,
+    "methods": 5,
+    "functions": 43,
+    "documentable": 48,
+    "total_incl_classes": 51
+  },
+  "flask-main": {
+    "classes": 29,
+    "methods": 146,
+    "functions": 59,
+    "documentable": 205,
+    "total_incl_classes": 234
+  },
+  "joblib": {
+    "classes": 62,
+    "methods": 306,
+    "functions": 78,
+    "documentable": 384,
+    "total_incl_classes": 446
+  },
+  "pyro": {
+    "classes": 28,
+    "methods": 122,
+    "functions": 112,
+    "documentable": 234,
+    "total_incl_classes": 262
+  },
+  "sonnet": {
+    "classes": 181,
+    "methods": 709,
+    "functions": 96,
+    "documentable": 805,
+    "total_incl_classes": 986
+  },
+  "torch": {
+    "classes": 110,
+    "methods": 665,
+    "functions": 789,
+    "documentable": 1454,
+    "total_incl_classes": 1564
+  }
+}
