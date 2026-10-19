@@ -104,6 +104,10 @@ class Relation:
     path: str = ""
     line: Optional[int] = None
     detail: str = ""
+    #: Fully qualified name of the target entity, when it is one inside the project.
+    #: ``target`` is a human label and can be ambiguous (two classes named
+    #: Blueprint in different packages); source injection needs the exact entity.
+    target_qname: str = ""
 
     def __post_init__(self) -> None:
         if self.kind not in RelationKind.ALL:

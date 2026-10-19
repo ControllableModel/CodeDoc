@@ -41,7 +41,7 @@ class _PromptArgs:
     relevant = True
     language = "English"
     prompt_template: str | None = None
-    max_tokens = 16000
+    max_tokens = 40000
     source_budget = 8000
 
 

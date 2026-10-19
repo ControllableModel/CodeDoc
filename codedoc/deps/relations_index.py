@@ -131,8 +131,10 @@ def get_dep(
     display: str,
     key: str,
     fpath: str,
-    snippet_lines: int = 20,
-    max_snippets: int = 6,
+    snippet_lines: int = 40,
+    max_snippets: int = 10,
+    relation_snippet_lines: int = 40,
+    relation_max_snippets: int = 8,
 ) -> Optional[Dict[str, object]]:
     """Return the writer-facing record for one entity.
 
@@ -174,8 +176,37 @@ def get_dep(
 
     uses = entries(ctx.get(RelationKind.CALLS))
     used_by = entries(ctx.get(RelationKind.CALLED_BY))
+    # Relation targets also carry source now. Input tokens are cheap and output is
+    # not, so the model should see the base class or the overridden method it has to
+    # honour rather than only its name. Classes contribute their class view
+    # (declaration + __init__ + signatures) so a base class does not flood the prompt
+    # with implementation detail; methods and functions contribute a clipped body.
+    def relation_entry(rel, index_in_block: int) -> Dict[str, str]:
+        # Exact qualified name first: the label can be ambiguous, and an attribute
+        # name must never be resolved to an unrelated same-named method.
+        target_ctx = index._by_key.get(rel.target_qname) if rel.target_qname else None
+        if target_ctx is None:
+            target_ctx = index.get(name=rel.target)
+        if target_ctx is None:
+            candidates = index._by_short.get(rel.target.split(".")[-1], [])
+            target_ctx = candidates[0] if len(candidates) == 1 else None
+        code = ""
+        if (target_ctx is not None and index_in_block < relation_max_snippets
+                and rel.kind != RelationKind.ATTRIBUTE_ACCESS):
+            body = target_ctx.source or ""
+            if str(target_ctx.entity.kind) == "class":
+                from codedoc.writer.classview import class_skeleton
+                body = class_skeleton(body)
+            lines = body.splitlines()
+            if len(lines) > relation_snippet_lines:
+                lines = lines[:relation_snippet_lines] + [
+                    f"# ... {len(lines) - relation_snippet_lines} more lines ..."
+                ]
+            code = "\n".join(lines)
+        return {"name": index.label(rel.target), "code": code}
+
     relations = {
-        BLOCK_LABELS[kind]: [rel.target for rel in ctx.get(kind)]
+        BLOCK_LABELS[kind]: [relation_entry(rel, i) for i, rel in enumerate(ctx.get(kind))]
         for kind in BLOCK_LABELS
         if ctx.get(kind)
     }

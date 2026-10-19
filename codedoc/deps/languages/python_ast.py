@@ -128,6 +128,7 @@ class ProjectIndex:
         self.classes: Dict[str, _ClassInfo] = {}
         self.functions: Dict[str, _FuncInfo] = {}
         self.parse_errors: List[Tuple[str, str]] = []
+        self._unique_labels: Optional[Dict[str, str]] = None
         self.unresolved_bases: List[Tuple[str, str]] = []
         self.total_calls = 0
         self.unresolved_calls = 0
@@ -369,6 +370,33 @@ class ProjectIndex:
                     return sub
         return None
 
+    def _build_unique_labels(self) -> None:
+        """Map qname -> shortest unambiguous label.
+
+        Taking the last two components is not enough: ``flask.blueprints.Blueprint``
+        and ``flask.sansio.blueprints.Blueprint`` both become ``blueprints.Blueprint``,
+        which rendered the subclass as if it inherited from itself.
+        """
+        counts: dict = {}
+        for qname in self.classes:
+            short = qname.split(".")[-1]
+            counts[short] = counts.get(short, 0) + 1
+        labels: dict = {}
+        for qname in self.classes:
+            parts = qname.split(".")
+            if counts.get(parts[-1], 0) <= 1:
+                labels[qname] = parts[-1]
+                continue
+            chosen = qname
+            for depth in range(2, len(parts) + 1):
+                candidate = ".".join(parts[-depth:])
+                if sum(1 for other in self.classes
+                       if ".".join(other.split(".")[-depth:]) == candidate) <= 1:
+                    chosen = candidate
+                    break
+            labels[qname] = chosen
+        self._unique_labels = labels
+
     def display_name(self, qname: str) -> str:
         """Short name when unambiguous, otherwise a dotted suffix.
 
@@ -376,12 +404,11 @@ class ProjectIndex:
         ``Blueprint`` and also imports ``sansio.blueprints.Blueprint``) render as
         "Blueprint inherits Blueprint", which reads like a self-loop.
         """
-        short = qname.split(".")[-1]
-        same = [q for q in self.classes if q.split(".")[-1] == short]
-        if len(same) <= 1:
-            return short
-        parts = qname.split(".")
-        return ".".join(parts[-2:]) if len(parts) >= 2 else short
+        labels = getattr(self, "_unique_labels", None)
+        if labels is None:
+            self._build_unique_labels()
+            labels = self._unique_labels
+        return labels.get(qname, qname.split(".")[-1])
 
     # -- derived views ------------------------------------------------------
     def subclass_map(self) -> Dict[str, List[str]]:
@@ -483,15 +510,17 @@ class PythonAstExtractor(Extractor):
             ctx = DependencyContext(entity=entity, source=self._slice(info.path, info.lineno, info.end_lineno))
             for base in info.bases:
                 ctx.add(Relation(kind=RelationKind.INHERITS, target=idx.display_name(base),
-                                 target_kind=EntityKind.CLASS, path=idx.classes[base].path))
+                                 target_kind=EntityKind.CLASS, path=idx.classes[base].path,
+                                 target_qname=base))
             for sub in subs.get(qname, []):
                 ctx.add(Relation(kind=RelationKind.SUBCLASSED_BY, target=idx.display_name(sub),
-                                 target_kind=EntityKind.CLASS, path=idx.classes[sub].path))
+                                 target_kind=EntityKind.CLASS, path=idx.classes[sub].path,
+                                 target_qname=sub))
             for user in dict.fromkeys(instantiated_by.get(qname, [])):
                 target_kind = EntityKind.METHOD if user in idx.functions and idx.functions[user].kind == EntityKind.METHOD else EntityKind.FUNCTION
                 path = idx.functions[user].path if user in idx.functions else ""
                 ctx.add(Relation(kind=RelationKind.INSTANTIATED_AT, target=idx.display_name(user) if user in idx.classes else user.split(".")[-1],
-                                 target_kind=target_kind, path=path))
+                                 target_kind=target_kind, path=path, target_qname=user))
             # polymorphic contract: methods overridden somewhere in the subtree
             for mname, mqname in info.methods.items():
                 impls = [q for q in subs.get(qname, []) if mname in idx.classes[q].methods]
@@ -523,10 +552,10 @@ class PythonAstExtractor(Extractor):
                 path = (idx.classes[target].path if target in idx.classes
                         else idx.functions[target].path if target in idx.functions else "")
                 ctx.add(Relation(kind=RelationKind.CALLS, target=target.split(".")[-1],
-                                 target_kind=kind, path=path))
+                                 target_kind=kind, path=path, target_qname=target))
             for caller in dict.fromkeys(called_by.get(qname, [])):
                 ctx.add(Relation(kind=RelationKind.CALLED_BY, target=caller.split(".")[-1],
-                                 target_kind=EntityKind.FUNCTION))
+                                 target_kind=EntityKind.FUNCTION, target_qname=caller))
             if info.kind == EntityKind.METHOD and info.owner:
                 for attr in info.attrs:
                     ctx.add(Relation(kind=RelationKind.ATTRIBUTE_ACCESS, target=attr,
@@ -537,7 +566,8 @@ class PythonAstExtractor(Extractor):
                         ctx.add(Relation(kind=RelationKind.OVERRIDES,
                                          target=f"{idx.classes[anc].name}.{info.name}",
                                          target_kind=EntityKind.METHOD,
-                                         path=idx.classes[anc].path))
+                                         path=idx.classes[anc].path,
+                                         target_qname=idx.classes[anc].methods[info.name]))
                 for sub in subs.get(info.owner, []):
                     if info.name in idx.classes[sub].methods:
                         ctx.add(Relation(kind=RelationKind.OVERRIDDEN_BY,
@@ -552,7 +582,8 @@ class PythonAstExtractor(Extractor):
                             ctx.add(Relation(kind=RelationKind.DISPATCH_CANDIDATES,
                                              target=f"{idx.classes[peer].name}.{info.name}",
                                              target_kind=EntityKind.METHOD,
-                                             path=idx.classes[peer].path))
+                                             path=idx.classes[peer].path,
+                                             target_qname=idx.classes[peer].methods[info.name]))
             contexts.append(ctx)
         return contexts
 

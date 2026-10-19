@@ -82,3 +82,23 @@ opt-in, because a call graph over a whole repository is unreadable. With `focus`
 the server returns the neighbourhood of that entity and adds the call and attribute
 edges for it. Node labels are disambiguated by module suffix and then by full
 qualified name, so two classes called `Blueprint` do not appear to be one node.
+
+## What the prompt carries
+
+Input tokens are the cheap side of the bill and output is the expensive one, so every
+relation target now arrives with its **source**, not just its name:
+
+| block | payload |
+|---|---|
+| `Uses` / `Used by` | every callee/caller listed; the first 10 also carry up to 40 lines of source |
+| `Inherits` / `Subclassed by` | base class / subclass **class view** (declaration + `__init__` + method signatures), up to 40 lines |
+| `Overrides` / `Overridden by` | the parent implementation body, up to 40 lines |
+| `Instantiated at` / `Dispatch candidates` | the constructing or sibling implementation, up to 40 lines |
+| `Attribute access` | names only — an attribute is not an entity, and resolving `self.name` to some unrelated same-named method was wrong |
+
+Measured effect (ragflow, same four entities before and after): 1,217 -> 1,359 input
+tokens, 1,780 -> 2,228 output tokens, CNY 0.0167 -> 0.0205 per entity. The output grows
+because a better-grounded prompt yields a longer document, which is the point.
+
+The prompt cap is raised to 40,000 characters to leave room for the relation sources;
+mean prompt length on flask-main is 5.9k characters and the largest is 18.9k.
