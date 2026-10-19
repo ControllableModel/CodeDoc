@@ -45,6 +45,7 @@
     </label>
 
     <button id="analyzeBtn" class="primary">分析</button>
+    <button id="batchBtn" class="primary" disabled>生成全部</button>
     <button id="configBtn" class="ghost">⚙ 配置</button>
   </div>
 </header>
@@ -68,10 +69,30 @@
       <div class="tabs" id="sourceTabs">
         <button class="tab active" data-view="source">源码</button>
         <button class="tab" data-view="promptSource">注入视图</button>
+        <button class="tab" data-view="graph">关系图</button>
       </div>
     </div>
     <div id="entityStrip" class="chips"></div>
     <pre id="sourceBody" class="code scroll"><span class="hint">← 先在左侧选择文件</span></pre>
+    <div id="graphPane" class="graph-pane hidden">
+      <div class="graph-tools">
+        <label class="field"><span>仅看选中</span><input type="checkbox" id="graphFocus" checked /></label>
+        <label class="field narrow"><span>深度</span><input id="graphDepth" type="number" value="1" min="1" max="3" /></label>
+        <button id="graphReset" class="ghost small">重新布局</button>
+        <span id="graphKinds" class="kind-toggles">
+          <label><input type="checkbox" value="inherits" checked />inherits</label>
+          <label><input type="checkbox" value="subclassed_by" checked />subclassed</label>
+          <label><input type="checkbox" value="instantiated_at" checked />instantiated</label>
+          <label><input type="checkbox" value="overrides" checked />overrides</label>
+          <label><input type="checkbox" value="overridden_by" checked />overridden</label>
+          <label><input type="checkbox" value="dispatch_candidates" checked />dispatch</label>
+          <label><input type="checkbox" value="attribute_access" />attribute</label>
+          <label><input type="checkbox" value="calls" />calls</label>
+          <label><input type="checkbox" value="called_by" />called_by</label>
+        </span>
+      </div>
+      <canvas id="graphCanvas"></canvas>
+    </div>
   </section>
 
   <!-- column 3: document / prompt / relations / params -->
@@ -149,5 +170,6 @@
 </div>
 
 <script src="/static/app.js"></script>
+<script src="/static/graph.js"></script>
 </body>
 </html>

@@ -17,6 +17,10 @@ class LinguisticCore:
         self.temperature = 1
         self.history = []
         self.round = 10
+        #: Optional per-call tag so concurrent callers can attribute usage to
+        #: themselves. Without it, a thread that snapshots the recorder cannot tell
+        #: its own records from its siblings', and batch accounting inflates.
+        self.label = ""
 
     def create_socket(self):
         self.client = OpenAI(api_key=self.LLM_key, base_url=self.LLM_url)
@@ -38,10 +42,12 @@ class LinguisticCore:
         except Exception as exc:
             RECORDER.record(phase="generation", model=self.model,
                             seconds=time.time() - started, ok=False,
-                            error=f"{type(exc).__name__}: {exc}")
+                            error=f"{type(exc).__name__}: {exc}",
+                            label=getattr(self, "label", ""))
             raise
         if not stream:
-            RECORDER.record_response("generation", self.model, r, time.time() - started)
+            RECORDER.record_response("generation", self.model, r, time.time() - started,
+                                     label=getattr(self, "label", ""))
 
         if stream:
             def gen():
