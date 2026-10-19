@@ -175,6 +175,9 @@ def main() -> int:
         kind = kind_of.get(qname, "function")
         spec = spec_by_kind.get(kind) or spec_by_kind["function"]
         judge = LLM_Remote_query(api_key=key, api_url=base_url, model=args.model)
+        # Output budget scales with the number of dimensions: a 14-dimension rubric
+        # does not fit in the historical 1024-token cap and gets truncated mid-JSON.
+        judge.max_token = max(1024, 200 * max(1, len(criteria)))
         judge.load_JudgeContent_Once(spec)
         verdict, attempts, raw = judge_with_retry(judge, text or "")
         if not verdict:
