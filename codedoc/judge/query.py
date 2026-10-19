@@ -24,6 +24,12 @@ class LLM_Remote_query:
         self.max_token = 1024
         #: See writer.llm: newer models need ``max_completion_tokens`` via extra_body.
         self.use_max_completion_tokens = False
+        #: Models such as gpt-6-luna accept only the default temperature (1). When such
+        #: a model is used the judge records the temperature it actually ran at, because
+        #: a scoring instrument at temperature 1 needs replicated runs to control
+        #: variance and may emit unparseable verdicts more often.
+        self.temperature_forced = False
+        self.effective_temperature = None
 
     def multi_query(self, question):
         self.MESSAGE_HISTORY.append({"role": "user", "content": question})
@@ -45,6 +51,8 @@ class LLM_Remote_query:
         self.MESSAGE_HISTORY.append({"role": "user", "content": question})
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_url)
         count = 5
+        answer = None
+        last_error: Exception | None = None
         while count > 0:
             time.sleep(2)
             try:
@@ -56,11 +64,26 @@ class LLM_Remote_query:
                 else:
                     _kwargs["max_tokens"] = int(self.max_token)
                 answer = self.client.chat.completions.create(**_kwargs)
+                self.effective_temperature = _kwargs.get("temperature")
                 RECORDER.record_response("judge_solo", self.model, answer, time.time() - _t0)
                 count = 0
-            except:
+            except Exception as exc:  # noqa: BLE001 - retried, then surfaced
+                last_error = exc
+                message = str(exc)
+                if "temperature" in message and "does not support" in message:
+                    # Fixed-temperature models: drop the parameter rather than fail, and
+                    # remember that this judge could not run at the configured value.
+                    self.temperature_forced = True
+                    self.judge_temperature = 1.0
+                    count = 5
+                    continue
                 count -= 1
-                print(f"Request Try Left: {count}")
+                print(f"Request Try Left: {count} ({type(exc).__name__}: {message[:160]})")
+        if answer is None:
+            # A bare `except` here used to swallow the real cause and fail later with
+            # UnboundLocalError, which hid provider errors entirely.
+            raise RuntimeError(f"judge request failed: {type(last_error).__name__}: {last_error}"
+                               if last_error else "judge request failed")
         ans = answer.choices[0].message.content
         self.MESSAGE_HISTORY.append({"role": "assistant", "content": ans})
         return ans

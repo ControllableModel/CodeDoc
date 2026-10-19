@@ -1,0 +1,289 @@
+[
+  {
+    "axis": "iso_26514",
+    "label": "ISO/IEC 26514",
+    "documents": 0,
+    "empty_verdicts": 0,
+    "dimensions_asked": 26,
+    "dimensions_scored": 0,
+    "overall_mean": null,
+    "main_dimensions": [
+      {
+        "category": "Content Quality",
+        "dimensions": 5,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Information Structure",
+        "dimensions": 4,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Format & Presentation",
+        "dimensions": 4,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Accessibility",
+        "dimensions": 3,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Internationalization & Localization",
+        "dimensions": 3,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Usability & User Experience",
+        "dimensions": 3,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Safety & Compliance",
+        "dimensions": 2,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Maintenance & Updates",
+        "dimensions": 2,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      }
+    ],
+    "dimensions": [
+      {
+        "dimension": "Correctness",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Consistency",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Comprehensibility",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Conciseness",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Completeness",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Modularity",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Structured by Function",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Navigability",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Metadata",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Consistent Format",
+        "category": "Format & Presentation",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Legibility",
+        "category": "Format & Presentation",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Illustrations and Media",
+        "category": "Format & Presentation",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Representation of Interactive Elements",
+        "category": "Format & Presentation",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Multi-modal Support",
+        "category": "Accessibility",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Device Independence",
+        "category": "Accessibility",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Accessibility Features",
+        "category": "Accessibility",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Cultural Neutrality",
+        "category": "Internationalization & Localization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Translation-Friendly",
+        "category": "Internationalization & Localization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Space Consideration",
+        "category": "Internationalization & Localization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "User-Centered Design",
+        "category": "Usability & User Experience",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Testing and Feedback",
+        "category": "Usability & User Experience",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Search and Indexing",
+        "category": "Usability & User Experience",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Safety Information",
+        "category": "Safety & Compliance",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Legal and Copyright",
+        "category": "Safety & Compliance",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Version Control",
+        "category": "Maintenance & Updates",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Change Log",
+        "category": "Maintenance & Updates",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      }
+    ],
+    "per_repo": {},
+    "unmatched_keys": {}
+  }
+]

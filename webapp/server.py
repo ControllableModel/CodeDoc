@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import os
 import sys
 import threading
@@ -48,6 +49,11 @@ DEFAULT_CONFIG = {
     "api_key": "",
     "base_url": "https://apic1.ohmycdn.com/v1",
     "model": "gpt-6-luna",
+    #: The judge is a separate model on purpose: gpt-6-luna accepts only the default
+    #: temperature, and a scoring instrument needs temperature 0 so that re-running a
+    #: judgement reproduces it.
+    "judge_model": "deepseek-v4-flash",
+    "judge_temperature": 0.0,
     "use_max_completion_tokens": True,
     "max_completion_tokens": 8000,
     #: Price list of the configured endpoint, per million tokens, in USD.
@@ -150,6 +156,218 @@ def compute_cost(prompt_tokens: int, completion_tokens: int, cached_tokens: int,
         "cached_tokens": cached,
         "rates": rates,
     }
+
+
+#: rubric id -> (label, score only entity-applicable dimensions)
+JUDGE_AXES = {
+    "iso_26514": ("ISO/IEC 26514", True),
+    "github_docs_style": ("GitHub docs style", False),
+    "practice_docstring": ("Practice (docstring)", True),
+}
+
+
+def rubric_for(axis: str) -> list:
+    from codedoc.criteria import registry
+
+    if axis not in JUDGE_AXES:
+        raise ValueError(f"unknown rubric: {axis}")
+    criteria = registry.load(axis)
+    if JUDGE_AXES[axis][1]:
+        # entity_level() filters on criterion.level. Filtering with applies_to(kind)
+        # instead returns everything, because a dimension that declares no kinds
+        # applies to all of them -- that silently asked the judge for 26 dimensions
+        # where only 14 govern a single code entity.
+        criteria = criteria.entity_level()
+    return criteria
+
+
+def _score_of(entry):
+    """Judge entries are {'judge': int, 'evidence': str}; never invent a score."""
+    if isinstance(entry, dict):
+        value = entry.get("judge")
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            match = re.search(r"[1-5]", value)
+            return float(match.group(0)) if match else None
+    if isinstance(entry, (int, float)):
+        return float(entry)
+    return None
+
+
+def summarize_verdict(criteria, verdict: dict) -> dict:
+    """Turn one raw verdict into per-dimension rows and main-dimension aggregates.
+
+    A main dimension is the mean of its dimensions' means, so a category carrying more
+    dimensions does not dominate by weight alone. Dimensions the judge omitted stay
+    'missing' instead of being scored zero, and names that match no rubric entry are
+    reported rather than silently dropped.
+    """
+    def normalize(name: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
+
+    by_name = {c.name: c for c in criteria}
+    by_norm = {normalize(c.name): c for c in criteria}
+    scored: dict = {}
+    unmatched: dict = {}
+    for raw_name, entry in (verdict or {}).items():
+        criterion = by_name.get(raw_name) or by_norm.get(normalize(raw_name))
+        if criterion is None:
+            unmatched[raw_name] = unmatched.get(raw_name, 0) + 1
+            continue
+        value = _score_of(entry)
+        if value is None:
+            continue
+        scored[criterion.name] = value
+
+    dimensions = []
+    for criterion in criteria:
+        dimensions.append({
+            "dimension": criterion.name,
+            "category": criterion.category,
+            "score": scored.get(criterion.name),
+            "missing": criterion.name not in scored,
+        })
+
+    categories: dict = {}
+    for row in dimensions:
+        categories.setdefault(row["category"], []).append(row["score"])
+    main_dimensions = []
+    for category, values in categories.items():
+        present = [v for v in values if v is not None]
+        main_dimensions.append({
+            "category": category,
+            "dimensions": len(values),
+            "scored": len(present),
+            "mean": round(sum(present) / len(present), 2) if present else None,
+        })
+    main_dimensions.sort(key=lambda r: -(r["mean"] or 0))
+
+    all_values = [v for v in scored.values()]
+    return {
+        "dimensions": dimensions,
+        "main_dimensions": main_dimensions,
+        "overall": round(sum(all_values) / len(all_values), 2) if all_values else None,
+        "verdict": verdict or {},
+        "unmatched": unmatched,
+    }
+
+
+def score_dir(repo_name: str, axis: str) -> Path:
+    path = ROOT / "outputs" / "console" / (repo_name or "custom") / f"scores_{axis}"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def judge_document(repo_name: str, qname: str, axis: str, config: dict) -> dict:
+    from codedoc.judge.query import LLM_Remote_query, judge_with_retry
+
+    key = config.get("api_key") or ""
+    if not key:
+        raise RuntimeError("no API key configured")
+    safe = qname.replace(".", "_").replace("/", "_").replace("#", "_")
+    doc_path = ROOT / "outputs" / "console" / (repo_name or "custom") / f"{safe}.md"
+    if not doc_path.exists():
+        raise KeyError(f"no generated document for {qname}; generate it first")
+    text = doc_path.read_text(encoding="utf-8")
+
+    criteria = rubric_for(axis)
+    judge = LLM_Remote_query(
+        api_key=key,
+        api_url=config.get("base_url") or DEFAULT_CONFIG["base_url"],
+        model=(config.get("judge_model") or config.get("model")
+               or DEFAULT_CONFIG["judge_model"]),
+    )
+    judge.judge_temperature = float(config.get("judge_temperature", 0.0))
+    judge.use_max_completion_tokens = bool(config.get("use_max_completion_tokens", True))
+    judge.max_token = max(1024, 200 * len(criteria))
+    spec = "\n".join(f"- {c.name}: {c.definition}" for c in criteria)
+    judge.load_JudgeContent_Once(spec)
+
+    started = time.time()
+    verdict, attempts, unparsed = judge_with_retry(judge, text)
+    seconds = time.time() - started
+    summary = summarize_verdict(criteria, verdict)
+    payload = {
+        "repo": repo_name,
+        "qname": qname,
+        "axis": axis,
+        "axis_label": JUDGE_AXES[axis][0],
+        "document": doc_path.name,
+        "model": judge.model,
+        "temperature": (judge.effective_temperature
+                        if judge.effective_temperature is not None
+                        else judge.judge_temperature),
+        "temperature_forced": judge.temperature_forced,
+        "seconds": round(seconds, 2),
+        "attempts": attempts,
+        "unparsed": unparsed,
+        "dimensions_asked": len(criteria),
+        **summary,
+    }
+    (score_dir(repo_name, axis) / f"{safe}.json").write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    return payload
+
+
+def existing_score(repo_name: str, qname: str, axis: str) -> dict:
+    safe = qname.replace(".", "_").replace("/", "_").replace("#", "_")
+    path = ROOT / "outputs" / "console" / (repo_name or "custom") / f"scores_{axis}" / f"{safe}.json"
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return {}
+
+
+def start_judge_batch(spec: dict, axis: str, config: dict, workers: int) -> str:
+    """Judge every already-generated document of this selection under one rubric."""
+    job_id = str(uuid.uuid4())
+    entry = analyse(**{k: spec[k] for k in ("repo_name", "custom_path", "mode", "limit", "seed")})
+    targets = [e["qname"] for e in entry["result"]["entities"]]
+    with _LOCK:
+        _JOBS[job_id] = {
+            "status": "running",
+            "started": time.time(),
+            "kind": "judge",
+            "progress": {"done": 0, "total": len(targets), "failed": 0,
+                         "unparsed": 0, "axis": axis, "current": ""},
+            "cancel": False,
+        }
+
+    def one(qname):
+        with _LOCK:
+            job = _JOBS[job_id]
+            if job.get("cancel"):
+                return
+            job["progress"]["current"] = qname
+        try:
+            result = judge_document(spec["repo_name"], qname, axis, config)
+            with _LOCK:
+                progress = _JOBS[job_id]["progress"]
+                progress["done"] += 1
+                if not result["verdict"]:
+                    progress["unparsed"] += 1
+        except Exception as exc:  # noqa: BLE001 - one failure must not stop the batch
+            with _LOCK:
+                progress = _JOBS[job_id]["progress"]
+                progress["done"] += 1
+                progress["failed"] += 1
+                progress["last_error"] = f"{type(exc).__name__}: {exc}"
+
+    def work():
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+            list(pool.map(one, targets))
+        with _LOCK:
+            job = _JOBS[job_id]
+            job["status"] = "cancelled" if job.get("cancel") else "done"
+            job["finished"] = time.time()
+
+    threading.Thread(target=work, daemon=True).start()
+    return job_id
 
 
 def public_config(config: dict) -> dict:
@@ -763,6 +981,9 @@ class Handler(BaseHTTPRequestHandler):
                     self._json({"error": "unknown job"}, 404)
                 else:
                     self._json(job)
+            elif route == "/api/scores":
+                self._json(existing_score(query.get("repo", ""), query.get("qname", ""),
+                                          query.get("axis", "iso_26514")))
             elif route == "/api/entity":
                 config = load_config()
                 self._json(entity_detail(
@@ -796,6 +1017,29 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if route == "/api/config":
                 self._json({"config": public_config(save_config(body))})
+            elif route == "/api/judge":
+                config = load_config()
+                for key in DEFAULT_CONFIG:
+                    if key in body:
+                        config[key] = body[key]
+                self._json(judge_document(body.get("repo", ""), body.get("qname", ""),
+                                          body.get("axis", "iso_26514"), config))
+            elif route == "/api/judge_all":
+                config = load_config()
+                for key in DEFAULT_CONFIG:
+                    if key in body:
+                        config[key] = body[key]
+                if not config.get("api_key"):
+                    raise RuntimeError("no API key configured")
+                job_id = start_judge_batch({
+                    "repo_name": body.get("repo", ""),
+                    "custom_path": body.get("path", ""),
+                    "mode": body.get("mode", "full"),
+                    "limit": int(body.get("limit") or 0),
+                    "seed": int(body.get("seed") or 42),
+                }, body.get("axis", "iso_26514"), config,
+                    int(body.get("workers") or 0) or int(config.get("workers") or 12))
+                self._json({"job": job_id})
             elif route == "/api/generate_all":
                 config = load_config()
                 for key in DEFAULT_CONFIG:
