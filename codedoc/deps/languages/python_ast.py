@@ -79,8 +79,8 @@ def _module_name(path: Path, root: Path) -> str:
 
 
 class _ClassInfo:
-    __slots__ = ("qname", "module", "name", "bases_raw", "bases", "methods",
-                 "path", "lineno", "end_lineno", "outer_function")
+    __slots__ = ("qname", "module", "name", "bases_raw", "bases", "attributes",
+                 "methods", "path", "lineno", "end_lineno", "outer_function")
 
     def __init__(self, qname, module, name, bases_raw, path, lineno, end_lineno, outer):
         self.qname = qname
@@ -88,6 +88,7 @@ class _ClassInfo:
         self.name = name
         self.bases_raw = bases_raw
         self.bases: List[str] = []
+        self.attributes = set()
         self.methods: Dict[str, str] = {}
         self.path = path
         self.lineno = lineno
@@ -97,7 +98,7 @@ class _ClassInfo:
 
 class _FuncInfo:
     __slots__ = ("qname", "module", "name", "kind", "owner", "path", "lineno",
-                 "end_lineno", "calls", "unresolved")
+                 "end_lineno", "calls", "unresolved", "attrs")
 
     def __init__(self, qname, module, name, kind, owner, path, lineno, end_lineno):
         self.qname = qname
@@ -110,6 +111,8 @@ class _FuncInfo:
         self.end_lineno = end_lineno
         self.calls: List[str] = []
         self.unresolved = 0
+        #: ``self.x`` / ``cls.x`` attribute names touched by this function body.
+        self.attrs: List[str] = []
 
 
 class ProjectIndex:
@@ -204,6 +207,17 @@ class ProjectIndex:
                     self.functions[qname] = info
                     if owner:
                         self.classes[owner].methods.setdefault(node.name, qname)
+                        # Attribute access: the only relation family the schema
+                        # declared but no extractor produced. A method touching
+                        # self.config is a durable, checkable fact, and class
+                        # documents need the attribute set to describe state.
+                        seen_attrs: List[str] = []
+                        for sub in ast.walk(node):
+                            if isinstance(sub, ast.Attribute) and isinstance(sub.value, ast.Name)                                     and sub.value.id in ("self", "cls"):
+                                if sub.attr not in seen_attrs:
+                                    seen_attrs.append(sub.attr)
+                        info.attrs = seen_attrs
+                        self.classes[owner].attributes.update(seen_attrs)
                     stack.append(("function", qname))
                     visit(node.body)
                     stack.pop()
@@ -488,6 +502,10 @@ class PythonAstExtractor(Extractor):
                         detail="implemented by " + ", ".join(
                             f"{idx.classes[q].name}.{mname}" for q in impls[:6]),
                     ))
+            for attr in sorted(info.attributes):
+                ctx.add(Relation(kind=RelationKind.ATTRIBUTE_ACCESS, target=attr,
+                                 target_kind=EntityKind.ATTRIBUTE, path=info.path,
+                                 detail="attribute of this class"))
             contexts.append(ctx)
 
         # --- functions and methods ----------------------------------------
@@ -510,6 +528,10 @@ class PythonAstExtractor(Extractor):
                 ctx.add(Relation(kind=RelationKind.CALLED_BY, target=caller.split(".")[-1],
                                  target_kind=EntityKind.FUNCTION))
             if info.kind == EntityKind.METHOD and info.owner:
+                for attr in info.attrs:
+                    ctx.add(Relation(kind=RelationKind.ATTRIBUTE_ACCESS, target=attr,
+                                     target_kind=EntityKind.ATTRIBUTE, path=info.path,
+                                     detail="self attribute accessed"))
                 for anc in idx.mro(info.owner)[1:]:
                     if info.name in idx.classes[anc].methods:
                         ctx.add(Relation(kind=RelationKind.OVERRIDES,

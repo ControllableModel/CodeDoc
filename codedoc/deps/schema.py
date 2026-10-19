@@ -27,8 +27,14 @@ class EntityKind:
     METHOD = "method"
     CLASS = "class"
     MODULE = "module"
+    #: An attribute observed on a class (``self.x`` inside its methods). The schema
+    #: declared ``attribute_access`` as a relation kind, but until now no extractor
+    #: emitted it — nine relation families were promised and eight were delivered.
+    ATTRIBUTE = "attribute"
 
-    ALL = (FUNCTION, METHOD, CLASS, MODULE)
+    ALL = (FUNCTION, METHOD, CLASS, MODULE, ATTRIBUTE)
+    #: Kinds that can be documented as an entity of their own. Attributes carry
+    #: relations but are not documented standalone.
     DOCUMENTABLE = (FUNCTION, METHOD, CLASS)
 
 
