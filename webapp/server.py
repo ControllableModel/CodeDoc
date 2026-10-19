@@ -82,7 +82,7 @@ DEFAULT_CONFIG = {
     "relevant": True,
     #: Concurrent generations. The endpoint latency dominates (about 25 s per entity on
     #: gpt-6-luna), so throughput scales with this until the proxy starts throttling.
-    "workers": 6,
+    "workers": 12,
 }
 
 #: Analysis results and their dependency indices, keyed by request signature.
