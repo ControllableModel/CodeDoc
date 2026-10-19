@@ -1,0 +1,115 @@
+{
+  "id": "practice_docstring",
+  "title": "Entity-level docstring conventions as used in IDE/assistant workflows",
+  "version": "draft",
+  "standards": [
+    "Google Python Style Guide (docstrings)",
+    "PEP 257",
+    "JSDoc",
+    "TSDoc",
+    "Oracle Javadoc"
+  ],
+  "description": "New practice axis. Replaces the vendor document-set style guide with entity-level conventions that assistant tools follow per language. Anchors are intentionally left incomplete pending calibration (S5).",
+  "axis_role": "primary",
+  "criteria": [
+    {
+      "id": "q1",
+      "name": "Signature Conformance",
+      "category": "Signature & Interface",
+      "definition": "The described name, parameter order, and types match the actual signature.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q2",
+      "name": "Parameter Coverage",
+      "category": "Signature & Interface",
+      "definition": "Every parameter is described, including defaults and constraints.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q3",
+      "name": "Return Documentation",
+      "category": "Signature & Interface",
+      "definition": "Return values are described, including empty/None/void cases.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q4",
+      "name": "Exception Documentation",
+      "category": "Signature & Interface",
+      "definition": "Thrown exceptions or error codes are described.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q5",
+      "name": "Side-effect & State Documentation",
+      "category": "Behaviour & Contract",
+      "definition": "Side effects, state mutation, and I/O are described.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q6",
+      "name": "Inheritance/Polymorphism Contract",
+      "category": "Behaviour & Contract",
+      "definition": "For classes and overridden methods, the inheritance chain, override obligations, and polymorphic contract are described.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q7",
+      "name": "Dependency Context",
+      "category": "Behaviour & Contract",
+      "definition": "Relevant callers, callees, or collaborators are described.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q8",
+      "name": "Usage Example Validity",
+      "category": "Usability",
+      "definition": "Any example is runnable and consistent with the signature.",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q9",
+      "name": "Language Convention Adherence",
+      "category": "Convention Adherence",
+      "definition": "The artifact follows the target language's docstring convention (Google Style/PEP 257, JSDoc/TSDoc, Javadoc).",
+      "level": "entity",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": true,
+      "note": ""
+    }
+  ]
+}

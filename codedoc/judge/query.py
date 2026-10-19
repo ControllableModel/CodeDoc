@@ -72,3 +72,54 @@ class LLM_Remote_query:
                   "You should output like {judgeName : {judge: ..., evidence: ...}, judgeName : {judge: ..., evidence: ...}}")
         self.MESSAGE_HISTORY = [{"role": "system", "content": judge}]
 
+
+
+# ---------------------------------------------------------------------------
+# Parsing helper (added during the refactor)
+# ---------------------------------------------------------------------------
+import json as _json
+import re as _re
+
+
+def parse_verdict(text):
+    """Parse a judge response into {dimension: {"judge": int, "evidence": str}}.
+
+    The archived judge output format is *not* valid JSON: keys are unquoted
+    (`{judge: 4, evidence: ...}`).  A tolerant parser is therefore required, and
+    it must never silently invent a score.
+    """
+    if not text:
+        return {}
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        cleaned = _re.sub(r"^```[a-zA-Z]*\s*|```$", "", cleaned).strip()
+    try:
+        data = _json.loads(cleaned)
+        return _normalize(data)
+    except Exception:
+        pass
+    quoted = _re.sub(r'([{,]\s*)([A-Za-z_][A-Za-z0-9_ .&/-]*?)\s*:', r'\1"\2":', cleaned)
+    try:
+        return _normalize(_json.loads(quoted))
+    except Exception:
+        return {}
+
+
+def _normalize(data):
+    out = {}
+    if not isinstance(data, dict):
+        return out
+    if "judge" in data:
+        return {"overall": {"judge": _as_int(data.get("judge")), "evidence": str(data.get("evidence", ""))}}
+    for name, value in data.items():
+        if isinstance(value, dict) and "judge" in value:
+            out[name] = {"judge": _as_int(value.get("judge")), "evidence": str(value.get("evidence", ""))}
+    return out
+
+
+def _as_int(value):
+    try:
+        return int(float(str(value).strip()))
+    except Exception:
+        m = _re.search(r"\d+", str(value))
+        return int(m.group()) if m else None

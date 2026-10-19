@@ -1,0 +1,210 @@
+{
+  "id": "github_docs_style",
+  "title": "GitHub documentation style guide (document-set level)",
+  "version": "2024",
+  "standards": [
+    "GitHub Docs style guide"
+  ],
+  "description": "Secondary axis, retained for continuity with the published results. It is a document-set specification, not a general standard for code-level artifacts, so it is never used as the primary rubric.",
+  "axis_role": "secondary",
+  "criteria": [
+    {
+      "id": "q1",
+      "name": "Content Type Consistency",
+      "category": "Content Quality",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q2",
+      "name": "Reuse Instead of Copying",
+      "category": "Content Quality",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q3",
+      "name": "Balanced Hierarchy",
+      "category": "Structure & Organization",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q4",
+      "name": "Content Order",
+      "category": "Structure & Organization",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q5",
+      "name": "Category Title Naming",
+      "category": "Structure & Organization",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q6",
+      "name": "Title Standards",
+      "category": "Styling & Formatting",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q7",
+      "name": "Introduction Standards",
+      "category": "Styling & Formatting",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q8",
+      "name": "Permission Declaration Standards",
+      "category": "Styling & Formatting",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q9",
+      "name": "Product Label Standards",
+      "category": "Styling & Formatting",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q10",
+      "name": "Process Content Standards",
+      "category": "Content Types & Completeness",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q11",
+      "name": "Next Steps Standards",
+      "category": "Content Types & Completeness",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q12",
+      "name": "Further Reading Standards",
+      "category": "Content Types & Completeness",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q13",
+      "name": "Prerequisites Standards",
+      "category": "Content Types & Completeness",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q14",
+      "name": "Reference Content",
+      "category": "Article Content Families",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q15",
+      "name": "Conceptual Content Guidelines",
+      "category": "Article Content Families",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q16",
+      "name": "Error Reference Content Guidelines",
+      "category": "Article Content Families",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q17",
+      "name": "Tutorial Content Guidelines",
+      "category": "Article Content Families",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    },
+    {
+      "id": "q18",
+      "name": "Getting Started Content Guidelines",
+      "category": "Article Content Families",
+      "definition": "",
+      "level": "document-set",
+      "source": "",
+      "anchors": {},
+      "applicable_to_entity": false,
+      "note": "Document-set level specification; not a normative standard for docstrings."
+    }
+  ]
+}
