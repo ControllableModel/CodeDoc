@@ -172,6 +172,7 @@ def aggregate(axis: str) -> dict:
 
     per_dim: dict = {c.name: [] for c in criteria}
     per_repo_dim: dict = {}
+    per_kind_dim: dict = {}
     unmatched: dict = {}
     documents = 0
     empty = 0
@@ -183,6 +184,7 @@ def aggregate(axis: str) -> dict:
             continue
         documents += 1
         repo = payload.get("repo") or score_file.parent.parent.name
+        kind = payload.get("kind") or "unknown"
         verdict = payload.get("verdict") or {}
         if not verdict:
             empty += 1
@@ -197,6 +199,7 @@ def aggregate(axis: str) -> dict:
                 continue
             per_dim[criterion.name].append(value)
             per_repo_dim.setdefault(repo, {}).setdefault(criterion.name, []).append(value)
+            per_kind_dim.setdefault(kind, {}).setdefault(criterion.name, []).append(value)
 
     dimensions = []
     for criterion in criteria:
@@ -239,6 +242,21 @@ def aggregate(axis: str) -> dict:
                            for name, values in dims.items() if values},
         }
 
+    per_kind = {}
+    for kind, dims in sorted(per_kind_dim.items()):
+        values = [v for entries in dims.values() for v in entries]
+        per_kind[kind] = {
+            "verdicts": len(values),
+            "mean": round(statistics.mean(values), 3) if values else None,
+            "dimensions": {name: round(statistics.mean(entries), 3)
+                           for name, entries in dims.items() if entries},
+        }
+
+    covered_categories = {c.category for c in criteria}
+    from codedoc.criteria import registry as _registry
+    all_categories = {c.category for c in _registry.load(axis)}
+    uncovered_sorted = sorted(all_categories - covered_categories)
+
     all_scored = [v for values in per_dim.values() for v in values]
     return {
         "axis": axis,
@@ -251,6 +269,9 @@ def aggregate(axis: str) -> dict:
         "main_dimensions": main_dimensions,
         "dimensions": dimensions,
         "per_repo": per_repo,
+        "per_kind": per_kind,
+        "all_main_dimensions": sorted(all_categories),
+        "uncovered_main_dimensions": uncovered_sorted,
         "unmatched_keys": unmatched,
     }
 
@@ -271,7 +292,14 @@ def write_reports(results: list) -> None:
                   f"({result['empty_verdicts']} returned no parseable verdict)",
                   f"* dimensions asked: {result['dimensions_asked']}, "
                   f"scored: {result['dimensions_scored']}",
-                  f"* overall mean: {result['overall_mean']}", ""]
+                  f"* overall mean: {result['overall_mean']}"]
+        uncovered = result.get("uncovered_main_dimensions") or []
+        if uncovered:
+            lines.append(f"* main dimensions with no entity-applicable dimension at all: "
+                         f"{', '.join(uncovered)} -- these govern a document set and cannot be "
+                         f"scored on a single entity, which is the paper's evaluation-unit argument "
+                         f"in concrete numbers")
+        lines.append("")
         lines += ["### Main dimensions", "",
                   "| main dimension | dims | scored | mean | pooled | verdicts |",
                   "|---|---|---|---|---|---|"]
@@ -291,11 +319,36 @@ def write_reports(results: list) -> None:
                   "| repo | verdicts | mean |", "|---|---|---|"]
         for repo, stats in result["per_repo"].items():
             lines.append(f"| {repo} | {stats['verdicts']} | {stats['mean']} |")
+        lines += ["", "### Per entity kind", "",
+                  "| kind | verdicts | mean |", "|---|---|---|"]
+        for kind, stats in result["per_kind"].items():
+            lines.append(f"| {kind} | {stats['verdicts']} | {stats['mean']} |")
         if result["unmatched_keys"]:
             lines += ["", "Judge returned dimension names that match no rubric entry "
                           "(excluded from the tables above, listed so nothing disappears quietly):", ""]
             for name, count in sorted(result["unmatched_keys"].items(), key=lambda kv: -kv[1]):
                 lines.append(f"* `{name}` x{count}")
+        lines.append("")
+
+    if len(results) > 1:
+        lines += ["## Axis comparison", "",
+                  "Each axis grades its own document set against its own rubric, so these are",
+                  "rubric-fit scores rather than a head-to-head grade of one text.", "",
+                  "| axis | documents | dimensions | overall mean | main dimensions |",
+                  "|---|---|---|---|---|"]
+        for result in results:
+            lines.append(f"| {result['axis']} | {result['documents']} "
+                         f"| {result['dimensions_asked']} | {result['overall_mean']} "
+                         f"| {len(result['main_dimensions'])} |")
+        lines += ["", "| repo | " + " | ".join(r["axis"] for r in results) + " |",
+                  "|---|" + "---|" * len(results)]
+        repos = sorted({repo for r in results for repo in r["per_repo"]})
+        for repo in repos:
+            cells = []
+            for result in results:
+                value = (result["per_repo"].get(repo) or {}).get("mean")
+                cells.append("—" if value is None else str(value))
+            lines.append(f"| {repo} | " + " | ".join(cells) + " |")
         lines.append("")
 
     (ANALYSIS / "matrix_scores.md").write_text("\n".join(lines) + "\n", encoding="utf-8")

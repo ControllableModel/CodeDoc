@@ -113,3 +113,21 @@ same flag (`use_max_completion_tokens`).
 Cost is computed from `price_in_per_m` / `price_out_per_m` in the config file. The
 defaults are DeepSeek list prices and are **wrong for any other endpoint** — set them
 before trusting the CNY figures on screen.
+
+## Judging
+
+The console scores a generated document under any rubric without leaving the page: the
+`judge` tab shows the main dimensions, every dimension, and the judge's evidence, and a
+`batch judge` button runs the same over the current selection. Scores are written next to
+the documents under `scores_<axis>/` and can be re-read for free.
+
+The judge is a **separate model** from the generator. `gpt-6-luna` rejects
+`temperature` 0 ("Only the default (1) value is supported"), and a scoring instrument
+must run at a fixed temperature to be reproducible, so judging defaults to
+`deepseek-v4-flash` at temperature 0. Each score records the model, the temperature it
+actually ran at, and a `temperature_forced` flag.
+
+Entity-applicable dimensions are selected with `criterion_set.entity_level()` (the
+criterion's `level` field), not with `applies_to(kind)`: a dimension that names no kinds
+applies to every kind, so the kind test silently keeps all 26 ISO dimensions instead of
+the 14 that govern a single entity.
