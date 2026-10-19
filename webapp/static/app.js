@@ -234,6 +234,7 @@ async function runAnalysis() {
     $("outBody").innerHTML = '<span class="hint">选择实体后，这里显示提示词全文。</span>';
     $("generateBtn").disabled = true;
     $("batchBtn").disabled = false;
+    $("judgeBatchBtn").disabled = false;
 
     const c = result.counts;
     $("fileCount").textContent = `${c.files} 文件 · ${c.entities} 实体`;
@@ -362,6 +363,11 @@ function renderOutput() {
     return;
   }
 
+  if (state.outTab === "judge") {
+    renderJudge(host);
+    return;
+  }
+
   if (state.outTab === "relations") {
     const grid = el("div", "rel-grid");
     const blocks = Object.entries(detail.relations || {});
@@ -475,6 +481,174 @@ async function generate() {
   }
 }
 
+/* ------------------------------------------------------------------- judging */
+function renderJudge(host) {
+  const detail = state.entityDetail;
+  const box = el("div", "judge-panel");
+
+  const bar = el("div", "judge-bar");
+  const axisSelect = document.createElement("select");
+  axisSelect.id = "judgeAxis";
+  for (const [value, label] of [["iso_26514", "ISO/IEC 26514 (实体级)"],
+                                ["github_docs_style", "GitHub docs style (全量)"],
+                                ["practice_docstring", "Practice (docstring)"]]) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    axisSelect.appendChild(option);
+  }
+  axisSelect.value = state.judgeAxis || "iso_26514";
+  axisSelect.onchange = () => { state.judgeAxis = axisSelect.value; loadScore(); };
+  bar.appendChild(axisSelect);
+
+  const runBtn = el("button", "primary small", "判定这篇");
+  runBtn.onclick = () => runJudge(axisSelect.value);
+  bar.appendChild(runBtn);
+
+  const reloadBtn = el("button", "ghost small", "读取已有分数");
+  reloadBtn.onclick = () => loadScore();
+  bar.appendChild(reloadBtn);
+  box.appendChild(bar);
+
+  const body = el("div", "judge-body");
+  body.id = "judgeBody";
+  body.appendChild(el("p", "hint", "尚未判定。点击「判定这篇」，或先「生成文档」再判定。"));
+  box.appendChild(body);
+  host.appendChild(box);
+
+  if (detail) loadScore();
+}
+
+async function runJudge(axis) {
+  const detail = state.entityDetail;
+  if (!detail) return;
+  const body = $("judgeBody");
+  body.innerHTML = "";
+  body.appendChild(el("p", "hint", "判定中…（真实调用模型）"));
+  try {
+    const result = await api("/api/judge", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ repo: state.analysis.repo, qname: detail.qname, axis }),
+    });
+    renderVerdict(result);
+    setStatus(`判定完成：${result.axis_label} · 总均分 ${result.overall} · ${result.seconds}s`, "ok");
+  } catch (error) {
+    body.innerHTML = "";
+    body.appendChild(el("p", "err", `判定失败：${error.message}`));
+    setStatus(error.message, "err");
+  }
+}
+
+async function loadScore() {
+  const detail = state.entityDetail;
+  if (!detail) return;
+  const axis = $("judgeAxis") ? $("judgeAxis").value : (state.judgeAxis || "iso_26514");
+  try {
+    const saved = await api(`/api/scores?repo=${encodeURIComponent(state.analysis.repo)}`
+      + `&qname=${encodeURIComponent(detail.qname)}&axis=${encodeURIComponent(axis)}`);
+    if (saved && saved.dimensions) {
+      renderVerdict(saved);
+      setStatus(`读取已有分数：${saved.axis_label} · 总均分 ${saved.overall}`, "ok");
+      return;
+    }
+    const body = $("judgeBody");
+    if (body) {
+      body.innerHTML = "";
+      body.appendChild(el("p", "hint", `该实体在 ${axis} 下还没有分数。`));
+    }
+  } catch (error) {
+    setStatus(error.message, "err");
+  }
+}
+
+function renderVerdict(result) {
+  const body = $("judgeBody");
+  if (!body) return;
+  body.innerHTML = "";
+
+  const head = el("div", "judge-head");
+  head.appendChild(el("span", "badge", result.axis_label + (result.axis ? ` · ${result.axis}` : "")));
+  head.appendChild(el("span", "score-big", `总均分 ${result.overall ?? "—"}`));
+  head.appendChild(el("span", "hint",
+    `${result.dimensions_asked ?? "?"} 维 · ${(result.dimensions || []).filter((d) => !d.missing).length} 维已判`
+    + (result.unparsed ? " · 有未解析响应" : "")));
+  body.appendChild(head);
+
+  const cats = el("table", "judge-table");
+  cats.innerHTML = "<thead><tr><th>主维度</th><th>维度数</th><th>均分</th></tr></thead>";
+  const catBody = document.createElement("tbody");
+  for (const row of result.main_dimensions || []) {
+    const tr = document.createElement("tr");
+    tr.appendChild(el("td", "", row.category));
+    tr.appendChild(el("td", "num", `${row.scored}/${row.dimensions}`));
+    tr.appendChild(el("td", "num", row.mean === null ? "—" : row.mean.toFixed(2)));
+    catBody.appendChild(tr);
+  }
+  cats.appendChild(catBody);
+  body.appendChild(el("h3", "", "主维度"));
+  body.appendChild(cats);
+
+  body.appendChild(el("h3", "", "逐维度"));
+  const dims = el("table", "judge-table");
+  dims.innerHTML = "<thead><tr><th>维度</th><th>类别</th><th>分数</th><th>依据</th></tr></thead>";
+  const dimBody = document.createElement("tbody");
+  for (const row of result.dimensions || []) {
+    const tr = document.createElement("tr");
+    tr.appendChild(el("td", "", row.dimension));
+    tr.appendChild(el("td", "dim", row.category));
+    tr.appendChild(el("td", "num", row.missing ? "缺失" : row.score));
+    const evidence = (result.verdict || {})[row.dimension];
+    const text = evidence && evidence.evidence ? String(evidence.evidence) : "";
+    const cell = el("td", "evidence", text.length > 220 ? text.slice(0, 220) + "…" : text);
+    cell.title = text;
+    tr.appendChild(cell);
+    dimBody.appendChild(tr);
+  }
+  dims.appendChild(dimBody);
+  body.appendChild(dims);
+
+  const unmatched = Object.keys(result.unmatched || {});
+  if (unmatched.length) {
+    body.appendChild(el("p", "warn", `判官返回了准则里没有的维度名（已排除）：${unmatched.join("、")}`));
+  }
+}
+
+async function judgeAll() {
+  if (!state.analysis) { setStatus("请先分析仓库", "warn"); return; }
+  const { repo, customPath, mode, limit, seed } = analysisParams();
+  const axis = $("judgeAxis") ? $("judgeAxis").value : "iso_26514";
+  const total = state.analysis.counts.entities;
+  if (!confirm(`将用 ${axis} 判定 ${total} 篇文档（需已生成文档，约 $${(total * 0.0006).toFixed(2)}），继续？`)) return;
+  $("judgeBatchBtn").disabled = true;
+  const started = Date.now();
+  try {
+    const { job } = await api("/api/judge_all", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ repo, path: customPath, mode, limit, seed, axis,
+                             workers: parseInt($("workers").value, 10) || 12 }),
+    });
+    for (;;) {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const status = await api(`/api/job?id=${job}`);
+      const progress = status.progress || {};
+      const done = progress.done || 0;
+      const rate = done > 0 ? (done / ((Date.now() - started) / 1000) * 60).toFixed(1) : "…";
+      setStatus(`判定中：${done}/${progress.total || total} · ${rate} 篇/分钟`
+        + (progress.failed ? ` · 失败 ${progress.failed}` : "")
+        + (progress.unparsed ? ` · 未解析 ${progress.unparsed}` : ""), "warn");
+      if (status.status !== "running") break;
+    }
+    setStatus(`判定完成：${axis} · 结果已保存到 scores_${axis}/`, "ok");
+    if (state.selectedEntity) await loadScore();
+  } catch (error) {
+    setStatus(`批量判定失败：${error.message}`, "err");
+  } finally {
+    $("judgeBatchBtn").disabled = false;
+  }
+}
+
 /* ------------------------------------------------------------ batch generation */
 async function generateAll() {
   if (!state.analysis) {
@@ -536,6 +710,7 @@ async function generateAll() {
     setStatus(`批量生成失败：${error.message}`, "err");
   } finally {
     $("batchBtn").disabled = false;
+    $("judgeBatchBtn").disabled = false;
   }
 }
 
@@ -543,6 +718,7 @@ async function generateAll() {
 function wire() {
   $("analyzeBtn").addEventListener("click", runAnalysis);
   $("batchBtn").addEventListener("click", generateAll);
+  $("judgeBatchBtn").addEventListener("click", judgeAll);
   if (typeof wireGraphInteractions === "function") wireGraphInteractions();
   $("generateBtn").addEventListener("click", generate);
   $("configBtn").addEventListener("click", () => $("drawer").classList.remove("hidden"));

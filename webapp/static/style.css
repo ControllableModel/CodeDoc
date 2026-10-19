@@ -451,3 +451,38 @@ button.small { padding: 5px 10px; font-size: 12px; }
   max-height: 200px;
   overflow: auto;
 }
+
+/* ---------------- judging ---------------- */
+.judge-panel { display: flex; flex-direction: column; gap: 10px; }
+.judge-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+.judge-bar select {
+  background: #0d1420; color: var(--fg);
+  border: 1px solid var(--line); border-radius: 7px;
+  padding: 5px 8px; font-size: 12px; font-family: var(--mono);
+}
+.judge-head {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 8px 10px; border-radius: 8px;
+  background: linear-gradient(90deg, rgba(43,127,255,.13), transparent);
+  border: 1px solid var(--line);
+}
+.score-big { font-size: 19px; font-weight: 700; color: #7ec8ff; font-family: var(--mono); }
+.badge {
+  font-family: var(--mono); font-size: 11px;
+  background: #14233a; color: #9fc4ec;
+  border: 1px solid #24405f; border-radius: 999px; padding: 2px 9px;
+}
+.judge-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.judge-table th {
+  text-align: left; font-weight: 600; color: var(--muted);
+  border-bottom: 1px solid var(--line); padding: 4px 6px;
+  position: sticky; top: 0; background: #0b1017;
+}
+.judge-table td { padding: 4px 6px; border-bottom: 1px solid #131c28; vertical-align: top; }
+.judge-table td.num { font-family: var(--mono); text-align: right; color: #7ec8ff; width: 62px; }
+.judge-table td.dim { color: var(--muted); font-size: 10.5px; }
+.judge-table td.evidence { color: #9fb2c9; font-size: 10.5px; line-height: 1.45; }
+.judge-panel h3 { margin: 6px 0 2px; font-size: 12px; color: var(--muted); }
