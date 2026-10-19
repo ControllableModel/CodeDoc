@@ -6,9 +6,12 @@ import subprocess
 import argparse
 import json
 import os
+import sys
 import time
 from pathlib import Path
 from datetime import datetime
+
+from codedoc.config import default_template
 
 
 def run_experiment(target_path, mode, output_base, args):
@@ -20,7 +23,7 @@ def run_experiment(target_path, mode, output_base, args):
     output_dir = Path(output_base) / f"ablation_{mode}"
     
     cmd = [
-        "python", "main.py",
+        sys.executable, "-m", "codedoc.cli",
         "--target_path", target_path,
         "--output_dir", str(output_dir),
         "--ablation_mode", mode,
@@ -133,7 +136,7 @@ def main():
     parser.add_argument('--llm_url', type=str, default=os.getenv('LLM_URL', 'https://api.openai.com/v1'))
     parser.add_argument('--model', type=str, default=os.getenv('MODEL', 'gpt-4o-mini'))
     parser.add_argument('--language', type=str, default='English')
-    parser.add_argument('--prompt_template', type=str, default='prompts/ISO.txt')
+    parser.add_argument('--prompt_template', type=str, default=default_template())
     parser.add_argument('--test_mode', action='store_true', help='Run in test mode')
     
     args = parser.parse_args()

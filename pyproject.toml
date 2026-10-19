@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codedoc"
+version = "0.2.0"
+description = "Standards-guided, dependency-aware code-level documentation generation"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "openai>=1.0",
+    "pyan3==1.1.1",
+]
+
+[project.optional-dependencies]
+# Language-server based relation extraction (class hierarchy, instantiation,
+# overrides) — see docs/ARCHITECTURE.md and experiment step S1.
+lsp = ["multilspy>=0.0.11"]
+stats = []
+
+[project.scripts]
+codedoc = "codedoc.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["codedoc*"]
+
+[tool.setuptools.package-data]
+"codedoc.writer" = ["templates/*.txt"]
+"codedoc.criteria" = ["sets/*.json"]

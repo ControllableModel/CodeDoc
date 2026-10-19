@@ -1,0 +1,376 @@
+{
+  "id": "iso_26514",
+  "title": "ISO/IEC/IEEE 26514 documentation requirements (code-level projection)",
+  "version": "2018",
+  "standards": [
+    "ISO/IEC/IEEE 26514:2018"
+  ],
+  "description": "Criterion set used as the primary evaluation axis. Requirements that govern a document set are marked level=document-set so they can be excluded from the entity-level rubric; see docs/CRITERIA_ISO.md.",
+  "axis_role": "primary",
+  "criteria": [
+    {
+      "id": "q1",
+      "name": "Correctness",
+      "category": "Content Quality",
+      "definition": "The documentation states facts about the entity that match its implementation.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q2",
+      "name": "Consistency",
+      "category": "Content Quality",
+      "definition": "Terminology and claims do not contradict the rest of the documentation.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q3",
+      "name": "Comprehensibility",
+      "category": "Content Quality",
+      "definition": "A reader familiar with the project can understand the description.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q4",
+      "name": "Conciseness",
+      "category": "Content Quality",
+      "definition": "The description avoids redundancy and unnecessary detail.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q5",
+      "name": "Completeness",
+      "category": "Content Quality",
+      "definition": "Core functionality, inputs, outputs, and preconditions are covered.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q6",
+      "name": "Modularity",
+      "category": "Information Structure",
+      "definition": "Information is organised into coherent, self-contained units.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q7",
+      "name": "Structured by Function",
+      "category": "Information Structure",
+      "definition": "Content is grouped by the function it serves rather than arbitrarily.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q8",
+      "name": "Navigability",
+      "category": "Information Structure",
+      "definition": "A reader can locate the relevant information about the entity.",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q9",
+      "name": "Metadata",
+      "category": "Information Structure",
+      "definition": "{'definition': 'Each topic should include metadata (e.g., audience, product version, information type) to facilitate content management and retrieval.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q10",
+      "name": "Consistent Format",
+      "category": "Format & Presentation",
+      "definition": "{'definition': 'Uses a unified style guide (fonts, colors, icons, warning formats, etc.); maintains consistent formatting for both print and electronic documents.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q11",
+      "name": "Legibility",
+      "category": "Format & Presentation",
+      "definition": "{'definition': 'Font size and color contrast are suitable for the reading environment; avoids all-caps text, excessive italics, or underlining.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q12",
+      "name": "Illustrations and Media",
+      "category": "Format & Presentation",
+      "definition": "{'definition': 'Graphics should be clear and consistent, placed adjacent to relevant text; avoids culturally sensitive images; videos and animations should be brief and have control options.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q13",
+      "name": "Representation of Interactive Elements",
+      "category": "Format & Presentation",
+      "definition": "{'definition': 'Uses consistent graphics or formats to represent keyboard shortcuts, mouse actions, touch gestures, etc.; uses symbols or graphics to distinguish literal values from variables.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q14",
+      "name": "Multi-modal Support",
+      "category": "Accessibility",
+      "definition": "{'definition': 'Provides text alternatives for non-text content (images, videos, audio); supports screen readers, high-contrast modes, etc.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q15",
+      "name": "Device Independence",
+      "category": "Accessibility",
+      "definition": "{'definition': \"Avoids dependencies on specific devices (e.g., 'click the green button'); provides instructions for multiple operation methods (keyboard, voice, touch, etc.).\", 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q16",
+      "name": "Accessibility Features",
+      "category": "Accessibility",
+      "definition": "{'definition': \"Clearly explains the software's accessibility features and how to use them.\", 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q17",
+      "name": "Cultural Neutrality",
+      "category": "Internationalization & Localization",
+      "definition": "{'definition': 'Avoids culture-specific examples, humor, and images; uses internationally recognized date, currency, and measurement unit formats.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q18",
+      "name": "Translation-Friendly",
+      "category": "Internationalization & Localization",
+      "definition": "{'definition': 'Uses simple sentences, consistent terminology, and avoids abbreviations and slang; text in graphics should be separable to facilitate translation.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q19",
+      "name": "Space Consideration",
+      "category": "Internationalization & Localization",
+      "definition": "{'definition': 'Reserves space for text expansion (e.g., German and Finnish text is typically longer than English).', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q20",
+      "name": "User-Centered Design",
+      "category": "Usability & User Experience",
+      "definition": "{'definition': 'Designs content based on user tasks and roles; provides context-sensitive help.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "entity",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": true,
+      "note": ""
+    },
+    {
+      "id": "q21",
+      "name": "Testing and Feedback",
+      "category": "Usability & User Experience",
+      "definition": "{'definition': 'Conducts usability testing to ensure information is easy to find, use, and understand; collects user feedback for continuous improvement.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q22",
+      "name": "Search and Indexing",
+      "category": "Usability & User Experience",
+      "definition": "{'definition': 'Provides full-text search, Boolean search, and filtering capabilities; indexes should include synonyms and user-friendly terms.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q23",
+      "name": "Safety Information",
+      "category": "Safety & Compliance",
+      "definition": "{'definition': 'Safety information (e.g., danger, warning, caution) should be prominent and consistent; uses standard signal words (Danger, Warning, Caution).', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q24",
+      "name": "Legal and Copyright",
+      "category": "Safety & Compliance",
+      "definition": "{'definition': 'Includes copyright notices, trademark information, and license terms; complies with relevant laws and regulations (e.g., Section 508, ISO standards).', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q25",
+      "name": "Version Control",
+      "category": "Maintenance & Updates",
+      "definition": "{'definition': 'Documentation should be updated in sync with software versions; uses configuration management (CM) systems to manage changes.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    },
+    {
+      "id": "q26",
+      "name": "Change Log",
+      "category": "Maintenance & Updates",
+      "definition": "{'definition': 'Clearly identifies new or modified content; provides release notes and compatibility information.', 'source': '5Score/DOTquality_mul_Eval.jsonl'}",
+      "level": "document-set",
+      "source": "",
+      "anchors": {
+        "1": "Not Mention",
+        "5": "Excellent"
+      },
+      "applicable_to_entity": false,
+      "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
+    }
+  ]
+}

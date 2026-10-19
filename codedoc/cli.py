@@ -7,8 +7,22 @@ from pathlib import Path
 from threading import Semaphore, Lock
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from DOT import analyze, get_dep, format_dep, build_prompt
-from LLM import LinguisticCore
+from codedoc.config import TEMPLATES, default_template
+from codedoc.deps.dot import analyze, get_dep
+from codedoc.writer.prompt import format_dep, build_prompt
+from codedoc.writer.llm import LinguisticCore
+
+
+def str2bool(value):
+    """Parse a CLI boolean properly (argparse's bool() turns 'False' into True)."""
+    if isinstance(value, bool):
+        return value
+    v = str(value).strip().lower()
+    if v in {"1", "true", "t", "yes", "y", "on"}:
+        return True
+    if v in {"0", "false", "f", "no", "n", "off"}:
+        return False
+    raise argparse.ArgumentTypeError(f"Expected a boolean value, got: {value!r}")
 
 sem = Semaphore(10)
 
@@ -96,7 +110,7 @@ def call_llm(args, msg):
         llm.create_socket()
         if len(msg) > args.max_tokens:
             msg = msg[:args.max_tokens]
-        with open("system.prompt", "r", encoding="utf-8") as f:
+        with open(str(TEMPLATES / "system.txt"), "r", encoding="utf-8") as f:
             sys_prompt = f.read()
         messages = [{"role": "system", "content": sys_prompt}, {"role": "user", "content": msg}]
         for i in range(5):
@@ -285,12 +299,15 @@ def main():
                    help='LLM API key. Prefer the LLM_KEY environment variable (see .env.example).')
     p.add_argument('--llm_url', type=str, default=os.getenv('LLM_URL', 'https://api.openai.com/v1'),
                    help='OpenAI-compatible API base URL (env: LLM_URL).')
-    p.add_argument('--model', type=str, default=os.getenv('MODEL', 'gpt-4o-mini'))
+    p.add_argument('--model', type=str, default=os.getenv('MODEL', 'gpt-5-mini'))
     p.add_argument('--max_tokens', type=int, default=10000)
-    p.add_argument('--relevant', type=bool, default=True)
-    p.add_argument('--process', type=bool, default=True)
+    p.add_argument('--relevant', type=str2bool, default=True,
+                   help='Include dependency context (True/False).')
+    p.add_argument('--process', type=str2bool, default=True,
+                   help='Run the LLM generation stage (True/False).')
     p.add_argument('--language', type=str, default="English")
-    p.add_argument('--prompt_template', type=str, default='prompts/ISO.txt')
+    p.add_argument('--prompt_template', type=str, default=default_template(),
+                   help='Criteria template used for generation (default: ISO/IEC/IEEE 26514).')
     p.add_argument('--test_mode', action='store_true', help='只生成tests文件夹中已有md文件对应的文档')
     
     # Ablation study parameters

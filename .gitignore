@@ -65,6 +65,14 @@ repositories/
 **/.git/
 
 # ---------------------------------------------------------------------------
+# Six-library layout: inputs and outputs stay local, only their READMEs ship
+# ---------------------------------------------------------------------------
+targets/*
+!targets/README.md
+outputs/*
+!outputs/README.md
+
+# ---------------------------------------------------------------------------
 # Voluminous, regenerable intermediates
 # (the evaluation *scores* are published, the raw generated docs are not)
 # ---------------------------------------------------------------------------
