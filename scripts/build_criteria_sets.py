@@ -110,6 +110,17 @@ PRACTICE_DEFINITIONS = {
 }
 
 
+#: Entity kinds a criterion can judge. Anything absent applies to every kind.
+#:
+#: Only criteria that are *structurally impossible* for an entity kind belong here.
+#: A free function has no inheritance contract, so scoring it on one measures the
+#: rubric, not the document: in the first full-corpus run functions scored 1.78 on
+#: "Inheritance/Polymorphism Contract" purely because the property cannot exist.
+APPLIES_TO_KINDS = {
+    "Inheritance/Polymorphism Contract": ["class", "method"],
+}
+
+
 def _load_recovered() -> dict:
     path = RESULTS / "judge_criteria_recovered.json"
     if not path.exists():
@@ -145,6 +156,7 @@ def _build(set_id, title, version, standards, description, axis_role, categories
                     category=category,
                     definition=definition,
                     level=DOCUMENT_SET if name in docset else ENTITY,
+                    applies_to_kinds=APPLIES_TO_KINDS.get(name),
                     source="",
                     anchors=dict(anchors or {}),
                     note=note if name in docset else "",

@@ -21,6 +21,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional
 
+#: Entity kinds a criterion can govern. ``None`` applicability means "all kinds".
+KINDS = ("class", "method", "function")
+
 ENTITY = "entity"          # governed per code entity (docstring level)
 DOCUMENT_SET = "document-set"  # governed over a collection of documents
 
@@ -41,6 +44,15 @@ class Criterion:
     #: exactly the gap reviewers flagged: only the endpoints were ever defined.
     anchors: Dict[int, str] = field(default_factory=dict)
     applicable_to_entity: Optional[bool] = None
+    #: Entity kinds this criterion can judge. ``None`` means all of :data:`KINDS`.
+    #:
+    #: ``level`` alone was not enough. A free function cannot satisfy an
+    #: inheritance/polymorphism requirement, yet the judge scored it 1.78 —
+    #: reading "not mentioned" as "absent and therefore bad". That is a
+    #: measurement artefact: it lowers every function's mean and makes per-kind
+    #: comparisons meaningless. Non-applicable pairs are now excluded from both
+    #: the question asked and the aggregation.
+    applies_to_kinds: Optional[List[str]] = None
     note: str = ""
 
     def __post_init__(self) -> None:
@@ -50,6 +62,18 @@ class Criterion:
         self.anchors = {int(k): v for k, v in (self.anchors or {}).items()}
         if self.applicable_to_entity is None:
             self.applicable_to_entity = self.level == ENTITY
+        if self.applies_to_kinds is not None:
+            unknown = [k for k in self.applies_to_kinds if k not in KINDS]
+            if unknown:
+                raise ValueError(
+                    f"applies_to_kinds must be drawn from {KINDS}, got {unknown}"
+                )
+
+    def applies_to(self, kind: str) -> bool:
+        """Whether this criterion can be judged for an entity of ``kind``."""
+        if self.applies_to_kinds is None:
+            return True
+        return kind in self.applies_to_kinds
 
     @property
     def has_full_anchors(self) -> bool:
@@ -122,6 +146,14 @@ class CriterionSet:
     def entity_level(self) -> List[Criterion]:
         """Criteria that govern a single code entity (usable as a docstring rubric)."""
         return [c for c in self.criteria if c.applicable_to_entity]
+
+    def for_kind(self, kind: str) -> List[Criterion]:
+        """Entity-level criteria that can be judged for this entity kind."""
+        return [c for c in self.criteria if c.applicable_to_entity and c.applies_to(kind)]
+
+    def kind_coverage(self) -> Dict[str, List[str]]:
+        """Which criteria apply to each entity kind — the applicability audit table."""
+        return {kind: [c.name for c in self.for_kind(kind)] for kind in KINDS}
 
     def audit_anchors(self) -> Dict[str, List[int]]:
         """Report which criteria are missing scoring anchors (reviewer item)."""

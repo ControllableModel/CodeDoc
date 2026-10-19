@@ -35,9 +35,9 @@ def documents(doc_dir: Path, pattern: str) -> list:
     return sorted(doc_dir.rglob(pattern))
 
 
-def judge_document(judge: LLM_Remote_query, text: str, criteria, mode: str) -> dict:
+def judge_document(judge: LLM_Remote_query, text: str, criteria, mode: str, spec: str = "") -> dict:
     if mode == "multi":
-        spec = "\n".join(f"- {c.name}: {c.definition}" for c in criteria)
+        spec = spec or "\n".join(f"- {c.name}: {c.definition}" for c in criteria)
         judge.load_JudgeContent_Once(spec)
         verdict, _attempts, _raw = judge_with_retry(judge, text)
         return verdict
@@ -62,6 +62,9 @@ def main() -> int:
                     help="score only criteria that govern a single code entity")
     ap.add_argument("--limit", type=int, default=0, help="only score the first N documents")
     ap.add_argument("--model", default=os.getenv("MODEL", "gpt-5-mini"))
+    ap.add_argument("--repo", default=None,
+                    help="repository under targets/ used to infer each document's entity "
+                         "kind, so criteria that cannot apply are not asked")
     args = ap.parse_args()
 
     key = os.getenv("LLM_KEY", "")
@@ -74,6 +77,27 @@ def main() -> int:
     if not criteria:
         print("no criteria selected", file=sys.stderr)
         return 2
+
+    # Optional entity-kind awareness: document stems are qualified names with dots
+    # and path separators flattened, so the index is the reliable source of kinds.
+    spec_by_kind: dict = {}
+    if args.repo:
+        from codedoc.config import TARGETS as _TARGETS
+        from codedoc.deps.relations_index import build_index
+
+        _index = build_index(str(_TARGETS / args.repo))
+        if _index is None:
+            print(f"cannot read entity kinds from {args.repo}", file=sys.stderr)
+            return 2
+        for kind in ("class", "method", "function"):
+            kind_criteria = criterion_set.for_kind(kind) if args.entity_level_only else [
+                c for c in criterion_set if c.applies_to(kind)
+            ]
+            spec_by_kind[kind] = (kind_criteria,
+                                  "\n".join(f"- {c.name}: {c.definition}" for c in kind_criteria))
+        stamp = {c.entity.qualified_name.replace(".", "_").replace("/", "_"): str(c.entity.kind)
+                 for c in _index.contexts}
+        print(f"entity kinds from {args.repo}: {len(stamp)} entities")
 
     doc_dir = Path(args.doc_dir)
     files = documents(doc_dir, args.pattern)
@@ -96,7 +120,11 @@ def main() -> int:
         text = path.read_text(encoding="utf-8", errors="ignore")
         judge = LLM_Remote_query(api_key=key, api_url=os.getenv("LLM_URL", "https://api.openai.com/v1"),
                                  model=args.model)
-        scores = judge_document(judge, text, criteria, args.mode)
+        spec = ""
+        if spec_by_kind:
+            kind = stamp.get(path.stem, "function")
+            criteria, spec = spec_by_kind.get(kind, (criteria, ""))
+        scores = judge_document(judge, text, criteria, args.mode, spec)
         if not scores:
             empty += 1
             print(f"[{i}/{len(files)}] EMPTY verdict for {path.name}")
