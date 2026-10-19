@@ -107,3 +107,8 @@ _tmp/
 # ---------------------------------------------------------------------------
 standards/*
 !standards/README.md
+
+# Console state: holds the API key
+webapp/config.local.json
+outputs/console/
+

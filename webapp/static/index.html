@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CodeDoc Console — 依赖感知文档生成大屏</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="dot"></span>
+    <h1>CodeDoc <em>Console</em></h1>
+    <span class="tag">dependency-aware documentation</span>
+  </div>
+
+  <div class="controls">
+    <label class="field">
+      <span>仓库</span>
+      <select id="repo"></select>
+    </label>
+
+    <label class="field path-field">
+      <span>或路径</span>
+      <input id="customPath" placeholder="E:\path\to\repo" />
+    </label>
+
+    <label class="field">
+      <span>分析方式</span>
+      <select id="mode">
+        <option value="full">全量</option>
+        <option value="sample">抽样（按关系分层）</option>
+      </select>
+    </label>
+
+    <label class="field narrow" id="limitField">
+      <span>样本量</span>
+      <input id="limit" type="number" value="60" min="1" max="2000" />
+    </label>
+
+    <label class="field narrow">
+      <span>种子</span>
+      <input id="seed" type="number" value="42" />
+
+    </label>
+
+    <button id="analyzeBtn" class="primary">分析</button>
+    <button id="configBtn" class="ghost">⚙ 配置</button>
+  </div>
+</header>
+
+<main class="grid">
+  <!-- column 1: files -->
+  <section class="panel files">
+    <div class="panel-head">
+      <h2>参与生成的文件</h2>
+      <span id="fileCount" class="badge">—</span>
+    </div>
+    <div id="fileTree" class="scroll">
+      <p class="hint">选择仓库后点击「分析」。文件按源码路径分组，括号内为实体数。</p>
+    </div>
+  </section>
+
+  <!-- column 2: entities + source -->
+  <section class="panel source">
+    <div class="panel-head">
+      <h2 id="sourceTitle">源码</h2>
+      <div class="tabs" id="sourceTabs">
+        <button class="tab active" data-view="source">源码</button>
+        <button class="tab" data-view="promptSource">注入视图</button>
+      </div>
+    </div>
+    <div id="entityStrip" class="chips"></div>
+    <pre id="sourceBody" class="code scroll"><span class="hint">← 先在左侧选择文件</span></pre>
+  </section>
+
+  <!-- column 3: document / prompt / relations / params -->
+  <section class="panel output">
+    <div class="panel-head">
+      <div class="tabs" id="outTabs">
+        <button class="tab active" data-tab="prompt">提示词</button>
+        <button class="tab" data-tab="document">生成文档</button>
+        <button class="tab" data-tab="relations">关系</button>
+        <button class="tab" data-tab="params">模型参数</button>
+      </div>
+      <div class="actions">
+        <span id="promptStats" class="badge">—</span>
+        <button id="generateBtn" class="primary small" disabled>生成文档</button>
+        <button id="copyBtn" class="ghost small">复制</button>
+      </div>
+    </div>
+    <pre id="outBody" class="code scroll"><span class="hint">选择实体后，这里显示提示词全文。</span></pre>
+  </section>
+</main>
+
+<footer class="statusbar">
+  <span id="status">就绪</span>
+  <span class="sep"></span>
+  <span id="counts">—</span>
+  <span class="sep"></span>
+  <span id="usage">本次会话：—</span>
+  <span class="grow"></span>
+  <span id="endpoint" class="mono">—</span>
+</footer>
+
+<!-- config drawer -->
+<div id="drawer" class="drawer hidden">
+  <div class="drawer-card">
+    <h2>运行配置</h2>
+    <p class="hint">Key 保存在本地 <code>webapp/config.local.json</code>（已 gitignore），不会回传给页面。</p>
+
+    <label class="row"><span>API Key</span>
+      <input id="cfgKey" type="password" placeholder="sk-..." autocomplete="off" />
+      <small id="keyHint"></small>
+    </label>
+    <label class="row"><span>接口地址</span>
+      <input id="cfgBase" placeholder="https://api.deepseek.com/v1" />
+    </label>
+    <label class="row"><span>模型</span>
+      <input id="cfgModel" placeholder="deepseek-chat" />
+    </label>
+    <label class="row"><span>生成温度</span>
+      <input id="cfgTemp" type="number" step="0.1" min="0" max="2" />
+    </label>
+    <label class="row"><span>提示词上限</span>
+      <input id="cfgMaxTokens" type="number" step="1000" />
+    </label>
+    <label class="row"><span>源码预算</span>
+      <input id="cfgSourceBudget" type="number" step="500" />
+    </label>
+    <label class="row"><span>生成模板</span>
+      <select id="cfgTemplate"></select>
+    </label>
+    <label class="row"><span>注入依赖</span>
+      <input id="cfgRelevant" type="checkbox" />
+    </label>
+
+    <div class="row criteria-box">
+      <span>准则集</span>
+      <div id="criteriaList" class="checks"></div>
+    </div>
+    <div id="criteriaDetail" class="criteria-detail"></div>
+
+    <div class="drawer-actions">
+      <button id="saveConfig" class="primary">保存</button>
+      <button id="closeDrawer" class="ghost">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
