@@ -55,135 +55,134 @@ You are an AI documentation assistant. Generate clear, accurate documentation fo
 **Source Code:**
 ```python
 class Flask(App):
-    """The flask object implements a WSGI application and acts as the central
-    object.  It is passed the name of the module or package of the
-    application.  Once it is created it will act as a central registry for
-    the view functions, the URL rules, template configuration and much more.
+    def __init__(
+        self,
+        import_name: str,
+        static_url_path: str | None = None,
+        static_folder: str | os.PathLike[str] | None = "static",
+        static_host: str | None = None,
+        host_matching: bool = False,
+        subdomain_matching: bool = False,
+        template_folder: str | os.PathLike[str] | None = "templates",
+        instance_path: str | None = None,
+        instance_relative_config: bool = False,
+        root_path: str | None = None,
+    ):
+        super().__init__(
+            import_name=import_name,
+            static_url_path=static_url_path,
+            static_folder=static_folder,
+            static_host=static_host,
+            host_matching=host_matching,
+            subdomain_matching=subdomain_matching,
+            template_folder=template_folder,
+            instance_path=instance_path,
+            instance_relative_config=instance_relative_config,
+            root_path=root_path,
+        )
 
-    The name of the package is used to resolve resources from inside the
-    package or the folder the module is contained in depending on if the
-    package parameter resolves to an actual python package (a folder with
-    an :file:`__init__.py` file inside) or a standard module (just a ``.py`` file).
+        #: The Click command group for registering CLI commands for this
+        #: object. The commands are available from the ``flask`` command
+        #: once the application has been discovered and blueprints have
+        #: been registered.
+        self.cli = cli.AppGroup()
 
-    For more information about resource loading, see :func:`open_resource`.
+        # Set the name of the Click group in case someone wants to add
+        # the app's commands to another CLI tool.
+        self.cli.name = self.name
 
-    Usually you create a :class:`Flask` instance in your main module or
-    in the :file:`__init__.py` file of your package like this::
-
-        from flask import Flask
-        app = Flask(__name__)
-
-    .. admonition:: About the First Parameter
-
-        The idea of the first parameter is to give Flask an idea of what
-        belongs to your application.  This name is used to find resources
-        on the filesystem, can be used by extensions to improve debugging
-        information and a lot more.
-
-        So it's important what you provide there.  If you are using a single
-        module, `__name__` is always the correct value.  If you however are
-        using a package, it's usually recommended to hardcode the name of
-        your package there.
-
-        For example if your application is defined in :file:`yourapplication/app.py`
-        you should create it with one of the two versions below::
-
-            app = Flask('yourapplication')
-            app = Flask(__name__.split('.')[0])
-
-        Why is that?  The application will work even with `__name__`, thanks
-        to how resources are looked up.  However it will make debugging more
-        painful.  Certain extensions can make assumptions based on the
-        import name of your application.  For example the Flask-SQLAlchemy
-        extension will look for the code in your application that triggered
-        an SQL query in debug mode.  If the import name is not properly set
-        up, that debugging information is lost.  (For example it would only
-        pick up SQL queries in `yourapplication.app` and not
-        `yourapplication.views.frontend`)
-
-    .. versionadded:: 0.7
-       The `static_url_path`, `static_folder`, and `template_folder`
-       parameters were added.
-
-    .. versionadded:: 0.8
-       The `instance_path` and `instance_relative_config` parameters were
-       added.
-
-    .. versionadded:: 0.11
-       The `root_path` parameter was added.
-
-    .. versionadded:: 1.0
-       The ``host_matching`` and ``static_host`` parameters were added.
-
-    .. versionadded:: 1.0
-       The ``subdomain_matching`` parameter was added. Subdomain
-       matching needs to be enabled manually now. Setting
-       :data:`SERVER_NAME` does not implicitly enable it.
-
-    :param import_name: the name of the application package
-    :param static_url_path: can be used to specify a different path for the
-                            static files on the web.  Defaults to the name
-                            of the `static_folder` folder.
-    :param static_folder: The folder with static files that is served at
-# ... 1388 lines elided (source exceeds the 5651-char budget) ...
+        # Add a static route using the provided static_url_path, static_host,
+        # and static_folder if there is a configured static_folder.
+        # Note we do this without checking if static_folder exists.
+        # For one, it might be created while the server is running (e.g. during
+        # development). Also, Google App Engine stores static files somewhere
+        if self.has_static_folder:
+            assert bool(static_host) == host_matching, (
+                "Invalid static_host/host_matching combination"
+            )
+            # Use a weakref to avoid creating a reference cycle between the app
+            # and the view function (see #3761).
+            self_ref = weakref.ref(self)
+            self.add_url_rule(
+                f"{self.static_url_path}/<path:filename>",
+                endpoint="static",
+                host=static_host,
+                view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore
+            )
+    def __init_subclass__(cls, **kwargs: t.Any) -> None:
+    def get_send_file_max_age(self, filename: str | None) -> int | None:
+    def send_static_file(self, filename: str) -> Response:
+    def open_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = None
+    ) -> t.IO[t.AnyStr]:
+    def open_instance_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
+    ) -> t.IO[t.AnyStr]:
+    def create_jinja_environment(self) -> Environment:
+    def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
+    def raise_routing_exception(self, request: Request) -> t.NoReturn:
+    def update_template_context(
+        self, ctx: AppContext, context: dict[str, t.Any]
+    ) -> None:
+    def make_shell_context(self) -> dict[str, t.Any]:
+    def run(
+        self,
+        host: str | None = None,
+        port: int | None = None,
+# ... 7 lines elided (source exceeds the 5651-char budget) ...
+        self, ctx: AppContext, e: HTTPException
+    ) -> HTTPException | ft.ResponseReturnValue:
+    def handle_user_exception(
+        self, ctx: AppContext, e: Exception
+    ) -> HTTPException | ft.ResponseReturnValue:
+    def handle_exception(self, ctx: AppContext, e: Exception) -> Response:
+    def log_exception(
+        self,
+        ctx: AppContext,
+        exc_info: tuple[type, BaseException, TracebackType] | tuple[None, None, None],
+    ) -> None:
+    def dispatch_request(self, ctx: AppContext) -> ft.ResponseReturnValue:
+    def full_dispatch_request(self, ctx: AppContext) -> Response:
+    def finalize_request(
+        self,
+        ctx: AppContext,
+        rv: ft.ResponseReturnValue | HTTPException,
+        from_error_handler: bool = False,
+    ) -> Response:
+    def make_default_options_response(self, ctx: AppContext) -> Response:
+    def ensure_sync(self, func: t.Callable[..., t.Any]) -> t.Callable[..., t.Any]:
+    def async_to_sync(
+        self, func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]
+    ) -> t.Callable[..., t.Any]:
+    def url_for(
+        self,
+        /,
+        endpoint: str,
+        *,
+        _anchor: str | None = None,
+        _method: str | None = None,
+        _scheme: str | None = None,
+        _external: bool | None = None,
+        **values: t.Any,
+    ) -> str:
+    def make_response(self, rv: ft.ResponseReturnValue) -> Response:
+    def preprocess_request(self, ctx: AppContext) -> ft.ResponseReturnValue | None:
+    def process_response(self, ctx: AppContext, response: Response) -> Response:
+    def do_teardown_request(
+        self, ctx: AppContext, exc: BaseException | None = None
+    ) -> None:
+    def do_teardown_appcontext(
+        self, ctx: AppContext, exc: BaseException | None = None
+    ) -> None:
+    def app_context(self) -> AppContext:
+    def request_context(self, environ: WSGIEnvironment) -> AppContext:
+    def test_request_context(self, *args: t.Any, **kwargs: t.Any) -> AppContext:
+    def wsgi_app(
+        self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
-        """The actual WSGI application. This is not implemented in
-        :meth:`__call__` so that middlewares can be applied without
-        losing a reference to the app object. Instead of doing this::
-
-            app = MyMiddleware(app)
-
-        It's a better idea to do this instead::
-
-            app.wsgi_app = MyMiddleware(app.wsgi_app)
-
-        Then you still have the original application object around and
-        can continue to call methods on it.
-
-        .. versionchanged:: 0.7
-            Teardown events for the request and app contexts are called
-            even if an unhandled error occurs. Other events may not be
-            called depending on when an error occurs during dispatch.
-
-        :param environ: A WSGI environment.
-        :param start_response: A callable accepting a status code,
-            a list of headers, and an optional exception context to
-            start the response.
-        """
-        ctx = self.request_context(environ)
-        error: BaseException | None = None
-        try:
-            try:
-                ctx.push()
-                response = self.full_dispatch_request(ctx)
-            except Exception as e:
-                error = e
-                response = self.handle_exception(ctx, e)
-            except:
-                error = sys.exc_info()[1]
-                raise
-            return response(environ, start_response)
-        finally:
-            if "werkzeug.debug.preserve_context" in environ:
-                environ["werkzeug.debug.preserve_context"](ctx)
-
-            if (
-                error is not None
-                and self.should_ignore_error is not None
-                and self.should_ignore_error(error)
-            ):
-                error = None
-
-            ctx.pop(error)
-
     def __call__(
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
-        """The WSGI server calls the Flask application object as the
-        WSGI application. This calls :meth:`wsgi_app`, which can be
-        wrapped to apply middleware.
-        """
-        return self.wsgi_app(environ, start_response)
 ```
 
 

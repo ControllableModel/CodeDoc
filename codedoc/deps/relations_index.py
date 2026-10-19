@@ -25,6 +25,7 @@ from typing import Dict, List, Optional
 
 from codedoc.deps import languages
 from codedoc.deps.schema import DependencyContext, EntityKind, RelationKind
+from codedoc.writer.classview import class_skeleton
 
 #: Relation kinds rendered as their own labelled block in prompts and audits.
 BLOCK_LABELS = {
@@ -172,13 +173,21 @@ def get_dep(
         for kind in BLOCK_LABELS
         if ctx.get(kind)
     }
+    source = ctx.source
+    # A class body is a poor prompt: implementation detail that the class document
+    # should not restate, and long enough to crowd out everything else. The agreed
+    # view keeps the declaration, __init__ in full, and the remaining method
+    # signatures; method bodies are documented by their own entities.
+    prompt_source = class_skeleton(source) if ctx.entity.kind == EntityKind.CLASS else source
+
     return {
         "real_name": ctx.entity.name,
         "display_name": ctx.entity.name,
         "kind": ctx.entity.kind,
         "qualified_name": ctx.entity.qualified_name,
         "path": ctx.entity.path or fpath,
-        "source_code": ctx.source,
+        "source_code": source,
+        "prompt_source": prompt_source,
         "uses": uses,
         "used_by": used_by,
         "relations": relations,

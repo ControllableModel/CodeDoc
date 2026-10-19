@@ -1,0 +1,53 @@
+# Blueprint
+## Path
+`E:\Pycharm_projects\CodeEval\targets\flask-main\blueprints.py`
+
+## Definition
+```python
+class Blueprint(SansioBlueprint):
+    def __init__(
+        self,
+        name: str,
+        import_name: str,
+        static_folder: str | os.PathLike[str] | None = None,
+        static_url_path: str | None = None,
+        template_folder: str | os.PathLike[str] | None = None,
+        url_prefix: str | None = None,
+        subdomain: str | None = None,
+        url_defaults: dict[str, t.Any] | None = None,
+        root_path: str | None = None,
+        cli_group: str | None = _sentinel,  # type: ignore
+    ) -> None:
+        super().__init__(
+            name,
+            import_name,
+            static_folder,
+            static_url_path,
+            template_folder,
+            url_prefix,
+            subdomain,
+            url_defaults,
+            root_path,
+            cli_group,
+        )
+
+        #: The Click command group for registering CLI commands for this
+        #: object. The commands are available from the ``flask`` command
+        #: once the application has been discovered and blueprints have
+        #: been registered.
+        self.cli = AppGroup()
+
+        # Set the name of the Click group in case someone wants to add
+        # the app's commands to another CLI tool.
+        self.cli.name = self.name
+    def get_send_file_max_age(self, filename: str | None) -> int | None:
+    def send_static_file(self, filename: str) -> Response:
+    def open_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
+    ) -> t.IO[t.AnyStr]:
+```
+
+
+
+## Inherits
+- `blueprints.Blueprint`

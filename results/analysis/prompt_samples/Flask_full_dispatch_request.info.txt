@@ -35,23 +35,103 @@
 ```
 
 ## Uses
-### finalize_request
+### Flask.finalize_request
 ```python
-E:\Pycharm_projects\CodeEval\targets\flask-main\app.py
+    def finalize_request(
+        self,
+        ctx: AppContext,
+        rv: ft.ResponseReturnValue | HTTPException,
+        from_error_handler: bool = False,
+    ) -> Response:
+        """Given the return value from a view function this finalizes
+        the request by converting it into a response and invoking the
+        postprocessing functions.  This is invoked for both normal
+        request dispatching as well as error handlers.
+
+        Because this means that it might be called as a result of a
+        failure a special safe mode is available which can be enabled
+        with the `from_error_handler` flag.  If enabled, failures in
+        response processing will be logged and otherwise ignored.
+
+        :internal:
+        """
+        response = self.make_response(rv)
+        try:
+# ... 11 more lines ...
 ```
-### preprocess_request
+### Flask.preprocess_request
 ```python
-E:\Pycharm_projects\CodeEval\targets\flask-main\app.py
+    def preprocess_request(self, ctx: AppContext) -> ft.ResponseReturnValue | None:
+        """Called before the request is dispatched. Calls
+        :attr:`url_value_preprocessors` registered with the app and the
+        current blueprint (if any). Then calls :attr:`before_request_funcs`
+        registered with the app and the blueprint.
+
+        If any :meth:`before_request` handler returns a non-None value, the
+        value is handled as if it was the return value from the view, and
+        further request handling is stopped.
+        """
+        req = ctx.request
+        names = (None, *reversed(req.blueprints))
+
+        for name in names:
+            if name in self.url_value_preprocessors:
+                for url_func in self.url_value_preprocessors[name]:
+                    url_func(req.endpoint, req.view_args)
+
+        for name in names:
+            if name in self.before_request_funcs:
+# ... 7 more lines ...
 ```
 ### dispatch_request
+### Flask.handle_user_exception
 ```python
-E:\Pycharm_projects\CodeEval\targets\flask-main\app.py
-```
-### handle_user_exception
-```python
-E:\Pycharm_projects\CodeEval\targets\flask-main\app.py
+    def handle_user_exception(
+        self, ctx: AppContext, e: Exception
+    ) -> HTTPException | ft.ResponseReturnValue:
+        """This method is called whenever an exception occurs that
+        should be handled. A special case is :class:`~werkzeug
+        .exceptions.HTTPException` which is forwarded to the
+        :meth:`handle_http_exception` method. This function will either
+        return a response value or reraise the exception with the same
+        traceback.
+
+        .. versionchanged:: 1.0
+            Key errors raised from request data like ``form`` show the
+            bad key in debug mode rather than a generic bad request
+            message.
+
+        .. versionadded:: 0.7
+        """
+        if isinstance(e, BadRequestKeyError) and (
+            self.debug or self.config["TRAP_BAD_REQUEST_ERRORS"]
+        ):
+# ... 11 more lines ...
 ```
 
 ## Used by
-### wsgi_app
+### Flask.wsgi_app
+```python
+    def wsgi_app(
+        self, environ: WSGIEnvironment, start_response: StartResponse
+    ) -> cabc.Iterable[bytes]:
+        """The actual WSGI application. This is not implemented in
+        :meth:`__call__` so that middlewares can be applied without
+        losing a reference to the app object. Instead of doing this::
+
+            app = MyMiddleware(app)
+
+        It's a better idea to do this instead::
+
+            app.wsgi_app = MyMiddleware(app.wsgi_app)
+
+        Then you still have the original application object around and
+        can continue to call methods on it.
+
+        .. versionchanged:: 0.7
+            Teardown events for the request and app contexts are called
+            even if an unhandled error occurs. Other events may not be
+            called depending on when an error occurs during dispatch.
+# ... 31 more lines ...
+```
 

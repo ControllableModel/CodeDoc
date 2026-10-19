@@ -1,0 +1,72 @@
+# send_from_directory
+## Path
+`E:\Pycharm_projects\CodeEval\targets\flask-main\helpers.py`
+
+## Definition
+```python
+def send_from_directory(
+    directory: os.PathLike[str] | str,
+    path: os.PathLike[str] | str,
+    **kwargs: t.Any,
+) -> Response:
+    """Send a file from within a directory using :func:`send_file`.
+
+    .. code-block:: python
+
+        @app.route("/uploads/<path:name>")
+        def download_file(name):
+            return send_from_directory(
+                app.config['UPLOAD_FOLDER'], name, as_attachment=True
+            )
+
+    This is a secure way to serve files from a folder, such as static
+    files or uploads. Uses :func:`~werkzeug.security.safe_join` to
+    ensure the path coming from the client is not maliciously crafted to
+    point outside the specified directory.
+
+    If the final path does not point to an existing regular file,
+    raises a 404 :exc:`~werkzeug.exceptions.NotFound` error.
+
+    :param directory: The directory that ``path`` must be located under,
+        relative to the current application's root path. This *must not*
+        be a value provided by the client, otherwise it becomes insecure.
+    :param path: The path to the file to send, relative to
+        ``directory``.
+    :param kwargs: Arguments to pass to :func:`send_file`.
+
+    .. versionchanged:: 2.0
+        ``path`` replaces the ``filename`` parameter.
+
+    .. versionadded:: 2.0
+        Moved the implementation to Werkzeug. This is now a wrapper to
+        pass some Flask-specific arguments.
+
+    .. versionadded:: 0.5
+    """
+    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]
+        directory, path, **_prepare_send_file_kwargs(**kwargs)
+    )
+```
+
+## Uses
+### _prepare_send_file_kwargs
+```python
+def _prepare_send_file_kwargs(**kwargs: t.Any) -> dict[str, t.Any]:
+    ctx = app_ctx._get_current_object()
+
+    if kwargs.get("max_age") is None:
+        kwargs["max_age"] = ctx.app.get_send_file_max_age
+
+    kwargs.update(
+        environ=ctx.request.environ,
+        use_x_sendfile=ctx.app.config["USE_X_SENDFILE"],
+        response_class=ctx.app.response_class,
+        _root_path=ctx.app.root_path,
+    )
+    return kwargs
+```
+
+## Used by
+### send_static_file
+### send_static_file
+
