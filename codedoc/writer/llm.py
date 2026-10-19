@@ -15,6 +15,11 @@ class LinguisticCore:
         self.web_search = False
         self.call_robot = True
         self.temperature = 1
+        #: Newer OpenAI-family models reject ``max_tokens`` and require
+        #: ``max_completion_tokens``; the installed SDK (1.3.0) has no typed kwarg for
+        #: it, so it is sent through ``extra_body``.
+        self.max_output_tokens = 0
+        self.use_max_completion_tokens = False
         self.history = []
         self.round = 10
         #: Optional per-call tag so concurrent callers can attribute usage to
@@ -31,14 +36,20 @@ class LinguisticCore:
         else:
             messages = msg
 
+        kwargs = {
+            "model": self.model,
+            "messages": messages,
+            "stream": stream,
+            "temperature": self.temperature,
+        }
+        if self.max_output_tokens:
+            if self.use_max_completion_tokens:
+                kwargs["extra_body"] = {"max_completion_tokens": int(self.max_output_tokens)}
+            else:
+                kwargs["max_tokens"] = int(self.max_output_tokens)
         started = time.time()
         try:
-            r = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                stream=stream,
-                temperature=self.temperature
-            )
+            r = self.client.chat.completions.create(**kwargs)
         except Exception as exc:
             RECORDER.record(phase="generation", model=self.model,
                             seconds=time.time() - started, ok=False,

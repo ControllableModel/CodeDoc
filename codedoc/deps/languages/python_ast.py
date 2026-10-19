@@ -80,7 +80,8 @@ def _module_name(path: Path, root: Path) -> str:
 
 class _ClassInfo:
     __slots__ = ("qname", "module", "name", "bases_raw", "bases", "attributes",
-                 "methods", "path", "lineno", "end_lineno", "outer_function")
+                 "attribute_code", "methods", "path", "lineno", "end_lineno",
+                 "outer_function")
 
     def __init__(self, qname, module, name, bases_raw, path, lineno, end_lineno, outer):
         self.qname = qname
@@ -89,6 +90,8 @@ class _ClassInfo:
         self.bases_raw = bases_raw
         self.bases: List[str] = []
         self.attributes = set()
+        #: attribute name -> the assignment statement that defines it (``self.x = ...``)
+        self.attribute_code: Dict[str, str] = {}
         self.methods: Dict[str, str] = {}
         self.path = path
         self.lineno = lineno
@@ -98,7 +101,7 @@ class _ClassInfo:
 
 class _FuncInfo:
     __slots__ = ("qname", "module", "name", "kind", "owner", "path", "lineno",
-                 "end_lineno", "calls", "unresolved", "attrs")
+                 "end_lineno", "calls", "unresolved", "attrs", "call_sites")
 
     def __init__(self, qname, module, name, kind, owner, path, lineno, end_lineno):
         self.qname = qname
@@ -113,6 +116,9 @@ class _FuncInfo:
         self.unresolved = 0
         #: ``self.x`` / ``cls.x`` attribute names touched by this function body.
         self.attrs: List[str] = []
+        #: (target qname, line number) for every resolved call, so a caller can inject
+        #: the call expression itself rather than its whole body.
+        self.call_sites: List[Tuple[str, int]] = []
 
 
 class ProjectIndex:
@@ -219,6 +225,28 @@ class ProjectIndex:
                                     seen_attrs.append(sub.attr)
                         info.attrs = seen_attrs
                         self.classes[owner].attributes.update(seen_attrs)
+                        # A bare attribute name tells a documenter nothing; the
+                        # assignment that defines it usually does.
+                        lines = self._file_lines(str(path))
+                        for sub in ast.walk(node):
+                            if isinstance(sub, ast.Assign):
+                                assign_targets = list(sub.targets)
+                            elif isinstance(sub, ast.AnnAssign):
+                                assign_targets = [sub.target]
+                            else:
+                                continue
+                            for tgt in assign_targets:
+                                if not (isinstance(tgt, ast.Attribute)
+                                        and isinstance(tgt.value, ast.Name)
+                                        and tgt.value.id in ("self", "cls")):
+                                    continue
+                                if tgt.attr in self.classes[owner].attribute_code or not lines:
+                                    continue
+                                first = sub.lineno - 1
+                                last = getattr(sub, "end_lineno", sub.lineno)
+                                text = "\n".join(lines[first:last]).strip()
+                                if text:
+                                    self.classes[owner].attribute_code[tgt.attr] = text
                     stack.append(("function", qname))
                     visit(node.body)
                     stack.pop()
@@ -357,6 +385,7 @@ class ProjectIndex:
                 self.unresolved_calls += 1
                 continue
             func.calls.append(target[1])
+            func.call_sites.append((target[1], sub.lineno))
 
     def _find_node(self, tree: ast.AST, func: _FuncInfo) -> Optional[ast.AST]:
         for sub in ast.walk(tree):
@@ -369,6 +398,18 @@ class ProjectIndex:
                 if sub.name == func.name and sub.lineno == func.lineno:
                     return sub
         return None
+
+    def _file_lines(self, path: str) -> List[str]:
+        cache = getattr(self, "_line_cache", None)
+        if cache is None:
+            cache = {}
+            self._line_cache = cache
+        if path not in cache:
+            try:
+                cache[path] = Path(path).read_text(encoding="utf-8", errors="ignore").splitlines()
+            except OSError:
+                cache[path] = []
+        return cache[path]
 
     def _build_unique_labels(self) -> None:
         """Map qname -> shortest unambiguous label.
@@ -534,7 +575,8 @@ class PythonAstExtractor(Extractor):
             for attr in sorted(info.attributes):
                 ctx.add(Relation(kind=RelationKind.ATTRIBUTE_ACCESS, target=attr,
                                  target_kind=EntityKind.ATTRIBUTE, path=info.path,
-                                 detail="attribute of this class"))
+                                 detail="attribute of this class",
+                                 snippet=info.attribute_code.get(attr, "")))
             contexts.append(ctx)
 
         # --- functions and methods ----------------------------------------
@@ -554,8 +596,21 @@ class PythonAstExtractor(Extractor):
                 ctx.add(Relation(kind=RelationKind.CALLS, target=target.split(".")[-1],
                                  target_kind=kind, path=path, target_qname=target))
             for caller in dict.fromkeys(called_by.get(qname, [])):
+                # The call expression, with a line of context, is what shows *how*
+                # this entity is used; the caller's whole body is mostly noise.
+                snippet = ""
+                caller_info = idx.functions.get(caller)
+                if caller_info is not None:
+                    for site_target, line_no in caller_info.call_sites:
+                        if site_target != qname:
+                            continue
+                        lines = idx._file_lines(caller_info.path)  # noqa: SLF001
+                        start = max(0, line_no - 3)
+                        snippet = "\n".join(lines[start:line_no + 1]).strip()
+                        break
                 ctx.add(Relation(kind=RelationKind.CALLED_BY, target=caller.split(".")[-1],
-                                 target_kind=EntityKind.FUNCTION, target_qname=caller))
+                                 target_kind=EntityKind.FUNCTION, target_qname=caller,
+                                 snippet=snippet))
             if info.kind == EntityKind.METHOD and info.owner:
                 for attr in info.attrs:
                     ctx.add(Relation(kind=RelationKind.ATTRIBUTE_ACCESS, target=attr,
