@@ -8,9 +8,12 @@ declaring a winner.
 |---|---|---|---|---|
 | `stdlib ast + import-graph` | `codedoc/deps/languages/python_ast.py` | none | names, imports, `self.m()` | **every** entity |
 | `pyright LSP + ast` | `codedoc/deps/languages/python_pyright.py` | node + `pyright` (npm) | type inference | sampled entities |
-| `pyan3` (legacy, published) | `codedoc/deps/languages/python_pyan.py` | `pyan3==1.1.1` | call edges only | functions only, and it crashes on 5/10 repositories |
+| ~~`pyan3` (legacy, published)~~ | **removed** | — | call edges only | unusable: crashes on 5/10 repositories |
 
-## Why the legacy backend was replaced
+## Why the legacy backend was removed from the artifact
+
+The pyan3 backend, its DOT parser and the compatibility patch were deleted; the
+history keeps them at commit `61637cc` and earlier. The reasons it could not stay:
 
 `pyan3` 1.1.1 cannot be the dependency layer:
 

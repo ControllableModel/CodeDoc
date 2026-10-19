@@ -35,7 +35,6 @@ def _registry() -> Dict[str, Dict[str, Type[Extractor]]]:
         return _REGISTRY
     from codedoc.deps.languages import (  # noqa: F401  (import for side effects)
         python_ast,
-        python_pyan,
         python_lsp,
         java_lsp,
         ts_lsp,

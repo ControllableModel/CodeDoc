@@ -4,8 +4,9 @@ Layout
 ------
 ``schema``      :class:`Entity` / :class:`Relation` / :class:`DependencyContext`
 ``graph``       helpers for closure and lookup over relation records
-``dot``         pyan3 DOT parsing, source-span location, prompt formatting (legacy core)
-``source``      AST-based source extraction helpers
+``relations_index``  lookup seam between extraction and generation
+``export_dot``       optional DOT export for figures and manual audit
+``analyzer``         legacy pyan3 driver (kept only for the pyan comparison)
 ``languages``   per-language extractors behind one interface
 
 Why language-agnostic: the paper's contribution is not tied to Python.  A

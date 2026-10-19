@@ -234,12 +234,12 @@ class PythonPyrightExtractor(Extractor):
                 )
                 for parent in base_edges.get(qname, []):
                     ctx.add(Relation(kind=RelationKind.INHERITS,
-                                     target=idx.classes[parent].name,
+                                     target=idx.display_name(parent),
                                      target_kind=EntityKind.CLASS,
                                      path=idx.classes[parent].path))
                 for child in subs.get(qname, []):
                     ctx.add(Relation(kind=RelationKind.SUBCLASSED_BY,
-                                     target=idx.classes[child].name,
+                                     target=idx.display_name(child),
                                      target_kind=EntityKind.CLASS,
                                      path=idx.classes[child].path))
                 # references -> instantiation / usage sites (optional)
