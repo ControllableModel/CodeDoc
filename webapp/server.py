@@ -561,12 +561,24 @@ def start_batch(spec: dict, config: dict, workers: int = 0) -> str:
     entry = analyse(**{k: spec[k] for k in ("repo_name", "custom_path", "mode", "limit", "seed")})
     targets = [e["qname"] for e in entry["result"]["entities"]]
     workers = int(workers or config.get("workers") or 6)
+    # Resumable by default: a repo-wide run is long enough that an interrupted batch
+    # should not pay twice for documents that already exist on disk.
+    skipped: list = []
+    if spec.get("resume", True):
+        keep = []
+        for qname in targets:
+            if existing_document(spec["repo_name"], qname):
+                skipped.append(qname)
+            else:
+                keep.append(qname)
+        targets = keep
     with _LOCK:
         _JOBS[job_id] = {
             "status": "running",
             "started": time.time(),
             "kind": "batch",
             "progress": {"done": 0, "total": len(targets), "failed": 0,
+                         "skipped": len(skipped),
                          "prompt_tokens": 0, "completion_tokens": 0,
                          "cached_tokens": 0, "cost": 0.0, "cost_cny": 0.0,
                          "workers": workers,
@@ -603,6 +615,11 @@ def start_batch(spec: dict, config: dict, workers: int = 0) -> str:
 
     def work():
         from concurrent.futures import ThreadPoolExecutor
+        if not targets:
+            with _LOCK:
+                _JOBS[job_id]["status"] = "done"
+                _JOBS[job_id]["finished"] = time.time()
+            return
 
         with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
             list(pool.map(one, targets))
@@ -792,7 +809,9 @@ class Handler(BaseHTTPRequestHandler):
                     "mode": body.get("mode", "full"),
                     "limit": int(body.get("limit") or 0),
                     "seed": int(body.get("seed") or 42),
+                    "resume": bool(body.get("resume", True)),
                 }, config, workers=int(body.get("workers") or 0))
+                _JOBS[job_id]["spec_resume"] = bool(body.get("resume", True))
                 self._json({"job": job_id})
             elif route == "/api/job_cancel":
                 with _LOCK:

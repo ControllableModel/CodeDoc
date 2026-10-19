@@ -1,0 +1,47 @@
+[
+  {
+    "workers": 4,
+    "limit": 24,
+    "elapsed_seconds": 178.6,
+    "done": 24,
+    "failed": 0,
+    "entities_per_minute": 8.06,
+    "seconds_per_entity": 7.44,
+    "prompt_tokens": 29662,
+    "completion_tokens": 36241,
+    "cached_tokens": 0,
+    "cost": 0.018979,
+    "cost_per_entity": 0.000791,
+    "currency": "USD"
+  },
+  {
+    "workers": 8,
+    "limit": 24,
+    "elapsed_seconds": 87.3,
+    "done": 24,
+    "failed": 0,
+    "entities_per_minute": 16.49,
+    "seconds_per_entity": 3.64,
+    "prompt_tokens": 24823,
+    "completion_tokens": 31286,
+    "cached_tokens": 0,
+    "cost": 0.016314,
+    "cost_per_entity": 0.00068,
+    "currency": "USD"
+  },
+  {
+    "workers": 12,
+    "limit": 24,
+    "elapsed_seconds": 49.5,
+    "done": 24,
+    "failed": 0,
+    "entities_per_minute": 29.07,
+    "seconds_per_entity": 2.06,
+    "prompt_tokens": 24823,
+    "completion_tokens": 32520,
+    "cached_tokens": 0,
+    "cost": 0.016868,
+    "cost_per_entity": 0.000703,
+    "currency": "USD"
+  }
+]

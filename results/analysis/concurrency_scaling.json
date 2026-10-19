@@ -1,0 +1,72 @@
+[
+  {
+    "workers": 1,
+    "elapsed_seconds": 158.5,
+    "done": 8,
+    "failed": 0,
+    "entities_per_minute": 3.03,
+    "seconds_per_entity": 19.82,
+    "prompt_tokens": 9978,
+    "completion_tokens": 12219,
+    "cached_tokens": 0,
+    "cost": 0.006396,
+    "cost_per_entity": 0.000799,
+    "currency": "USD"
+  },
+  {
+    "workers": 2,
+    "elapsed_seconds": 101.9,
+    "done": 8,
+    "failed": 0,
+    "entities_per_minute": 4.71,
+    "seconds_per_entity": 12.74,
+    "prompt_tokens": 9978,
+    "completion_tokens": 13344,
+    "cached_tokens": 0,
+    "cost": 0.006902,
+    "cost_per_entity": 0.000863,
+    "currency": "USD"
+  },
+  {
+    "workers": 4,
+    "elapsed_seconds": 88.7,
+    "done": 8,
+    "failed": 0,
+    "entities_per_minute": 5.41,
+    "seconds_per_entity": 11.08,
+    "prompt_tokens": 9978,
+    "completion_tokens": 12873,
+    "cached_tokens": 0,
+    "cost": 0.006691,
+    "cost_per_entity": 0.000836,
+    "currency": "USD"
+  },
+  {
+    "workers": 8,
+    "elapsed_seconds": 31.0,
+    "done": 8,
+    "failed": 0,
+    "entities_per_minute": 15.49,
+    "seconds_per_entity": 3.87,
+    "prompt_tokens": 9978,
+    "completion_tokens": 11795,
+    "cached_tokens": 0,
+    "cost": 0.006204,
+    "cost_per_entity": 0.000776,
+    "currency": "USD"
+  },
+  {
+    "workers": 12,
+    "elapsed_seconds": 38.0,
+    "done": 8,
+    "failed": 0,
+    "entities_per_minute": 12.63,
+    "seconds_per_entity": 4.75,
+    "prompt_tokens": 9978,
+    "completion_tokens": 12322,
+    "cached_tokens": 0,
+    "cost": 0.006442,
+    "cost_per_entity": 0.000805,
+    "currency": "USD"
+  }
+]
