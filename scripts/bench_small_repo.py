@@ -41,34 +41,74 @@ class _PromptArgs:
     relevant = True
     language = "English"
     prompt_template: str | None = None
-    max_tokens = 10000
+    max_tokens = 16000
     source_budget = 8000
 
 
 def pick_entities(index, limit: int, seed: int = 42) -> list:
-    """Deterministic, kind-balanced entity selection."""
+    """Relation-stratified, deterministic entity selection.
+
+    A plain kind-balanced sample can miss the relation families that make the
+    experiment meaningful: a repository may have hundreds of methods and only a
+    handful of classes that override anything. The sample therefore reserves a
+    quota per relation family first, then fills the rest kind-balanced, so a 60
+    entity sample still exercises inheritance, instantiation, overriding, dispatch
+    and attribute access.
+
+    Selection is deterministic for a given seed, which the reproduction protocol
+    requires.
+    """
     import random
 
-    by_kind: dict = {}
-    for ctx in index.contexts:
-        by_kind.setdefault(str(ctx.entity.kind), []).append(ctx)
-    for ctxs in by_kind.values():
-        ctxs.sort(key=lambda c: c.entity.qualified_name)
+    from codedoc.deps.schema import RelationKind
 
     rng = random.Random(seed)
-    if limit <= 0 or limit >= len(index.contexts):
-        return sorted(index.contexts, key=lambda c: str(c.entity.qualified_name))
+    all_ctx = sorted(index.contexts, key=lambda c: str(c.entity.qualified_name))
+    if limit <= 0 or limit >= len(all_ctx):
+        return all_ctx
 
-    kinds = sorted(by_kind)
-    per_kind = max(1, limit // max(1, len(kinds)))
+    # relation families that must be represented, hardest first
+    families = [
+        (RelationKind.SUBCLASSED_BY, 4),
+        (RelationKind.INSTANTIATED_AT, 4),
+        (RelationKind.OVERRIDES, 6),
+        (RelationKind.DISPATCH_CANDIDATES, 4),
+        (RelationKind.INHERITS, 4),
+        (RelationKind.ATTRIBUTE_ACCESS, 3),
+        (RelationKind.CALLED_BY, 3),
+    ]
+
     picked = []
-    for kind in kinds:
-        picked.extend(rng.sample(by_kind[kind], min(per_kind, len(by_kind[kind]))))
-    # top up if rounding left us short
-    remaining = [c for c in index.contexts if c not in picked]
-    remaining.sort(key=lambda c: c.entity.qualified_name)
-    if len(picked) < limit and remaining:
-        picked.extend(rng.sample(remaining, min(limit - len(picked), len(remaining))))
+    seen = set()
+
+    def take(candidates, count):
+        taken = 0
+        pool = [c for c in candidates if c.entity.qualified_name not in seen]
+        rng.shuffle(pool)
+        for ctx in pool:
+            if taken >= count or len(picked) >= limit:
+                break
+            picked.append(ctx)
+            seen.add(ctx.entity.qualified_name)
+            taken += 1
+
+    for relation_kind, quota in families:
+        take([c for c in all_ctx if c.get(relation_kind)], quota)
+
+    # fill kind-balanced
+    by_kind: dict = {}
+    for ctx in all_ctx:
+        if ctx.entity.qualified_name in seen:
+            continue
+        by_kind.setdefault(str(ctx.entity.kind), []).append(ctx)
+    kinds = sorted(by_kind)
+    while len(picked) < limit and any(by_kind.values()):
+        for kind in kinds:
+            if len(picked) >= limit:
+                break
+            if by_kind.get(kind):
+                take(by_kind[kind], 1)
+
     return sorted(picked, key=lambda c: str(c.entity.qualified_name))[:limit]
 
 

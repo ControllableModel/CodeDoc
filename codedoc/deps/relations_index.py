@@ -35,6 +35,7 @@ BLOCK_LABELS = {
     RelationKind.OVERRIDES: "Overrides",
     RelationKind.OVERRIDDEN_BY: "Overridden by",
     RelationKind.DISPATCH_CANDIDATES: "Dispatch candidates",
+    RelationKind.ATTRIBUTE_ACCESS: "Attribute access",
 }
 
 
@@ -131,7 +132,7 @@ def get_dep(
     key: str,
     fpath: str,
     snippet_lines: int = 20,
-    max_deps: int = 6,
+    max_snippets: int = 6,
 ) -> Optional[Dict[str, object]]:
     """Return the writer-facing record for one entity.
 
@@ -161,13 +162,18 @@ def get_dep(
             ]
         return "\n".join(lines)
 
-    # Dependency snippets are the bulk of the prompt, so both the per-dependency
-    # length and the number of rendered dependencies are bounded: uncapped, four
-    # dependency bodies left no budget for the entity itself.
-    calls = ctx.get(RelationKind.CALLS)[:max_deps]
-    callers = ctx.get(RelationKind.CALLED_BY)[:max_deps]
-    uses = [{index.label(rel.target): snippet(rel.target)} for rel in calls]
-    used_by = [{index.label(rel.target): snippet(rel.target)} for rel in callers]
+    # Every relation is listed; only the *source snippet* is budgeted. Truncating the
+    # list instead (the earlier behaviour, capped at six) hid the structure of the
+    # dependency set from the model while saving very little: names are ~30 chars,
+    # bodies are ~1 KB each.
+    def entries(relations):
+        return [
+            {index.label(rel.target): (snippet(rel.target) if i < max_snippets else "")}
+            for i, rel in enumerate(relations)
+        ]
+
+    uses = entries(ctx.get(RelationKind.CALLS))
+    used_by = entries(ctx.get(RelationKind.CALLED_BY))
     relations = {
         BLOCK_LABELS[kind]: [rel.target for rel in ctx.get(kind)]
         for kind in BLOCK_LABELS
