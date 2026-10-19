@@ -197,6 +197,7 @@ async function runAnalysis() {
     $("sourceBody").innerHTML = '<span class="hint">← 选择左侧文件，再点上方实体</span>';
     $("outBody").innerHTML = '<span class="hint">选择实体后，这里显示提示词全文。</span>';
     $("generateBtn").disabled = true;
+    $("batchBtn").disabled = false;
 
     const c = result.counts;
     $("fileCount").textContent = `${c.files} 文件 · ${c.entities} 实体`;
@@ -288,11 +289,21 @@ async function selectEntity(qname) {
 }
 
 function renderSource() {
+  const graphPane = $("graphPane");
+  const sourcePre = $("sourceBody");
+  if (state.sourceView === "graph") {
+    sourcePre.classList.add("hidden");
+    graphPane.classList.remove("hidden");
+    loadGraph(state.selectedEntity).catch((error) => setStatus(error.message, "err"));
+    return;
+  }
+  graphPane.classList.add("hidden");
+  sourcePre.classList.remove("hidden");
   const detail = state.entityDetail;
   if (!detail) return;
   const text = state.sourceView === "source" ? detail.source : detail.prompt_source;
   const label = state.sourceView === "source" ? "完整源码" : "注入提示词的视图（类：__init__ 全量 + 方法签名）";
-  $("sourceBody").textContent = `# ${label}\n${"-".repeat(60)}\n${text}`;
+  sourcePre.textContent = `# ${label}\n${"-".repeat(60)}\n${text}`;
 }
 
 function renderOutput() {
@@ -408,9 +419,63 @@ async function generate() {
   }
 }
 
+/* ------------------------------------------------------------ batch generation */
+async function generateAll() {
+  if (!state.analysis) {
+    setStatus("请先分析仓库", "warn");
+    return;
+  }
+  const { repo, customPath, mode, limit, seed } = analysisParams();
+  const total = state.analysis.counts.entities;
+  if (!confirm(`将为 ${total} 个实体生成文档（真实调用模型，按当前单价约 ¥${(total * 0.029).toFixed(2)}），继续？`)) return;
+
+  $("batchBtn").disabled = true;
+  setStatus(`批量生成中：0/${total}`, "warn");
+  try {
+    const { job } = await api("/api/generate_all", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        repo, path: customPath, mode, limit, seed,
+        temperature: parseFloat($("cfgTemp").value) || 1,
+        max_tokens: parseInt($("cfgMaxTokens").value, 10) || 16000,
+        source_budget: parseInt($("cfgSourceBudget").value, 10) || 8000,
+        template: $("cfgTemplate").value,
+      }),
+    });
+    let last = null;
+    for (;;) {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      const status = await api(`/api/job?id=${job}`);
+      if (status.status === "error") throw new Error(status.error);
+      const progress = status.progress || {};
+      last = status;
+      const done = progress.done || 0;
+      setStatus(`批量生成：${done}/${progress.total || total} · ¥${(progress.cost_cny || 0).toFixed(3)}`
+        + (progress.failed ? ` · 失败 ${progress.failed}` : ""), "warn");
+      $("usage").textContent = `本次会话：in ${(progress.prompt_tokens || 0).toLocaleString()} / out ${(progress.completion_tokens || 0).toLocaleString()} tokens · ¥${(progress.cost_cny || 0).toFixed(3)}`;
+      if (status.status === "done" || status.status === "cancelled") break;
+    }
+    const progress = last.progress || {};
+    setStatus(`批量完成：${progress.done}/${progress.total} 实体 · ¥${(progress.cost_cny || 0).toFixed(3)}`
+      + (progress.failed ? ` · 失败 ${progress.failed}` : ""), "ok");
+    if (state.selectedEntity) {
+      const doc = await api(`/api/document?repo=${encodeURIComponent(repo)}&qname=${encodeURIComponent(state.selectedEntity)}`);
+      state.document = doc.document || "";
+      renderOutput();
+    }
+  } catch (error) {
+    setStatus(`批量生成失败：${error.message}`, "err");
+  } finally {
+    $("batchBtn").disabled = false;
+  }
+}
+
 /* -------------------------------------------------------------------- wiring */
 function wire() {
   $("analyzeBtn").addEventListener("click", runAnalysis);
+  $("batchBtn").addEventListener("click", generateAll);
+  if (typeof wireGraphInteractions === "function") wireGraphInteractions();
   $("generateBtn").addEventListener("click", generate);
   $("configBtn").addEventListener("click", () => $("drawer").classList.remove("hidden"));
   $("closeDrawer").addEventListener("click", () => $("drawer").classList.add("hidden"));

@@ -31,6 +31,8 @@ python webapp/server.py --port 8765
 | left | every source file that contributes entities, with per-file entity counts |
 | middle | entity chips per file; source view and the *injected view* side by side |
 | right | tabs: **prompt** (verbatim), **document** (generated), **relations** (per block), **model params** |
+| middle, third tab | **dependency graph** — force-directed canvas, relation-kind filters, focus-on-entity with depth, click a node to open it |
+| top bar | **生成全部** — batch-generate every entity in the current selection, with live progress, token/cost totals and failure count |
 | drawer | API key, base URL, model, temperatures, prompt cap, source budget, template, criterion sets with per-kind applicability |
 
 ## API
@@ -58,3 +60,25 @@ $env:LLM_KEY="sk-..."; $env:LLM_URL="https://api.deepseek.com/v1"; $env:MODEL="d
 Generated documents are written to `outputs/console/<repo>/<entity>.md` alongside the
 prompt that produced them (`<entity>.prompt.txt`), which is the audit trail for any
 number shown in the UI.
+
+## Batch generation
+
+`POST /api/generate_all` runs the whole selection concurrently (default 5 workers).
+Sequentially, 38 entities took 7 min 33 s; at 6 workers the same repository needs
+1 min 09 s. Progress, tokens and cost are reported per completion and the job can be
+cancelled.
+
+Accounting note: usage is attributed **by per-call tag**, not by a positional snapshot
+of the recorder. Under concurrency a snapshot also captures sibling threads' records,
+which inflated the batch total by roughly the worker count (38 entities reported
+6,765 input tokens each instead of ~1,200).
+
+## Graph data
+
+`GET /api/graph?repo&mode&limit&seed&focus&depth&kinds` returns nodes and edges.
+Default edge kinds are the class-level relations (inheritance, subclassing,
+instantiation, overriding, dispatch); `calls`, `called_by` and `attribute_access` are
+opt-in, because a call graph over a whole repository is unreadable. With `focus` set,
+the server returns the neighbourhood of that entity and adds the call and attribute
+edges for it. Node labels are disambiguated by module suffix and then by full
+qualified name, so two classes called `Blueprint` do not appear to be one node.

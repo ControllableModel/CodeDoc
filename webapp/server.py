@@ -293,17 +293,21 @@ def generate_document(repo_name: str, custom_path: str, mode: str, limit: int, s
     core.LLM_url = config.get("base_url") or DEFAULT_CONFIG["base_url"]
     core.model = config.get("model") or DEFAULT_CONFIG["model"]
     core.temperature = float(config.get("temperature", 1.0))
+    # The writers record into the process-wide RECORDER. Tagging this call and
+    # filtering by the tag is required under concurrency: a positional snapshot also
+    # captures records written by sibling threads, which inflated batch accounting
+    # by roughly the worker count.
+    call_tag = f"console-{uuid.uuid4()}"
+    core.label = call_tag
     core.create_socket()
 
-    # The writers record into the process-wide RECORDER, so measure the delta rather
-    # than a fresh recorder (which would always read zero).
-    before = len(RECORDER.records)
     started = time.time()
     document = core.process(detail["prompt"])
     seconds = time.time() - started
+    mine = [r for r in RECORDER.records if r.get("label") == call_tag]
     usage = {
-        "prompt_tokens": sum(r["prompt_tokens"] for r in RECORDER.records[before:]),
-        "completion_tokens": sum(r["completion_tokens"] for r in RECORDER.records[before:]),
+        "prompt_tokens": sum(r["prompt_tokens"] for r in mine),
+        "completion_tokens": sum(r["completion_tokens"] for r in mine),
     }
 
     out_dir = ROOT / "outputs" / "console" / (repo_name or "custom")
@@ -325,6 +329,213 @@ def generate_document(repo_name: str, custom_path: str, mode: str, limit: int, s
         "model": core.model,
         "saved_to": str(out_dir),
     }
+
+
+GRAPH_KINDS = {
+    "inherits": "inherits",
+    "subclassed_by": "subclassed_by",
+    "instantiated_at": "instantiated_at",
+    "overrides": "overrides",
+    "overridden_by": "overridden_by",
+    "dispatch_candidates": "dispatch_candidates",
+    "attribute_access": "attribute_access",
+    "calls": "calls",
+    "called_by": "called_by",
+}
+
+
+def graph_data(repo_name: str, custom_path: str, mode: str, limit: int, seed: int,
+               focus: str = "", depth: int = 1, kinds: str = "") -> dict:
+    """Nodes and edges for the dependency graph view.
+
+    Defaults to the class-level skeleton (inheritance, instantiation, overriding,
+    dispatch) because a call graph on a whole repository is unreadable; call edges
+    are included when explicitly requested or when the view is focused on an entity.
+    """
+    entry = analyse(repo_name, custom_path, mode, limit, seed)
+    index = entry["index"]
+    wanted = [k.strip() for k in kinds.split(",") if k.strip()] or [
+        "inherits", "subclassed_by", "instantiated_at", "overrides",
+        "overridden_by", "dispatch_candidates",
+    ]
+    if focus:
+        wanted = list(dict.fromkeys(wanted + ["calls", "called_by", "attribute_access"]))
+
+    by_qname = {ctx.entity.qualified_name: ctx for ctx in index.contexts}
+    by_short: dict = {}
+    for ctx in index.contexts:
+        by_short.setdefault(ctx.entity.name.split(".")[-1], []).append(ctx)
+
+    def resolve(target: str, exclude: str = ""):
+        hit = by_qname.get(target)
+        if hit is not None:
+            return hit
+        candidates = [c for c in by_short.get(target.split(".")[-1], [])
+                      if c.entity.qualified_name != exclude]
+        if len(candidates) == 1:
+            return candidates[0]
+        return None
+
+    # ---- focus neighbourhood -------------------------------------------------
+    allowed = None
+    if focus:
+        allowed = set()
+        frontier = [by_qname.get(focus)] if focus in by_qname else []
+        if not frontier:
+            candidates = by_short.get(focus.split(".")[-1], [])
+            frontier = candidates[:1]
+        # depth 1 must include the neighbours themselves, so expand depth+1 times:
+        # the first pass admits the focus, each further pass admits one hop.
+        for _ in range(max(1, depth) + 1):
+            nxt = []
+            for ctx in frontier:
+                if ctx is None:
+                    continue
+                key = ctx.entity.qualified_name
+                if key in allowed:
+                    continue
+                allowed.add(key)
+                for relation_kind in wanted:
+                    for relation in ctx.get(relation_kind):
+                        target = resolve(relation.target, exclude=key)
+                        if target is not None:
+                            allowed.add(target.entity.qualified_name)
+                            nxt.append(target)
+            frontier = nxt
+        allowed.add(focus)
+
+    nodes: dict = {}
+    edges: list = []
+    seen_edges = set()
+
+    # Disambiguate labels: two modules can define the same class name (Flask defines
+    # Blueprint and imports sansio.blueprints.Blueprint), and a two-part suffix is not
+    # always enough, so fall back to the full qualified name.
+    short_counts: dict = {}
+    for ctx in index.contexts:
+        short = ctx.entity.name.split(".")[-1]
+        short_counts[short] = short_counts.get(short, 0) + 1
+    suffix_counts: dict = {}
+    for ctx in index.contexts:
+        parts = ctx.entity.qualified_name.split(".")
+        suffix_counts[".".join(parts[-2:])] = suffix_counts.get(".".join(parts[-2:]), 0) + 1
+
+    def label_of(ctx) -> str:
+        short = ctx.entity.name.split(".")[-1]
+        if short_counts.get(short, 0) <= 1:
+            return short
+        parts = ctx.entity.qualified_name.split(".")
+        suffix = ".".join(parts[-2:])
+        if suffix_counts.get(suffix, 0) <= 1:
+            return suffix
+        return ctx.entity.qualified_name
+
+    def node_of(ctx) -> dict:
+        key = ctx.entity.qualified_name
+        if key not in nodes:
+            nodes[key] = {
+                "id": key,
+                "name": label_of(ctx),
+                "kind": str(ctx.entity.kind),
+                "path": ctx.entity.path,
+                "qname": key,
+            }
+        return nodes[key]
+
+    for ctx in index.contexts:
+        key = ctx.entity.qualified_name
+        if allowed is not None and key not in allowed:
+            continue
+        for relation_kind in wanted:
+            for relation in ctx.get(relation_kind):
+                target_ctx = resolve(relation.target, exclude=key)
+                if allowed is not None and (
+                        target_ctx is None or target_ctx.entity.qualified_name not in allowed):
+                    continue
+                node_of(ctx)
+                target_id = (target_ctx.entity.qualified_name if target_ctx is not None
+                             else f"ext:{relation.target}")
+                if target_ctx is None:
+                    nodes.setdefault(target_id, {
+                        "id": target_id, "name": relation.target,
+                        "kind": "external", "path": "", "qname": "",
+                    })
+                signature = (key, target_id, relation_kind)
+                if signature in seen_edges:
+                    continue
+                seen_edges.add(signature)
+                edges.append({"source": key, "target": target_id, "kind": relation_kind})
+
+    return {
+        "nodes": list(nodes.values()),
+        "edges": edges,
+        "kinds": wanted,
+        "focus": focus,
+        "depth": depth,
+        "counts": {"nodes": len(nodes), "edges": len(edges)},
+    }
+
+
+def start_batch(spec: dict, config: dict, workers: int = 5) -> str:
+    """Generate documentation for every entity in the current selection.
+
+    Entities are independent, so the batch runs concurrently: sequentially, a
+    38-entity repository took 7.5 minutes and a 431-entity one would take over an
+    hour. Progress is updated under the job lock after each completion.
+    """
+    job_id = str(uuid.uuid4())
+    entry = analyse(**{k: spec[k] for k in ("repo_name", "custom_path", "mode", "limit", "seed")})
+    targets = [e["qname"] for e in entry["result"]["entities"]]
+    with _LOCK:
+        _JOBS[job_id] = {
+            "status": "running",
+            "started": time.time(),
+            "kind": "batch",
+            "progress": {"done": 0, "total": len(targets), "failed": 0,
+                         "prompt_tokens": 0, "completion_tokens": 0, "cost_cny": 0.0,
+                         "current": ""},
+            "cancel": False,
+        }
+
+    def one(qname):
+        with _LOCK:
+            job = _JOBS[job_id]
+            if job.get("cancel"):
+                return
+            job["progress"]["current"] = qname
+        try:
+            result = generate_document(
+                spec["repo_name"], spec["custom_path"], spec["mode"],
+                spec["limit"], spec["seed"], qname, config,
+            )
+            with _LOCK:
+                progress = _JOBS[job_id]["progress"]
+                progress["done"] += 1
+                progress["prompt_tokens"] += result["tokens"]["prompt"]
+                progress["completion_tokens"] += result["tokens"]["completion"]
+                progress["cost_cny"] = round(progress["cost_cny"] + result["cost_cny"], 5)
+        except Exception as exc:  # noqa: BLE001 - one failure must not stop the batch
+            with _LOCK:
+                progress = _JOBS[job_id]["progress"]
+                progress["done"] += 1
+                progress["failed"] += 1
+                progress["last_error"] = f"{type(exc).__name__}: {exc}"
+
+    def work():
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+            list(pool.map(one, targets))
+        with _LOCK:
+            job = _JOBS[job_id]
+            if job.get("cancel"):
+                job["status"] = "cancelled"
+            else:
+                job["status"] = "done"
+            job["finished"] = time.time()
+
+    threading.Thread(target=work, daemon=True).start()
+    return job_id
 
 
 def existing_document(repo_name: str, qname: str) -> str:
@@ -459,6 +670,13 @@ class Handler(BaseHTTPRequestHandler):
                     query.get("mode", "full"), int(query.get("limit") or 0),
                     int(query.get("seed") or 42), query.get("qname", ""), config,
                 ))
+            elif route == "/api/graph":
+                self._json(graph_data(
+                    query.get("repo", ""), query.get("path", ""),
+                    query.get("mode", "full"), int(query.get("limit") or 0),
+                    int(query.get("seed") or 42), query.get("focus", ""),
+                    int(query.get("depth") or 1), query.get("kinds", ""),
+                ))
             elif route == "/api/document":
                 self._json({"document": existing_document(query.get("repo", ""),
                                                           query.get("qname", ""))})
@@ -478,6 +696,29 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if route == "/api/config":
                 self._json({"config": public_config(save_config(body))})
+            elif route == "/api/generate_all":
+                config = load_config()
+                for key in DEFAULT_CONFIG:
+                    if key in body:
+                        config[key] = body[key]
+                if not config.get("api_key"):
+                    raise RuntimeError("no API key configured")
+                job_id = start_batch({
+                    "repo_name": body.get("repo", ""),
+                    "custom_path": body.get("path", ""),
+                    "mode": body.get("mode", "full"),
+                    "limit": int(body.get("limit") or 0),
+                    "seed": int(body.get("seed") or 42),
+                }, config, workers=int(body.get("workers") or 5))
+                self._json({"job": job_id})
+            elif route == "/api/job_cancel":
+                with _LOCK:
+                    job = _JOBS.get(body.get("id", ""))
+                    if job is None:
+                        self._json({"error": "unknown job"}, 404)
+                        return
+                    job["cancel"] = True
+                self._json({"ok": True})
             elif route == "/api/generate":
                 config = load_config()
                 for key in DEFAULT_CONFIG:
