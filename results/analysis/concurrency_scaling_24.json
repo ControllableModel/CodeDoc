@@ -43,5 +43,35 @@
     "cost": 0.016868,
     "cost_per_entity": 0.000703,
     "currency": "USD"
+  },
+  {
+    "workers": 16,
+    "limit": 24,
+    "elapsed_seconds": 39.1,
+    "done": 24,
+    "failed": 0,
+    "entities_per_minute": 36.82,
+    "seconds_per_entity": 1.63,
+    "prompt_tokens": 24823,
+    "completion_tokens": 31194,
+    "cached_tokens": 0,
+    "cost": 0.01627,
+    "cost_per_entity": 0.000678,
+    "currency": "USD"
+  },
+  {
+    "workers": 24,
+    "limit": 24,
+    "elapsed_seconds": 29.4,
+    "done": 24,
+    "failed": 0,
+    "entities_per_minute": 48.95,
+    "seconds_per_entity": 1.23,
+    "prompt_tokens": 24823,
+    "completion_tokens": 31408,
+    "cached_tokens": 0,
+    "cost": 0.016367,
+    "cost_per_entity": 0.000682,
+    "currency": "USD"
   }
 ]
