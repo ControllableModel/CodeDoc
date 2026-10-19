@@ -70,7 +70,7 @@ def _defines_init(source: str) -> bool:
 class _Args:
     relevant = True
     language = "English"
-    max_tokens = 16000
+    max_tokens = 40000
     source_budget = 8000
     prompt_template = str(TEMPLATES / "iso_26514.txt")
 
@@ -104,8 +104,10 @@ def main() -> int:
         dep = get_dep(index, ctx.entity.name, ctx.entity.qualified_name, ctx.entity.path)
         if dep is None:
             continue
-        injected_labels = {label: set(values) for label, values in (dep.get("relations") or {}).items()}
-        injected_names = {item for items in injected_labels.values() for item in items}
+        injected_names = set()
+        for entries in (dep.get("relations") or {}).values():
+            for entry in entries:
+                injected_names.add(entry.get("name") if isinstance(entry, dict) else str(entry))
         injected_names |= {name for item in dep["uses"] for name in item}
         injected_names |= {name for item in dep["used_by"] for name in item}
 

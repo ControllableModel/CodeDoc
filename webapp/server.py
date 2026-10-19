@@ -50,7 +50,7 @@ DEFAULT_CONFIG = {
     "model": "deepseek-chat",
     "temperature": 1.0,
     "judge_temperature": 0.0,
-    "max_tokens": 16000,
+    "max_tokens": 40000,
     "source_budget": 8000,
     "template": "iso_26514.txt",
     "criteria": ["practice_docstring"],
@@ -242,7 +242,13 @@ def entity_detail(repo_name: str, custom_path: str, mode: str, limit: int, seed:
     # dep["relations"] is already {block label: [target, ...]} — do not re-resolve it
     # against RelationKind, which held Relation objects only inside the extractor.
     relations_all = {
-        label: list(targets) for label, targets in (dep.get("relations") or {}).items()
+        label: [
+            {"name": entry.get("name"), "code": entry.get("code") or "",
+             "has_code": bool(entry.get("code"))}
+            if isinstance(entry, dict) else {"name": str(entry), "code": "", "has_code": False}
+            for entry in targets
+        ]
+        for label, targets in (dep.get("relations") or {}).items()
     }
     template_used = writer_args.prompt_template or "(IDE-style baseline: no criteria template)"
 
@@ -257,8 +263,7 @@ def entity_detail(repo_name: str, custom_path: str, mode: str, limit: int, seed:
         "prompt_chars": len(prompt),
         "prompt_clipped": "lines elided" in prompt,
         "relations": dep.get("relations") or {},
-        "relation_counts": {BLOCK_LABELS[k]: len(dep.get("relations", {}).get(BLOCK_LABELS[k], []))
-                            for k in BLOCK_LABELS},
+        "relation_counts": {label: len(entries) for label, entries in relations_all.items()},
         "is_polymorphic": dep.get("is_polymorphic", False),
         "uses": [list(item.keys())[0] for item in dep["uses"]],
         "used_by": [list(item.keys())[0] for item in dep["used_by"]],

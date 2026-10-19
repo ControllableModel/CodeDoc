@@ -230,7 +230,7 @@ def main():
     p.add_argument('--llm_url', type=str, default=os.getenv('LLM_URL', 'https://api.openai.com/v1'),
                    help='OpenAI-compatible API base URL (env: LLM_URL).')
     p.add_argument('--model', type=str, default=os.getenv('MODEL', 'gpt-5-mini'))
-    p.add_argument('--max_tokens', type=int, default=16000,
+    p.add_argument('--max_tokens', type=int, default=40000,
                    help='Hard cap on the assembled prompt, in characters (safety guard). '
                         'Sections should be budgeted before this point.')
     p.add_argument('--source_budget', type=int, default=8000,

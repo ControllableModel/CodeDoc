@@ -80,17 +80,31 @@ def _build_section(items: List[Dict[str, str]], title: str) -> str:
 
 
 def render_relations(info: Dict[str, object]) -> str:
-    """Render inheritance / instantiation / override blocks as markdown."""
+    """Render inheritance / instantiation / override blocks as markdown.
+
+    Entries are either plain names (older records) or ``{name, code}`` dicts. When a
+    source snippet is present it is rendered as a fenced block: the model needs the
+    base class or the overridden method itself, not just its name, and input tokens
+    are the cheap side of the bill.
+    """
     relations = info.get("relations") or {}
     if not relations:
         return ""
     lines: List[str] = []
-    for label, targets in relations.items():  # type: ignore[union-attr]
-        if not targets:
+    for label, entries in relations.items():  # type: ignore[union-attr]
+        if not entries:
             continue
         lines.append(f"## {label}\n")
-        for target in targets:  # type: ignore[union-attr]
-            lines.append(f"- `{target}`")
+        for entry in entries:  # type: ignore[union-attr]
+            if isinstance(entry, dict):
+                name = entry.get("name") or ""
+                code = entry.get("code") or ""
+            else:
+                name, code = str(entry), ""
+            if code:
+                lines.append(f"### {name}\n```python\n{code}\n```\n")
+            else:
+                lines.append(f"- `{name}`")
         lines.append("\n")
     return "".join(lines)
 
