@@ -90,3 +90,54 @@ A class has no callees, which is why class documentation had no usable context.
 Deliberate choice: an unimplemented capability **raises** instead of silently
 degrading to function-only analysis. A silent fallback is how the earlier class
 documentation ended up context-free while the paper claimed dependency awareness.
+
+## Prompt budget and the class view
+
+The assembled prompt has a hard cap (`--max_tokens`, characters) because every
+extra character is paid for at inference time. Three rules keep it under control
+without deleting evidence:
+
+| section | policy |
+|---|---|
+| criteria (template) | **fixed** — the standard text is never trimmed |
+| required output structure | **fixed** — the 12 mandated sections stay in every prompt |
+| entity source | budgeted from what the template leaves over; head + tail kept with an explicit elision marker |
+| dependency snippets | 20 lines per dependency, at most 6 dependencies |
+
+### Class entities
+
+A class body is a poor prompt (Flask's class is 1,517 lines). The class view
+(`writer/classview.py`) is:
+
+* the class declaration — where the bases, i.e. the inheritance, are visible;
+* `__init__` **in full** — the constructor is what a class document explains;
+* every other method as a **signature only** (parameters + return annotation,
+  body dropped).
+
+Method bodies are not lost: each method is its own entity, documented one level
+below its class.
+
+### Artifact hierarchy
+
+The generated Markdown mirrors the modelled structure:
+
+```
+## Class: `Flask`
+<class document>
+
+### Method: `__init__`
+<method document>
+
+### Method: `wsgi_app`
+<method document>
+
+## Functions
+### Function: `send_from_directory`
+<function document>
+```
+
+Inspect any prompt without a model call:
+
+```bash
+python scripts/show_prompt.py --repo targets/flask-main --entity Flask --show-info
+```

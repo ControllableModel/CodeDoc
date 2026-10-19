@@ -97,7 +97,7 @@ def render_relations(info: Dict[str, object]) -> str:
 
 def format_dep(info: Dict[str, object], include_deps: bool = True) -> str:
     """The ``.info`` audit record: what exactly reached the prompt."""
-    source = clip_source(str(info["source_code"]))
+    source = clip_source(str(info.get("prompt_source") or info["source_code"]))
     uses = _build_section(info["uses"], "Uses") if include_deps else ""          # type: ignore[arg-type]
     used_by = _build_section(info["used_by"], "Used by") if include_deps else ""  # type: ignore[arg-type]
     relations = render_relations(info) if include_deps else ""
@@ -128,7 +128,7 @@ def build_prompt(info: Dict[str, object], args) -> str:
     uses = _build_section(info["uses"], "Dependencies") if args.relevant else ""      # type: ignore[arg-type]
     used_by = _build_section(info["used_by"], "Dependents") if args.relevant else ""  # type: ignore[arg-type]
     relations = render_relations(info) if args.relevant else ""
-    source_text = str(info["source_code"])
+    source_text = str(info.get("prompt_source") or info["source_code"])
     cap = int(getattr(args, "max_tokens", 0) or 0)
     configured = int(getattr(args, "source_budget", 0) or DEFAULT_SOURCE_BUDGET)
 

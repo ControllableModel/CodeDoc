@@ -98,19 +98,22 @@ def _build_tasks(nav, members, source_path):
     exactly the information the dependency layer was extended to provide
     (inheritance, subclasses, instantiation sites, override obligations).
     """
+    # Sort key groups a class with its own methods: (group, class_name, rank, index).
+    # With the previous flat keys every class header was emitted before every
+    # method, which broke the class -> method hierarchy the artifact must show.
     tasks = []
     for cls_name, cls_info in members.get('classes', {}).items():
         cls_dep = get_dep(nav, cls_name, cls_info.get('key', ''), source_path)
         if cls_dep and cls_dep.get('source_code'):
-            tasks.append(((-1, cls_name, -1), cls_dep, cls_name, 'class', cls_name))
+            tasks.append(((0, cls_name, 0, -1), cls_dep, cls_name, 'class', cls_name))
         for i, method in enumerate(cls_info.get('methods', [])):
             dep = get_dep(nav, method['name'], method['key'], source_path)
             if dep and dep.get('source_code'):
-                tasks.append(((0, cls_name, i), dep, method['name'], 'method', cls_name))
+                tasks.append(((0, cls_name, 1, i), dep, method['name'], 'method', cls_name))
     for i, fn in enumerate(members.get('functions', [])):
         dep = get_dep(nav, fn['name'], fn['key'], source_path)
         if dep and dep.get('source_code'):
-            tasks.append(((1, '', i), dep, fn['name'], 'function', None))
+            tasks.append(((1, '', 0, i), dep, fn['name'], 'function', None))
     return tasks
 
 
@@ -160,6 +163,9 @@ def process_file(args, fname, finfo, nav, out_dir, target):
 
     for key in sorted(docs.keys()):
         info, md, name, kind, owner = docs[key]
+        # The artifact keeps the class -> method hierarchy explicit: a class is a
+        # level-2 section and its methods are level-3 sections beneath it, so the
+        # generated document mirrors the structure the dependency layer models.
         if kind == 'class':
             stats["cls"] += 1
             emitted_cls.add(name)
@@ -168,11 +174,14 @@ def process_file(args, fname, finfo, nav, out_dir, target):
             if owner not in emitted_cls:
                 emitted_cls.add(owner)
                 md_lines.append(f"## Class: `{owner}`\n\n")
+            method_name = name.split(".")[-1]
+            md_lines.append(f"### Method: `{method_name}`\n\n")
             stats["method"] += 1
         else:
             if not has_func_header:
                 md_lines.append("## Functions\n\n")
                 has_func_header = True
+            md_lines.append(f"### Function: `{name}`\n\n")
             stats["func"] += 1
         info_lines.append(info + "\n" + "=" * 50 + "\n\n")
         if md:
@@ -195,7 +204,18 @@ def process_test_file(args, fname, finfo, output_path, nav):
         return None
 
     docs = _run_tasks(args, tasks)
-    md_lines = [md + "\n\n" for md in (docs[k][1] for k in sorted(docs.keys())) if md]
+    md_lines = []
+    for key in sorted(docs.keys()):
+        _info, md, name, kind, owner = docs[key]
+        if not md:
+            continue
+        if kind == 'class':
+            md_lines.append(f"## Class: `{name}`\n\n")
+        elif kind == 'method':
+            md_lines.append(f"### Method: `{name.split('.')[-1]}`\n\n")
+        else:
+            md_lines.append(f"### Function: `{name}`\n\n")
+        md_lines.append(md + "\n\n")
     Path(output_path).write_text("".join(md_lines), encoding="utf-8")
     print(f"  -> {output_path}")
     return len(docs)
