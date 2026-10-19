@@ -99,3 +99,11 @@ review*/
 *.log
 scratch/
 _tmp/
+
+# ---------------------------------------------------------------------------
+# Source standards and their clause inventories.
+# Standards are copyrighted; the inventories quote them verbatim. Regenerate with
+# scripts/segment_standard.py instead of committing either.
+# ---------------------------------------------------------------------------
+standards/*
+!standards/README.md
