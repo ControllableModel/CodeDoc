@@ -4,142 +4,113 @@ This file records **where the evaluated code came from, what is shipped, and wha
 cannot be reproduced**. Reviewers asked for exactly this (R1: commits and sample
 properties; R3: how the repositories were selected).
 
-## 1. Source and location
+## 1. Current corpus: upstream, pinned by commit
 
-| | |
-|---|---|
-| original working copies | `E:\DZYCDscript\{Small,Middle,Large}-Size\<repo>` |
-| shipped copies (this artifact) | `targets/<repo>` (never committed; see `targets/README.md`) |
-| extraction method | full tree copy excluding `.git/`, `__pycache__/`, `node_modules/`, `.venv/`, `*.pyc` |
+The ten repositories under `targets/` are extracted from upstream GitHub at a
+**recorded commit**, keeping only the library's core package (front-end, docs,
+tests, CI and examples are dropped). Downloads go through
+`codeload.github.com` pinned to the resolved SHA, which is stricter than
+`git clone --depth 1`: the recorded SHA and the extracted tree cannot drift.
 
-**The shipped snapshots are trimmed subsets of the upstream projects**, not full
-clones: NumPy is 10 files, RAGFlow 6, Flask 18, PyTorch 42. This is why the
-"#classes / #functions" counts are in the hundreds rather than in the tens of
-thousands.
+| repo | upstream | commit | branch | committed | core package | files | size |
+|---|---|---|---|---|---|---|---|
+| dify_api | [langgenius/dify](https://github.com/langgenius/dify) | `67887de9e427` | main | 2026-10-19 | `api` | 2417 | 19.19 MB |
+| fairseq | [facebookresearch/fairseq](https://github.com/facebookresearch/fairseq) | `3d262bb25690` | main | 2025-09-30 | `fairseq` | 476 | 3.58 MB |
+| flask-main | [pallets/flask](https://github.com/pallets/flask) | `d086db856be1` | main | 2026-10-07 | `src/flask` | 26 | 0.33 MB |
+| joblib | [joblib/joblib](https://github.com/joblib/joblib) | `878c9e05995b` | main | 2026-10-16 | `joblib` | 45 | 0.55 MB |
+| numpy | [numpy/numpy](https://github.com/numpy/numpy) | `3e225b263fd6` | main | 2026-10-18 | `numpy` | 893 | 19.19 MB |
+| openui | [wandb/openui](https://github.com/wandb/openui) | `42d7ab4ab665` | main | 2026-06-30 | `backend/openui` | 38 | 2.29 MB |
+| pyro | [pyro-ppl/pyro](https://github.com/pyro-ppl/pyro) | `a31bc1784707` | dev | 2026-10-03 | `pyro` | 309 | 2.33 MB |
+| ragflow | [infiniflow/ragflow](https://github.com/infiniflow/ragflow) | `efbb80074309` | pinned@api/ragflow_server.py | 2026-09-28 | `api` | 21 | 0.13 MB |
+| sonnet | [google-deepmind/sonnet](https://github.com/google-deepmind/sonnet) | `8e7158b2beb8` | v2 | 2026-09-29 | `sonnet` | 267 | 31.73 MB |
+| torch | [pytorch/pytorch](https://github.com/pytorch/pytorch) | `25a447541892` | main | 2026-10-19 | `torch` | 4559 | 65.43 MB |
 
-## 2. What is shipped
+Manifest with sizes, timestamps and per-repository extraction details:
+`targets/PROVENANCE.json`. Re-fetch with:
 
-| repo | size class (folder) | .py files | size |
-|---|---|---|---|
-| numpy | Small | 10 | 1.0 MB |
-| openui | Small | 11 | 0.9 MB |
-| ragflow | Small | 6 | 0.5 MB |
-| dify_api | Middle | 22 | 1.2 MB |
-| flask-main | Middle | 18 | 4.0 MB |
-| joblib | Middle | 22 | 5.0 MB |
-| pyro | Middle | 21 | 3.3 MB |
-| fairseq | Large | 23 | 2.4 MB |
-| sonnet | Large | 61 | 3.8 MB |
-| torch | Large | 42 | 8.9 MB |
-
-> **Discrepancy 1 — size class.** The paper's Table 1 classifies **Joblib as
-> Large** (and groups 3 / 3 / 4 over Small / Medium / Large), while the working
-> tree keeps `joblib` under `Middle-Size/`. The table's own numbers
-> (Joblib 445 entities) are consistent with Large, so the folder is stale —
-> but the inconsistency must be fixed in one direction.
-
-## 3. Entity counts: measured vs published
-
-Counted with the shipped analyzer (`codedoc.deps.languages.python_pyan`), i.e.
-the same rule the pipeline uses: top-level functions + class methods.
-
-| repo | classes | methods | functions | documentable (methods+func) | total incl. classes | paper: classes / functions / total |
-|---|---|---|---|---|---|---|
-| numpy | 11 | 12 | 18 | 30 | 41 | 5 / 31 / 36 |
-| openui | 7 | 10 | 11 | 21 | 28 | 3 / 21 / 24 |
-| ragflow | 2 | 3 | 10 | 13 | 15 | 1 / 14 / **15** ✓ |
-| dify_api | 3 | 5 | 43 | 48 | 51 | 3 / 47 / 50 |
-| flask-main | 29 | 146 | 59 | 205 | 234 | 28 / **207** / 235 |
-| joblib | 62 | 306 | 78 | 384 | 446 | 56 / 389 / **445** |
-| pyro | 28 | 122 | 112 | **234** | **262** | 28 / 234 / **262** ✓ |
-| sonnet | 181 | 709 | 96 | 805 | 986 | 177 / **801** / 978 |
-| torch | 110 | 665 | 789 | 1454 | 1564 | 71 / 1279 / 1350 |
-| fairseq | — | — | — | — | — | 45 / 378 / 423 |
-
-**Good news:** the counting rule is reproducible. For **Pyro** the match is
-exact (234 functions, 262 total) and for **RAGFlow** exact (15 total); Flask,
-Joblib, Dify, Sonnet agree within a handful of entities.
-
-**What this settles:** the paper's "documentation entities" = *classes + methods
-+ functions* (the `total incl. classes` column). That confirms an inconsistency
-already visible in the code: **classes are counted as entities but the pipeline
-only generates documentation for methods and top-level functions** (a class gets
-a one-line summary). Either classes become first-class entities or the count must
-exclude them.
-
-**Discrepancy 2 — NumPy, OpenUI, PyTorch do not reproduce.** The counts differ by
-5–214 entities. The likely cause is that Table 1 was computed on a different
-(earlier or differently filtered) snapshot; the artifact as shipped cannot
-regenerate those numbers. This has to be either recomputed or disclosed.
-
-## 4. Archived evidence: two defects
-
-**(a) The `extracted_dependencies/` evidence for `joblib` and `torch` is
-cross-labelled.** Verified by module-name signatures:
-
-* `torch/extracted_dependencies/*.info` contains `memory`, `parallel`,
-  `numpy_pickle`, `hashing`, `compressor`, `_memmapping_reducer` → these are
-  **joblib** modules.
-* `joblib/extracted_dependencies/*.info` contains `_VF`, `_custom_ops`,
-  `_jit_internal`, `_linalg_utils`, `_lowrank`, `_distributor_init` → these are
-  **PyTorch** modules.
-
-**(b) The evidence covers more modules than the shipped snapshots.** 62 `.info`
-files against 42 `.py` for torch, and 72 against 22 for joblib — so the scores
-were produced from larger snapshots than those preserved here. Together with (a)
-this means **the exact source snapshots used for the published per-repository
-numbers are not preserved**.
-
-## 5. Commit SHAs are NOT recoverable
-
-Every `.git` directory in the working copies is a re-initialised repository with
-**a single synthetic commit** (`Initial commit` / `init` / `name` / `test`) and no
-upstream remote:
-
-```
-numpy        ca63f6d Initial commit
-flask-main   2ce490f main
-joblib       94f0d8d init
-openui       2d7aac7 init
-dify_api     5043ac8 name
-pyro         1ac0867 name
-ragflow      0d8b29e test
+```bash
+python scripts/fetch_core_repos.py --list
+python scripts/fetch_core_repos.py --all --force
 ```
 
-Large-Size repositories have no `.git` at all. **Therefore the upstream commit
-SHAs reviewers requested cannot be recovered from local data**; they must be
-re-cloned from upstream at a known commit, or the paper must state that the
-evaluated snapshots were trimmed and their provenance is the table above.
+### Repository identification note
 
-## 6. `pyan3==1.1.1` cannot analyse all ten repositories
+`openui` is **`wandb/openui`** (identified from `api.wandb.ai`, the litellm config
+generator and the default port 7878), and its core is the Python backend
+`backend/openui`.
 
-This is an artifact defect, not a corpus property. Two failure modes were found
-while wiring `targets/` back into the pipeline:
+`ragflow` needs a **pinned commit**: upstream restructured the project and the
+Python `api/` package is gone from HEAD (its core moved to Go-style
+`cmd/`/`internal/`). The fetcher pins the last commit that still contains
+`api/ragflow_server.py` (2026-09-28), which is recorded in the manifest.
 
-| failure | affected | handling |
+## 2. Legacy trimmed snapshots (what the published results used)
+
+The original evaluation ran on **hand-trimmed** snapshots (NumPy 10 files, RAGFlow
+6, etc.) whose provenance was never recorded. Those are preserved outside the
+repository at `_CodeEval_offcuts/targets_trimmed_v1/` and are *not* the current
+corpus. Their entity counts were the only way to cross-check the published table:
+
+| repo | legacy trimmed entities | paper (classes / functions / total) |
 |---|---|---|
-| `visit_AnnAssign` indexes an empty `sanitize_exprs(value)` list → `IndexError` | Flask (`ctx.py`, `sessions.py`, `testing.py`, `views.py`), PyTorch | patched in `codedoc/deps/pyan_compat.py`; pyan is now called **in-process** so the patch applies |
-| `KeyError: <Node attribute:torch.backends.cuda>` and `KeyError: <Node import:fairseq.logging.meters>` — cross-file resolution on a *trimmed* snapshot | `torch/__init__.py` (excluded), **all of `fairseq`** (not analysable) | partial: failing files are detected and excluded, and the exclusion is printed |
+| numpy | 42 | 5 / 31 / 36 |
+| openui | 20 | 3 / 21 / 24 |
+| ragflow | 14 | 1 / 14 / 15 |
+| dify_api | 47 | 3 / 47 / 50 |
+| flask-main | 207 | 28 / 207 / 235 |
+| pyro | 234 | 28 / 234 / 262 |
+| fairseq | 378 | 45 / 378 / 423 |
+| sonnet | 801 | 177 / 801 / 978 |
 
-Previously these failures were silent: `_run_pyan` returned `None`, and the
-`None` produced a `TypeError` hundreds of lines away. On the published pipeline,
-**Flask and PyTorch cannot regenerate their dependency graphs at all with the
-pinned pyan version** — which is precisely the kind of gap the artifact
-availability complaint was about.
+For Flask, Pyro, Fairseq and Sonnet the archived entity count equals the paper's
+*function* column exactly, which settles the counting rule: **total entities =
+classes + methods + functions**. Two consequences:
 
-Open items (S1 in `EXPERIMENT_SEQUENCE.md`): a per-file-and-merge fallback to
-rescue `fairseq`, and adoption of an LSP-based backend that does not depend on
-pyan's cross-file heuristics.
+1. Classes were **counted** as documentation entities although the generator only
+   documents methods and top-level functions (a class received a one-line
+   summary). Either classes become first-class or the count must exclude them.
+2. The archived `extracted_dependencies/` evidence for `joblib` and `torch` is
+   **cross-labelled** (each folder's evidence describes the other library, verified
+   by module-name signatures) and covers more modules than the shipped snapshots
+   (62 vs 42, 72 vs 22). The exact snapshots behind the published per-repository
+   numbers were therefore not preserved.
 
-## 7. Selection criteria (to be stated in the paper)
+## 3. Commit SHAs — now recoverable, previously not
+
+Every `.git` directory in the old local copies was a re-initialised repository
+with **one synthetic commit** (`Initial commit` / `init` / `name` / `test`) and no
+remote, and the Large-Size copies had no `.git` at all. The upstream SHAs reviewers
+asked for were unrecoverable from local data. Section 1 resolves that: the corpus
+is now fetched from upstream and every commit is recorded.
+
+## 4. Dependency analysis: legacy backend vs replacements
+
+`pyan3==1.1.1` (the backend behind the published numbers) cannot analyse these
+repositories:
+
+| failure | affected |
+|---|---|
+| `IndexError` in `visit_AnnAssign` (empty `sanitize_exprs` result) | Flask `ctx.py`/`sessions.py`/`testing.py`/`views.py`, PyTorch |
+| `KeyError` on cross-file import resolution | NumPy, joblib, Fairseq |
+| `ValueError: Unknown scope …lambda` | PyTorch, Fairseq |
+| grammar bound to the interpreter | any repository needing a newer Python |
+
+Two replacements are shipped and benchmarked — see
+[`DEPENDENCY_BACKENDS.md`](DEPENDENCY_BACKENDS.md): a dependency-free AST extractor
+that covers every entity, and a Pyright-backed extractor that resolves calls with
+type inference (54–59 % internal resolution versus 7–22 % for the AST backend).
+Both succeed on all ten repositories.
+
+## 5. Selection criteria (to be stated in the paper)
 
 The published text never explained how the ten repositories were chosen (R3
-flagged this). The actual procedure, as reconstructible from the working tree:
+flagged this). What is reconstructible from the working tree:
 
-1. candidate repositories generated/collected with assistance from an LLM;
-2. reduced to a file subset keeping modules larger than ~20 KB of source;
-3. ranked/filtered by hand using popularity (stars) and structural variety;
-4. grouped into Small / Medium / Large by the resulting entity count.
+1. candidate repositories were collected with LLM assistance;
+2. each was reduced to a file subset (modules larger than roughly 20 KB of source);
+3. the subset was filtered by hand using popularity and structural variety;
+4. repositories were grouped into Small / Medium / Large by resulting entity count.
 
-Steps 2–4 are only partially recoverable from the tree and must be confirmed by
-the authors before being written into the paper.
+Step 4 is inconsistent with the working tree: **Joblib sits under
+`Middle-Size/` while the paper's Table 1 classifies it as Large** (and its entity
+count supports Large). The grouping has to be fixed in one direction.

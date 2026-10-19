@@ -42,7 +42,7 @@ class PythonPyanExtractor(Extractor):
         """Run the existing analyser to obtain a Navigator (lazy import)."""
         if self._nav is not None:
             return
-        from codedoc.cli import Analyzer  # local import avoids a cycle
+        from codedoc.deps.analyzer import Analyzer  # no LLM dependency
 
         analyzer = Analyzer(repo_root)
         dot = analyzer.scan()

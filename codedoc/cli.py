@@ -8,6 +8,7 @@ from threading import Semaphore, Lock
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from codedoc.config import TEMPLATES, default_template
+from codedoc.deps.analyzer import Analyzer
 from codedoc.deps.dot import analyze, get_dep
 from codedoc.writer.prompt import format_dep, build_prompt
 from codedoc.writer.llm import LinguisticCore
@@ -45,60 +46,6 @@ def get_test_targets(target_path):
                 "output": str(md_file)
             }
     return targets
-
-
-class Analyzer:
-    def __init__(self, target):
-        self.target = Path(target)
-        self.files = {}
-
-    def scan(self):
-        for f in self.target.rglob("*.py"):
-            self.files[f.stem] = {"path": str(f), "members": self._parse(f)}
-        if not self.files:
-            return None
-        return self._run_pyan()
-
-    def _run_pyan(self):
-        paths = [f['path'] for f in self.files.values()]
-        # pyan is invoked in-process (not via subprocess) so that the
-        # compatibility patch for pyan3's visit_AnnAssign crash applies; a
-        # subprocess could not see the patch. See codedoc/deps/pyan_compat.py.
-        from codedoc.deps.pyan_compat import preflight, run_pyan_dot
-        try:
-            return run_pyan_dot(paths)
-        except RuntimeError as exc:
-            print(f"pyan error: {exc}")
-            print("  retrying with unparsable files excluded ...")
-            bad = set(preflight(paths))
-            if bad:
-                print(f"  excluded {len(bad)} file(s): {sorted(bad)[:5]}")
-            keep = [p for p in paths if p not in bad]
-            if len(keep) == len(paths):
-                raise
-            return run_pyan_dot(keep)
-
-    def _parse(self, fpath):
-        result = {"classes": {}, "functions": []}
-        try:
-            with open(fpath, "r", encoding="utf-8") as f:
-                tree = ast.parse(f.read())
-        except SyntaxError:
-            return result
-        fname = fpath.stem
-        for node in ast.iter_child_nodes(tree):
-            if isinstance(node, ast.FunctionDef):
-                result["functions"].append({"key": f"{fname}__{node.name}", "name": node.name})
-            elif isinstance(node, ast.ClassDef):
-                cls = {"key": f"{fname}__{node.name}", "name": node.name, "methods": []}
-                for item in node.body:
-                    if isinstance(item, ast.FunctionDef):
-                        cls["methods"].append({
-                            "key": f"{fname}__{node.name}__{item.name}",
-                            "name": f"{node.name}.{item.name}"
-                        })
-                result["classes"][node.name] = cls
-        return result
 
 
 def call_llm(args, msg):
