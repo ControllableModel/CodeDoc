@@ -1,0 +1,200 @@
+{
+  "repo": "flask-main",
+  "criteria": "practice_docstring",
+  "documents": 431,
+  "unscored": 2,
+  "kinds": {
+    "class": 47,
+    "method": 287,
+    "function": 97
+  },
+  "raw": {
+    "Signature Conformance": {
+      "n": 429,
+      "mean": 4.717948717948718
+    },
+    "Parameter Coverage": {
+      "n": 429,
+      "mean": 4.827505827505828
+    },
+    "Return Documentation": {
+      "n": 429,
+      "mean": 4.927738927738928
+    },
+    "Exception Documentation": {
+      "n": 429,
+      "mean": 4.153846153846154
+    },
+    "Side-effect & State Documentation": {
+      "n": 429,
+      "mean": 4.65034965034965
+    },
+    "Inheritance/Polymorphism Contract": {
+      "n": 429,
+      "mean": 3.156177156177156
+    },
+    "Dependency Context": {
+      "n": 429,
+      "mean": 4.927738927738928
+    },
+    "Usage Example Validity": {
+      "n": 429,
+      "mean": 4.741258741258742
+    },
+    "Language Convention Adherence": {
+      "n": 429,
+      "mean": 3.629370629370629
+    }
+  },
+  "filtered": {
+    "Signature Conformance": {
+      "n": 429,
+      "mean": 4.717948717948718
+    },
+    "Parameter Coverage": {
+      "n": 429,
+      "mean": 4.827505827505828
+    },
+    "Return Documentation": {
+      "n": 429,
+      "mean": 4.927738927738928
+    },
+    "Exception Documentation": {
+      "n": 429,
+      "mean": 4.153846153846154
+    },
+    "Side-effect & State Documentation": {
+      "n": 429,
+      "mean": 4.65034965034965
+    },
+    "Inheritance/Polymorphism Contract": {
+      "n": 332,
+      "mean": 3.5572289156626504
+    },
+    "Dependency Context": {
+      "n": 429,
+      "mean": 4.927738927738928
+    },
+    "Usage Example Validity": {
+      "n": 429,
+      "mean": 4.741258741258742
+    },
+    "Language Convention Adherence": {
+      "n": 429,
+      "mean": 3.629370629370629
+    }
+  },
+  "filtered_by_kind": {
+    "class": {
+      "Signature Conformance": {
+        "n": 47,
+        "mean": 4.297872340425532
+      },
+      "Parameter Coverage": {
+        "n": 47,
+        "mean": 4.531914893617022
+      },
+      "Return Documentation": {
+        "n": 47,
+        "mean": 4.595744680851064
+      },
+      "Exception Documentation": {
+        "n": 47,
+        "mean": 3.8085106382978724
+      },
+      "Side-effect & State Documentation": {
+        "n": 47,
+        "mean": 4.148936170212766
+      },
+      "Inheritance/Polymorphism Contract": {
+        "n": 47,
+        "mean": 4
+      },
+      "Dependency Context": {
+        "n": 47,
+        "mean": 4.74468085106383
+      },
+      "Usage Example Validity": {
+        "n": 47,
+        "mean": 4.659574468085107
+      },
+      "Language Convention Adherence": {
+        "n": 47,
+        "mean": 3.0638297872340425
+      }
+    },
+    "method": {
+      "Signature Conformance": {
+        "n": 285,
+        "mean": 4.828070175438596
+      },
+      "Parameter Coverage": {
+        "n": 285,
+        "mean": 4.8807017543859645
+      },
+      "Return Documentation": {
+        "n": 285,
+        "mean": 4.982456140350878
+      },
+      "Exception Documentation": {
+        "n": 285,
+        "mean": 4.189473684210526
+      },
+      "Side-effect & State Documentation": {
+        "n": 285,
+        "mean": 4.708771929824562
+      },
+      "Inheritance/Polymorphism Contract": {
+        "n": 285,
+        "mean": 3.4842105263157896
+      },
+      "Dependency Context": {
+        "n": 285,
+        "mean": 4.943859649122807
+      },
+      "Usage Example Validity": {
+        "n": 285,
+        "mean": 4.76140350877193
+      },
+      "Language Convention Adherence": {
+        "n": 285,
+        "mean": 3.789473684210526
+      }
+    },
+    "function": {
+      "Signature Conformance": {
+        "n": 97,
+        "mean": 4.597938144329897
+      },
+      "Parameter Coverage": {
+        "n": 97,
+        "mean": 4.814432989690721
+      },
+      "Return Documentation": {
+        "n": 97,
+        "mean": 4.927835051546392
+      },
+      "Exception Documentation": {
+        "n": 97,
+        "mean": 4.216494845360825
+      },
+      "Side-effect & State Documentation": {
+        "n": 97,
+        "mean": 4.721649484536083
+      },
+      "Dependency Context": {
+        "n": 97,
+        "mean": 4.969072164948454
+      },
+      "Usage Example Validity": {
+        "n": 97,
+        "mean": 4.721649484536083
+      },
+      "Language Convention Adherence": {
+        "n": 97,
+        "mean": 3.4329896907216493
+      }
+    }
+  },
+  "excluded_verdicts": 97
+}

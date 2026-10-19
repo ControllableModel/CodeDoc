@@ -154,15 +154,26 @@ def main() -> int:
         return 1
 
     # ---- judging -------------------------------------------------------------
-    criteria = list(registry.load(args.criteria))
-    spec = "\n".join(f"- {c.name}: {c.definition}" for c in criteria)
-    print(f"[3/4] judging {len(docs)} documents x {len(criteria)} criteria "
-          f"({args.criteria}, multi mode, {args.judge_workers} workers) ...")
+    criterion_set = registry.load(args.criteria)
+    # One specification per entity kind: a free function is not asked about the
+    # inheritance contract it cannot have (see criteria.schema.applies_to_kinds).
+    spec_by_kind = {
+        kind: "\n".join(f"- {c.name}: {c.definition}" for c in criterion_set.for_kind(kind))
+        for kind in ("class", "method", "function")
+    }
+    kind_of = {ctx.entity.qualified_name: str(ctx.entity.kind) for ctx in index.contexts}
+    per_kind = {kind: sum(1 for q in docs if kind_of.get(q) == kind) for kind in spec_by_kind}
+    n_criteria = {kind: len(criterion_set.for_kind(kind)) for kind in spec_by_kind}
+    print(f"[3/4] judging {len(docs)} documents "
+          f"({', '.join(f'{k}={v}x{n_criteria[k]}dims' for k, v in per_kind.items() if v)}, "
+          f"{args.judge_workers} workers) ...")
     scores: dict = {}
     judge_started = time.time()
 
     def judge_one(item):
         qname, text = item
+        kind = kind_of.get(qname, "function")
+        spec = spec_by_kind.get(kind) or spec_by_kind["function"]
         judge = LLM_Remote_query(api_key=key, api_url=base_url, model=args.model)
         judge.load_JudgeContent_Once(spec)
         verdict, attempts, raw = judge_with_retry(judge, text or "")

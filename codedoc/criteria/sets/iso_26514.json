@@ -20,6 +20,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -34,6 +35,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -48,6 +50,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -62,6 +65,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -76,6 +80,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -90,6 +95,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -104,6 +110,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -118,6 +125,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -132,6 +140,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -146,6 +155,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -160,6 +170,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -174,6 +185,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -188,6 +200,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -202,6 +215,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -216,6 +230,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -230,6 +245,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -244,6 +260,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -258,6 +275,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -272,6 +290,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -286,6 +305,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": true,
+      "applies_to_kinds": null,
       "note": ""
     },
     {
@@ -300,6 +320,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -314,6 +335,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -328,6 +350,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -342,6 +365,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -356,6 +380,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     },
     {
@@ -370,6 +395,7 @@
         "5": "Excellent"
       },
       "applicable_to_entity": false,
+      "applies_to_kinds": null,
       "note": "Governs a document set, not a single code entity; excluded from the entity-level rubric."
     }
   ]

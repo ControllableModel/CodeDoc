@@ -176,3 +176,75 @@ Three findings that change the analysis plan:
    for classes). The 12-section ISO output structure conflicts with in-language
    docstring conventions. Reporting it per criterion set is mandatory, since this is
    the axis the review questioned when it said the dimensions are not specific to code.
+
+
+## 8. Applicability filtering (implemented, measured impact)
+
+`criterion.level` distinguishes entity-level from document-set-level criteria. It does
+**not** distinguish entity *kinds*, and that gap produced the artefact in section 7:
+free functions scored 1.78 on `Inheritance/Polymorphism Contract`, a property they
+cannot have.
+
+### Mechanism
+
+* `Criterion.applies_to_kinds` — `None` (all kinds) or a subset of
+  `class` / `method` / `function`; validated against that set.
+* `Criterion.applies_to(kind)` and `CriterionSet.for_kind(kind)` /
+  `kind_coverage()` — the query surface and the audit table.
+* Populated from `APPLIES_TO_KINDS` in `scripts/build_criteria_sets.py`, so a
+  regenerated criterion set keeps the annotations.
+* Scoring stops asking the unanswerable question: `bench_small_repo.py` builds one
+  judge specification per entity kind, and `run_judge.py --repo <name>` infers each
+  document's kind from the index.
+
+Only criteria that are *structurally impossible* for a kind are annotated. In
+`practice_docstring` that is one criterion:
+
+| criterion | class | method | function |
+|---|---|---|---|
+| Inheritance/Polymorphism Contract | yes | yes | **N/A** |
+
+In `iso_26514` all 14 entity-level criteria remain applicable to all kinds, so the
+ISO axis is unaffected by this change (and comparable with earlier numbers).
+
+### Measured impact on the flask-main corpus (431 documents, 3,861 verdicts)
+
+| dimension | raw | filtered | Δ | class | method | function |
+|---|---|---|---|---|---|---|
+| Return Documentation | 4.93 | 4.93 | 0.00 | 4.60 | 4.98 | 4.93 |
+| Dependency Context | 4.93 | 4.93 | 0.00 | 4.74 | 4.94 | 4.97 |
+| Parameter Coverage | 4.83 | 4.83 | 0.00 | 4.53 | 4.88 | 4.81 |
+| Usage Example Validity | 4.74 | 4.74 | 0.00 | 4.66 | 4.76 | 4.72 |
+| Signature Conformance | 4.72 | 4.72 | 0.00 | 4.30 | 4.83 | 4.60 |
+| Side-effect & State Documentation | 4.65 | 4.65 | 0.00 | 4.15 | 4.71 | 4.72 |
+| Exception Documentation | 4.15 | 4.15 | 0.00 | 3.81 | 4.19 | 4.22 |
+| Language Convention Adherence | 3.63 | 3.63 | 0.00 | 3.06 | 3.79 | 3.43 |
+| Inheritance/Polymorphism Contract | 3.16 | **3.56** | **+0.40** | 4.00 | 3.48 | **N/A** |
+| **pooled** | **4.41** | **4.48** | **+0.07** | | | |
+| **mean per kind** | | | | 4.21 | 4.51 | **4.55** |
+
+* 97 verdicts excluded (one per function) — 3,861 → 3,764.
+* The correction is **not uniform**: functions move +0.31 (4.24 → 4.55), classes and
+  methods do not move. Pooling hid this because the artefact was diluted across kinds.
+* Direction of every cross-kind comparison is therefore only trustworthy after
+  filtering. Reporting both columns keeps the earlier numbers auditable instead of
+  silently rewriting them.
+
+### Verification of the wiring (9 entities, kind-balanced, end to end)
+
+| entity | kind | dimensions asked | inheritance asked |
+|---|---|---|---|
+| `blueprints.Blueprint` | class | 9 | yes |
+| `config.Config.__init__` | method | 9 | yes |
+| `json.tag.PassList.to_json` | method | 9 | yes |
+| `testing.EnvironBuilder` | class | 9 | yes |
+| `ctx.has_app_context` | function | **8** | **no** |
+| `templating.stream_template` | function | **8** | **no** |
+| `debughelpers.explain_template_loading…` | function | **8** | **no** |
+
+Reproduce:
+
+```bash
+python scripts/analyze_scores.py --scores outputs/bench_flask/scores.json --repo flask-main \
+       --criteria practice_docstring --json-out results/analysis/scores_flask_filtered.json
+```
