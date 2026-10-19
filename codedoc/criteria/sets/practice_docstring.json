@@ -22,6 +22,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -34,6 +37,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -46,6 +52,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -58,6 +67,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -70,6 +82,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -85,6 +100,9 @@
         "class",
         "method"
       ],
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -97,6 +115,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -109,6 +130,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     },
     {
@@ -121,6 +145,9 @@
       "anchors": {},
       "applicable_to_entity": true,
       "applies_to_kinds": null,
+      "in_paper_table": false,
+      "paper_category": "",
+      "paper_name": "",
       "note": ""
     }
   ]
