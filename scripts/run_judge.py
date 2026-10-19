@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from codedoc.criteria import registry  # noqa: E402
-from codedoc.judge.query import LLM_Remote_query, parse_verdict  # noqa: E402
+from codedoc.judge.query import LLM_Remote_query, judge_with_retry, parse_verdict  # noqa: E402
 
 
 def documents(doc_dir: Path, pattern: str) -> list:
@@ -39,7 +39,8 @@ def judge_document(judge: LLM_Remote_query, text: str, criteria, mode: str) -> d
     if mode == "multi":
         spec = "\n".join(f"- {c.name}: {c.definition}" for c in criteria)
         judge.load_JudgeContent_Once(spec)
-        return parse_verdict(judge.solo_query(text))
+        verdict, _attempts, _raw = judge_with_retry(judge, text)
+        return verdict
 
     scores: dict = {}
     for criterion in criteria:

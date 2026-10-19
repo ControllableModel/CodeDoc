@@ -8,6 +8,8 @@
 from openai import OpenAI
 import time
 
+from codedoc.writer.usage import RECORDER
+
 class LLM_Remote_query:
     def __init__(self, api_key='<>', api_url='', model='gpt-5-mini'):
         self.api_key = api_key
@@ -15,11 +17,16 @@ class LLM_Remote_query:
         self.model = model
         self.MESSAGE_HISTORY = [{"role": "system", "content": "You are a professional reviewer"}]
         self.temperature = 0.5
+        #: Judging temperature. 0 by default: a scoring instrument should not add
+        #: sampling variance, and at temperature 1 the model intermittently emits
+        #: unparseable JSON (observed: 2/38 documents in the first benchmark run).
+        self.judge_temperature = 0.0
         self.max_token = 1024
 
     def multi_query(self, question):
         self.MESSAGE_HISTORY.append({"role": "user", "content": question})
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_url)
+        _t0 = time.time()
         answer = self.client.chat.completions.create(
                 model=self.model,
                 messages=self.MESSAGE_HISTORY,
@@ -27,6 +34,7 @@ class LLM_Remote_query:
                 temperature=self.temperature,
                 max_tokens=self.max_token,
             )
+        RECORDER.record_response("judge_multi", self.model, answer, time.time() - _t0)
         ans = answer.choices[0].message.content
         self.MESSAGE_HISTORY.append({"role": "assistant", "content": ans})
 
@@ -38,13 +46,15 @@ class LLM_Remote_query:
         while count > 0:
             time.sleep(2)
             try:
+                _t0 = time.time()
                 answer = self.client.chat.completions.create(
                     model=self.model,
                     messages=self.MESSAGE_HISTORY,
                     stream=False,
-                    temperature=1,
+                    temperature=self.judge_temperature,
                     max_tokens=self.max_token,
                 )
+                RECORDER.record_response("judge_solo", self.model, answer, time.time() - _t0)
                 count = 0
             except:
                 count -= 1
@@ -123,3 +133,22 @@ def _as_int(value):
     except Exception:
         m = _re.search(r"\d+", str(value))
         return int(m.group()) if m else None
+
+
+def judge_with_retry(judge, text, attempts=3):
+    """Score one document, retrying when the verdict JSON cannot be parsed.
+
+    A malformed verdict is not an API failure: the call succeeds and returns prose
+    or truncated JSON. Silently recording an empty verdict loses the document from
+    the analysis, so the scoring path retries and reports the cost of doing so.
+    """
+    last = ""
+    for attempt in range(1, attempts + 1):
+        raw = judge.solo_query(text)
+        verdict = parse_verdict(raw)
+        if verdict:
+            return verdict, attempt, ""
+        last = raw or ""
+        if attempt < attempts:
+            judge.MESSAGE_HISTORY = judge.MESSAGE_HISTORY[:1]
+    return {}, attempts, last[:400]

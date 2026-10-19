@@ -1,5 +1,8 @@
 from openai import OpenAI
 import json
+import time
+
+from codedoc.writer.usage import RECORDER
 
 
 class LinguisticCore:
@@ -24,12 +27,21 @@ class LinguisticCore:
         else:
             messages = msg
 
-        r = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            stream=stream,
-            temperature=self.temperature
-        )
+        started = time.time()
+        try:
+            r = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                stream=stream,
+                temperature=self.temperature
+            )
+        except Exception as exc:
+            RECORDER.record(phase="generation", model=self.model,
+                            seconds=time.time() - started, ok=False,
+                            error=f"{type(exc).__name__}: {exc}")
+            raise
+        if not stream:
+            RECORDER.record_response("generation", self.model, r, time.time() - started)
 
         if stream:
             def gen():
