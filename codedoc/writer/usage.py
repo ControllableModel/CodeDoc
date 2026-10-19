@@ -46,6 +46,7 @@ class UsageRecorder:
         ok: bool = True,
         error: str = "",
         label: str = "",
+        cached_tokens: int = 0,
     ) -> None:
         with self._lock:
             self.records.append(
@@ -56,6 +57,7 @@ class UsageRecorder:
                     "prompt_tokens": int(prompt_tokens or 0),
                     "completion_tokens": int(completion_tokens or 0),
                     "total_tokens": int(prompt_tokens or 0) + int(completion_tokens or 0),
+                    "cached_tokens": int(cached_tokens or 0),
                     "seconds": round(float(seconds), 3),
                     "ok": bool(ok),
                     "error": error[:200],
@@ -63,8 +65,19 @@ class UsageRecorder:
             )
 
     def record_response(self, phase: str, model: str, response, seconds: float, label: str = "") -> None:
-        """Record straight from an OpenAI SDK response object."""
+        """Record straight from an OpenAI SDK response object.
+
+        Cached prompt tokens are billed at a different rate by most providers, and the
+        field name varies: OpenAI nests it under ``prompt_tokens_details.cached_tokens``
+        while DeepSeek returns ``prompt_cache_hit_tokens`` at the top level.
+        """
         usage = getattr(response, "usage", None)
+        cached = 0
+        details = getattr(usage, "prompt_tokens_details", None)
+        if details is not None:
+            cached = getattr(details, "cached_tokens", 0) or 0
+        if not cached:
+            cached = (getattr(usage, "prompt_cache_hit_tokens", 0) or 0)
         self.record(
             phase=phase,
             model=model,
@@ -72,6 +85,7 @@ class UsageRecorder:
             completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
             seconds=seconds,
             label=label,
+            cached_tokens=cached,
         )
 
     # -- reporting ----------------------------------------------------------
