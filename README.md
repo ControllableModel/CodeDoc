@@ -17,7 +17,7 @@ dependency structure of the repository.
 | Phase | Component | What it does |
 |---|---|---|
 | **(a) Offline criteria extraction** | `prompts/ISO.txt`, `prompts/Github.txt` | Turns two authoritative sources (ISO/IEC/IEEE software-documentation standards; the GitHub documentation style guide) into an explicit criterion set `Q`. Run once, before any repository is processed. |
-| **(b) Stage 1 — static analysis** | `main.py` → `analyzer`, `DOT.py` | Builds a repository representation from a **static call graph** (`pyan3`) plus an **AST** pass that resolves each entity to its exact source span; recovers direct callers / callees for each entity. |
+| **(b) Stage 1 — static analysis** | `codedoc/deps/` (AST + optional Pyright LSP) | Builds a typed relation set: call edges **and** class relations (inheritance, instantiation, overrides, dispatch) |presentation from a **static call graph** (`pyan3`) plus an **AST** pass that resolves each entity to its exact source span; recovers direct callers / callees for each entity. |
 | **(b) Stage 2 — generation** | `DOT.py:build_prompt`, `LLM.py` | Assembles a **dependency-aware structured prompt** (entity source, file path, `Uses` / `Used by` context, criteria, required output structure) and calls the LLM. |
 | **(b) Stage 2 — judge & refine** | `prompts/`, `LLM.py` | An LLM **document judge** scores the generated documentation dimension by dimension and returns textual feedback; the feedback is fed back into one refinement pass. |
 
@@ -26,7 +26,7 @@ dependency structure of the repository.
 ```
 CodeEval/
 ├── main.py                    # entry point: Phase (b) Stage 1 + Stage 2
-├── DOT.py                     # call-graph (.dot) parsing, AST source location, prompt assembly
+├── codedoc/                   # six-library package (see docs/ARCHITECTURE.md)y
 ├── LLM.py                     # OpenAI-compatible client wrapper
 ├── run_ablation.py            # batch runner for the component ablation
 ├── evaluate_ablation.py       # aggregation / comparison of ablation runs
@@ -57,7 +57,8 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -r requirements.txt
 ```
 
-Requires **Python 3.8+**. Dependencies: `openai`, `pyan3`, `requests` (see `requirements.txt`).
+Requires **Python 3.9+**. Python dependencies: `openai`, `requests` (see `requirements.txt`).
+Optional: `node` + `pyright` (`npm i -g pyright`) for type-aware call resolution.
 
 ## 4. Configuration
 
@@ -129,7 +130,7 @@ We state the lineage explicitly, because earlier snapshots of this repository ma
 misread:
 
 * **RepoAgent is a baseline, not the implementation.** CodeDoc's implementation is the
-  pipeline in `main.py` / `DOT.py` / `LLM.py` described in §1.
+  pipeline in `codedoc/cli.py` / `codedoc/deps/` / `codedoc/writer/` described in §1.
 * The `.project_doc_record/` and `markdown_docs/` directories are **RepoAgent's own working
   directories**, produced when RepoAgent was run over the same repositories for comparison.
   They follow RepoAgent's schema (`md_content`, `doc_version`, `fake_file_reflection`,

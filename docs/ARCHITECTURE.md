@@ -49,7 +49,8 @@ Extractors declare the relations they can actually produce:
 ```
 $ python scripts/probe_relations.py
 language    backend          supported relations
-python      pyan3 + ast      calls, called_by
+python      stdlib ast + import-graph resolution  calls, called_by, inherits, subclassed_by, instantiated_at, overrides, overridden_by, dispatch_candidates
+python      pyright LSP + stdlib ast          same, with type-aware call resolution
 java        LSP (java)       calls, called_by, inherits, ... (skeleton)
 typescript  LSP (typescript) calls, called_by, inherits, ... (skeleton)
 ```
@@ -77,11 +78,14 @@ A class has no callees, which is why class documentation had no usable context.
 |---|---|
 | criteria library + three shipped sets | done |
 | dependency schema, graph helpers, language registry | done |
-| Python call-graph extractor (pyan3) | done (parity with the published pipeline) |
+| Python AST extractor (classes + functions, zero dependencies) | done, benchmarked on 10 repositories |
+| Python Pyright extractor (type-aware calls) | done, benchmarked on 10 repositories |
+| pyan3 / DOT pipeline 供 | **removed** — DOT survives only as an export format (`deps/export_dot.py`) |
 | LSP extractors (class hierarchy, instantiation, overrides) | **skeleton** — `NotImplementedError` with the required requests documented |
 | writer prompt blocks for classes/polymorphism | done (data-level); wired into generation during S4 |
 | judge driver + aggregation + statistics | done |
-| session orchestration (`codedoc/cli.py`) | still contains the generation loop; extracting it into `writer/generate.py` and `deps/analyzer.py` is the next refactor step |
+| session orchestration (`codedoc/cli.py`) | still contains the generation loop; extracting it into `writer/generate.py` is the next refactor step |
+| class entities in generation | **not yet** — the generator documents methods and top-level functions; a class only receives a one-line summary. Wiring class entities is step S4 |
 
 Deliberate choice: an unimplemented capability **raises** instead of silently
 degrading to function-only analysis. A silent fallback is how the earlier class

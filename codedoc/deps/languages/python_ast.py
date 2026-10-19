@@ -355,6 +355,20 @@ class ProjectIndex:
                     return sub
         return None
 
+    def display_name(self, qname: str) -> str:
+        """Short name when unambiguous, otherwise a dotted suffix.
+
+        Without this, two classes that share a short name (Flask defines
+        ``Blueprint`` and also imports ``sansio.blueprints.Blueprint``) render as
+        "Blueprint inherits Blueprint", which reads like a self-loop.
+        """
+        short = qname.split(".")[-1]
+        same = [q for q in self.classes if q.split(".")[-1] == short]
+        if len(same) <= 1:
+            return short
+        parts = qname.split(".")
+        return ".".join(parts[-2:]) if len(parts) >= 2 else short
+
     # -- derived views ------------------------------------------------------
     def subclass_map(self) -> Dict[str, List[str]]:
         subs: Dict[str, List[str]] = defaultdict(list)
@@ -454,15 +468,15 @@ class PythonAstExtractor(Extractor):
             )
             ctx = DependencyContext(entity=entity, source=self._slice(info.path, info.lineno, info.end_lineno))
             for base in info.bases:
-                ctx.add(Relation(kind=RelationKind.INHERITS, target=base.split(".")[-1],
+                ctx.add(Relation(kind=RelationKind.INHERITS, target=idx.display_name(base),
                                  target_kind=EntityKind.CLASS, path=idx.classes[base].path))
             for sub in subs.get(qname, []):
-                ctx.add(Relation(kind=RelationKind.SUBCLASSED_BY, target=sub.split(".")[-1],
+                ctx.add(Relation(kind=RelationKind.SUBCLASSED_BY, target=idx.display_name(sub),
                                  target_kind=EntityKind.CLASS, path=idx.classes[sub].path))
             for user in dict.fromkeys(instantiated_by.get(qname, [])):
                 target_kind = EntityKind.METHOD if user in idx.functions and idx.functions[user].kind == EntityKind.METHOD else EntityKind.FUNCTION
                 path = idx.functions[user].path if user in idx.functions else ""
-                ctx.add(Relation(kind=RelationKind.INSTANTIATED_AT, target=user.split(".")[-1],
+                ctx.add(Relation(kind=RelationKind.INSTANTIATED_AT, target=idx.display_name(user) if user in idx.classes else user.split(".")[-1],
                                  target_kind=target_kind, path=path))
             # polymorphic contract: methods overridden somewhere in the subtree
             for mname, mqname in info.methods.items():

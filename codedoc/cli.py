@@ -8,8 +8,7 @@ from threading import Semaphore, Lock
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from codedoc.config import TEMPLATES, default_template
-from codedoc.deps.analyzer import Analyzer
-from codedoc.deps.dot import analyze, get_dep
+from codedoc.deps.relations_index import build_index, get_dep
 from codedoc.writer.prompt import format_dep, build_prompt
 from codedoc.writer.llm import LinguisticCore
 
@@ -290,7 +289,7 @@ def main():
     else:
         print("Ablation Mode: FULL (with dependencies + optimized prompt)")
 
-    target = Path(args.target_path)
+    target = Path(args.target_path).resolve()
     
     # Set ablation-specific output directory
     if args.ablation_output:
@@ -314,19 +313,15 @@ def main():
             print(f"  - {name}: {info['source']} -> {info['output']}")
         
         # 全项目扫描以获取完整的依赖关系
-        analyzer = Analyzer(str(target))
-        dot = analyzer.scan()
-        if not dot:
+        nav = build_index(str(target))
+        if nav is None:
             print("Failed to analyze")
             return
-        
-        file_map = {k: v['path'] for k, v in analyzer.files.items()}
-        nav = analyze(dot, str(target), file_map)
 
         total = 0
         for fname, info in test_targets.items():
-            if fname in analyzer.files:
-                finfo = analyzer.files[fname]
+            if fname in nav.files:
+                finfo = nav.files[fname]
                 # 修改输出路径：使用out_dir而不是原始tests目录
                 output_path = out_dir / "tests" / f"{fname}.md"
                 output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -334,7 +329,7 @@ def main():
                 if count:
                     total += count
             else:
-                print(f"  [ERROR] {fname} not found in analyzer")
+                print(f"  [ERROR] {fname} not found in index")
         
         print(f"\nGenerated docs for {total} items in {len(test_targets)} files")
         return
@@ -342,18 +337,13 @@ def main():
     # 原有的完整模式
     out_dir = Path(args.output_dir) if args.output_dir else target / "docs"
 
-    analyzer = Analyzer(str(target))
-    dot = analyzer.scan()
-
-    if not dot:
+    nav = build_index(str(target))
+    if nav is None:
         print("Failed to analyze")
         return
 
-    file_map = {k: v['path'] for k, v in analyzer.files.items()}
-    nav = analyze(dot, str(target), file_map)
-
     total = {"cls": 0, "func": 0, "method": 0}
-    for fname, finfo in analyzer.files.items():
+    for fname, finfo in nav.files.items():
         stats = process_file(args, fname, finfo, nav, out_dir, target)
         if stats:
             for k in total:
