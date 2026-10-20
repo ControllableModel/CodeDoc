@@ -86,6 +86,13 @@ function fillConfigForm(config) {
   $("cfgSourceBudget").value = config.source_budget ?? 8000;
   $("cfgRelevant").checked = !!config.relevant;
 
+  if ($("cfgJudgeBase")) $("cfgJudgeBase").value = config.judge_base_url || "";
+  if ($("cfgJudgeModel")) $("cfgJudgeModel").value = config.judge_model || "";
+  if ($("judgeKeyHint")) {
+    $("judgeKeyHint").textContent = config.judge_api_key_present
+      ? `已保存 ${config.judge_api_key_hint || ""}` : "未设置判定 Key";
+  }
+
   const pricing = config.pricing || {};
   const modeSelect = $("cfgPriceMode");
   if (modeSelect) {
@@ -174,7 +181,12 @@ async function saveConfig() {
     template: $("cfgTemplate").value,
     relevant: $("cfgRelevant").checked,
     criteria: [...document.querySelectorAll("#criteriaList input:checked")].map((b) => b.value),
+    judge_base_url: $("cfgJudgeBase") ? $("cfgJudgeBase").value.trim() : undefined,
+    judge_model: $("cfgJudgeModel") ? $("cfgJudgeModel").value.trim() : undefined,
   };
+  if ($("cfgJudgeKey") && $("cfgJudgeKey").value.trim()) {
+    payload.judge_api_key = $("cfgJudgeKey").value.trim();
+  }
   if ($("cfgPriceMode")) {
     payload.pricing = { ...(state.config.pricing || {}), mode: $("cfgPriceMode").value };
   }
@@ -532,7 +544,8 @@ async function runJudge(axis) {
       body: JSON.stringify({ repo: state.analysis.repo, qname: detail.qname, axis }),
     });
     renderVerdict(result);
-    setStatus(`判定完成：${result.axis_label} · 总均分 ${result.overall} · ${result.seconds}s`, "ok");
+    setStatus(`判定完成：${result.axis_label} · 总均分 ${result.overall} · ${result.seconds}s`
+      + (result.endpoint ? ` · ${result.model}@${result.endpoint.replace(/^https?:\/\//, "")}` : ""), "ok");
   } catch (error) {
     body.innerHTML = "";
     body.appendChild(el("p", "err", `判定失败：${error.message}`));

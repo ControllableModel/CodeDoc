@@ -57,9 +57,11 @@ AXES = {
 }
 
 DEFAULTS = {
-    "base_url": "https://apic1.ohmycdn.com/v1",
-    #: separate judge model: it must accept temperature 0 (gpt-6-luna does not)
-    "model": "deepseek-v4-flash",
+    #: The judge runs on the DeepSeek official API, not on the generation gateway:
+    #: it accepts temperature 0, which gpt-6-luna does not, and a scoring instrument has
+    #: to be reproducible.
+    "base_url": os.environ.get("JUDGE_URL", "https://api.deepseek.com/v1"),
+    "model": os.environ.get("JUDGE_MODEL", "deepseek-chat"),
     "judge_temperature": 0.0,
 }
 
@@ -387,6 +389,8 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--limit-docs", type=int, default=0)
+    ap.add_argument("--judge-url", default=None)
+    ap.add_argument("--judge-model", default=None)
     ap.add_argument("--docs-root", default=str(MATRIX),
                     help="root holding the documents (default outputs/matrix)")
     ap.add_argument("--layout", choices=["matrix", "flat"], default="matrix",
@@ -395,13 +399,17 @@ def main() -> int:
     ap.add_argument("--report-only", action="store_true",
                     help="skip judging, only re-aggregate existing score files")
     args = ap.parse_args()
+    if args.judge_url:
+        DEFAULTS["base_url"] = args.judge_url
+    if args.judge_model:
+        DEFAULTS["model"] = args.judge_model
     globals()["DOCS_ROOT"] = Path(args.docs_root)
     globals()["LAYOUT"] = args.layout
 
     if not args.report_only:
-        api_key = os.environ.get("LLM_KEY", "")
+        api_key = os.environ.get("JUDGE_KEY") or os.environ.get("LLM_KEY", "")
         if not api_key:
-            print("LLM_KEY is not set; refusing to run")
+            print("JUDGE_KEY (or LLM_KEY) is not set; refusing to run")
             return 2
         root_for_repos = DOCS_ROOT if LAYOUT == "flat" else DOCS_ROOT / args.axes[0]
         repos = args.repos or sorted(p.name for p in root_for_repos.iterdir() if p.is_dir())

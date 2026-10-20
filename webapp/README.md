@@ -131,3 +131,25 @@ Entity-applicable dimensions are selected with `criterion_set.entity_level()` (t
 criterion's `level` field), not with `applies_to(kind)`: a dimension that names no kinds
 applies to every kind, so the kind test silently keeps all 26 ISO dimensions instead of
 the 14 that govern a single entity.
+
+## RepoAgent baseline
+
+`scripts/run_repoagent.py` runs the published RepoAgent over the same entity set and
+adapts its output so the same judge can score it. Four obstacles, each of which would
+otherwise have produced a quietly unfair comparison:
+
+* **Entity scope.** RepoAgent documents every object it parses, and the working trees held
+  13,019 entities against our 578. The working copy is pruned to the sampled entities,
+  with kept objects sliced from the original source. Nested entities (closures, classes
+  built inside factories) are documented too: because RepoAgent walks the whole AST, the
+  pruner keeps their outermost enclosing definition rather than dropping them.
+* **Its own .gitignore.** When the target has no `.gitignore`, RepoAgent falls back to the
+  one shipped with its repository, which ignores `lib/`, `build/`, `dist/` and more. That
+  silently dropped every sampled entity under such a directory (numpy lost 9 files, 16
+  entities). The working tree now carries a permissive `.gitignore`.
+* **Git dependency.** Its ChangeDetector drives everything through GitPython, so a plain
+  directory fails with InvalidGitRepositoryError; each working tree is git-initialised.
+* **Temperature.** The CLI default is 0.2 and gpt-6-luna accepts only the default, so the
+  run appears to hang while llama_index retries. Pinned to 1, matching CodeDoc.
+
+Coverage after the fixes: 578/578 sampled entities, per repository, zero missing.

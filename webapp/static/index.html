@@ -146,6 +146,18 @@
     <label class="row"><span>模型</span>
       <input id="cfgModel" placeholder="deepseek-chat" />
     </label>
+
+    <label class="row"><span>判定端点</span>
+      <input id="cfgJudgeBase" placeholder="https://api.deepseek.com/v1" />
+      <small>判定单独走另一家：gpt-6-luna 只接受默认温度，判官需要温度 0</small>
+    </label>
+    <label class="row"><span>判定模型</span>
+      <input id="cfgJudgeModel" placeholder="deepseek-chat" />
+    </label>
+    <label class="row"><span>判定 Key</span>
+      <input id="cfgJudgeKey" type="password" placeholder="留空则沿用上面的 Key" autocomplete="off" />
+      <small id="judgeKeyHint"></small>
+    </label>
     <label class="row"><span>生成温度</span>
       <input id="cfgTemp" type="number" step="0.1" min="0" max="2" />
     </label>

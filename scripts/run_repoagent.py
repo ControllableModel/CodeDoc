@@ -89,6 +89,44 @@ def prune_source(text: str, wanted_classes: set, wanted_functions: set,
     except SyntaxError:
         return text
 
+    # A sampled entity may be nested (a closure inside a decorator, a class built inside
+    # a factory). RepoAgent walks the whole AST, so it *can* document those, but only if
+    # the enclosing definition is present: map every wanted name to its outermost
+    # enclosing module-level statement and keep that.
+    wanted_all = set(wanted_classes) | set(wanted_functions) | {
+        name for names in wanted_methods.values() for name in names}
+    outer_by_name: dict = {}
+
+    def note_outer(node, outer):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            outer_by_name.setdefault(node.name, outer)
+            for child in ast.iter_child_nodes(node):
+                note_outer(child, outer)
+        else:
+            for child in ast.iter_child_nodes(node):
+                note_outer(child, outer)
+
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            note_outer(node, node)
+
+    def outer_names_for(name: str) -> list:
+        outer = outer_by_name.get(name)
+        return [outer.name] if outer is not None else [name]
+
+    # names whose outermost container must be kept whole (nested entities)
+    extended_classes = set(wanted_classes)
+    extended_functions = set(wanted_functions)
+    for name in wanted_all:
+        outer = outer_by_name.get(name)
+        if outer is None or outer.name == name:
+            continue
+        if isinstance(outer, ast.ClassDef):
+            extended_classes.add(outer.name)
+        else:
+            extended_functions.add(outer.name)
+    wanted_classes, wanted_functions = extended_classes, extended_functions
+
     keep_spans = []
     # module docstring and imports stay, so the pruned file still parses
     for node in tree.body:
@@ -142,6 +180,15 @@ def prepare(repo: str, by_file: dict) -> Path:
     if work.exists():
         shutil.rmtree(work, ignore_errors=True)
     work.mkdir(parents=True, exist_ok=True)
+    # RepoAgent falls back to its *own* .gitignore when the target has none, and that
+    # file ignores lib/, build/, dist/ and more -- which silently dropped every sampled
+    # entity living under such a directory (numpy lost 9 files that way). A permissive
+    # .gitignore in the working tree keeps the baseline's own filter out of the sample.
+    (work / ".gitignore").write_text(
+        "# intentionally permissive: the baseline must see every sampled file\n"
+        "__pycache__/\n*.py[cod]\n",
+        encoding="utf-8")
+
     for rel, entities in by_file.items():
         src = TARGETS / repo / rel
         dst = work / rel
@@ -192,7 +239,7 @@ def run_repoagent(work: Path, threads: int, timeout: int, extra_args: list) -> d
     }
 
 
-SECTION = re.compile(r"^(#{2,3})\s+(ClassDef|FunctionDef)\s+([A-Za-z_][A-Za-z0-9_]*)")
+SECTION = re.compile(r"^(#{2,6})\s+(ClassDef|FunctionDef)\s+([A-Za-z_][A-Za-z0-9_]*)")
 
 
 def split_sections(md_text: str) -> list:
@@ -233,29 +280,37 @@ def adapt(repo: str, by_file: dict, work: Path) -> dict:
             missing.extend(entity["qname"] for entity in entities)
             continue
         sections = split_sections(md_path.read_text(encoding="utf-8", errors="replace"))
-        # classes and functions are level-2, methods are level-3 under their class
-        class_current = ""
+        # Headings deepen with nesting, so keep a stack of enclosing definitions instead
+        # of assuming methods are exactly one level below their class. Nested entities
+        # (closures, classes built inside factories) appear at depth 3 or more.
         index: dict = {}
+        stack: list = []
         for section in sections:
-            if section["level"] == 2 and section["kind"] == "ClassDef":
-                class_current = section["name"]
-                index[("class", section["name"])] = section["body"]
-            elif section["level"] == 2:
-                class_current = ""
-                index[("function", section["name"])] = section["body"]
-            elif section["level"] == 3:
-                index[("method", class_current, section["name"])] = section["body"]
+            while stack and stack[-1]["level"] >= section["level"]:
+                stack.pop()
+            parents = list(stack)
+            stack.append(section)
+            chain = [p["name"] for p in parents]
+            if not parents:
+                key = ("class" if section["kind"] == "ClassDef" else "function",
+                       section["name"])
+            elif parents[0]["kind"] == "ClassDef":
+                key = ("method", parents[0]["name"], section["name"])
+            else:
+                key = ("nested", tuple(chain), section["name"])
+            index[key] = section["body"]
+            index.setdefault(("byname", section["name"]), section["body"])
 
         for entity in entities:
             if entity["kind"] == "class":
-                body = index.get(("class", entity["name"]))
+                body = index.get(("class", entity["name"])) or index.get(("byname", entity["name"]))
             elif entity["kind"] == "method":
                 body = (index.get(("method", entity["owner"], entity["name"]))
-                        or index.get(("method", entity["name"]))
+                        or index.get(("byname", entity["name"]))
                         or next((v for k, v in index.items()
-                                 if k[0] == "method" and k[-1] == entity["name"]), None))
+                                 if k[0] in ("method", "nested") and k[-1] == entity["name"]), None))
             else:
-                body = index.get(("function", entity["name"]))
+                body = index.get(("function", entity["name"])) or index.get(("byname", entity["name"]))
             if not body:
                 missing.append(entity["qname"])
                 continue
@@ -277,17 +332,37 @@ def main() -> int:
     ap.add_argument("--reuse-work", action="store_true",
                     help="keep the pruned working tree from a previous run")
     ap.add_argument("--extra", default="", help="extra CLI args passed to repo_agent run")
+    ap.add_argument("--repair", action="store_true",
+                    help="re-run only the files whose sampled entities produced no document")
     args = ap.parse_args()
 
     repos = args.repos or sorted(p.name for p in TARGETS.iterdir() if p.is_dir())
     summary = []
+
+    def safe(qname: str) -> str:
+        return (qname.replace(".", "_").replace("/", "_").replace("#", "_")
+                .replace("<", "_").replace(">", "_"))
     for repo in repos:
         by_file = sample_map(repo, args.limit, args.seed)
         if not by_file:
             print(f"skip {repo}: no sampled entities")
             continue
+        if args.repair:
+            have = {f.stem for f in (OUT / repo).glob("*.md")} if (OUT / repo).is_dir() else set()
+            missing = [e for entities in by_file.values() for e in entities
+                       if safe(e["qname"]) not in have]
+            if not missing:
+                print(f"{repo}: nothing to repair", flush=True)
+                continue
+            missing_q = {e["qname"] for e in missing}
+            by_file = {rel: [e for e in entities if e["qname"] in missing_q]
+                       for rel, entities in by_file.items()}
+            by_file = {rel: entities for rel, entities in by_file.items() if entities}
+            print(f"{repo}: repairing {len(missing)} entities in {len(by_file)} files",
+                  flush=True)
+
         work = WORK / repo
-        if not args.reuse_work:
+        if args.repair or not args.reuse_work:
             work = prepare(repo, by_file)
         print(f"{repo}: {sum(len(v) for v in by_file.values())} entities in "
               f"{len(by_file)} files -> {work}", flush=True)
