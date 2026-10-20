@@ -10,6 +10,6 @@ Repository layout (six libraries)
 6. ``outputs/``          Documentation store — generated artifacts (never committed).
 """
 
-__version__ = "0.2.0"
+__version__ = "1.0.0"
 
 __all__ = ["__version__"]
