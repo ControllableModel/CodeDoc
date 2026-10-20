@@ -49,10 +49,13 @@ DEFAULT_CONFIG = {
     "api_key": "",
     "base_url": "https://apic1.ohmycdn.com/v1",
     "model": "gpt-6-luna",
-    #: The judge is a separate model on purpose: gpt-6-luna accepts only the default
-    #: temperature, and a scoring instrument needs temperature 0 so that re-running a
-    #: judgement reproduces it.
-    "judge_model": "deepseek-v4-flash",
+    #: Generation and judging use different endpoints on purpose: generation runs on the
+    #: ohmygpt gateway (gpt-6-luna), while judging runs on the DeepSeek official API,
+    #: which accepts temperature 0. A scoring instrument must be reproducible, and
+    #: gpt-6-luna accepts only the default temperature.
+    "judge_base_url": "https://api.deepseek.com/v1",
+    "judge_api_key": "",
+    "judge_model": "deepseek-chat",
     "judge_temperature": 0.0,
     "use_max_completion_tokens": True,
     "max_completion_tokens": 8000,
@@ -262,9 +265,9 @@ def score_dir(repo_name: str, axis: str) -> Path:
 def judge_document(repo_name: str, qname: str, axis: str, config: dict) -> dict:
     from codedoc.judge.query import LLM_Remote_query, judge_with_retry
 
-    key = config.get("api_key") or ""
+    key = (config.get("judge_api_key") or config.get("api_key") or "")
     if not key:
-        raise RuntimeError("no API key configured")
+        raise RuntimeError("no judge API key configured")
     safe = qname.replace(".", "_").replace("/", "_").replace("#", "_")
     doc_path = ROOT / "outputs" / "console" / (repo_name or "custom") / f"{safe}.md"
     if not doc_path.exists():
@@ -274,9 +277,9 @@ def judge_document(repo_name: str, qname: str, axis: str, config: dict) -> dict:
     criteria = rubric_for(axis)
     judge = LLM_Remote_query(
         api_key=key,
-        api_url=config.get("base_url") or DEFAULT_CONFIG["base_url"],
-        model=(config.get("judge_model") or config.get("model")
-               or DEFAULT_CONFIG["judge_model"]),
+        api_url=(config.get("judge_base_url") or config.get("base_url")
+                 or DEFAULT_CONFIG["judge_base_url"]),
+        model=(config.get("judge_model") or DEFAULT_CONFIG["judge_model"]),
     )
     judge.judge_temperature = float(config.get("judge_temperature", 0.0))
     judge.use_max_completion_tokens = bool(config.get("use_max_completion_tokens", True))
@@ -295,6 +298,7 @@ def judge_document(repo_name: str, qname: str, axis: str, config: dict) -> dict:
         "axis_label": JUDGE_AXES[axis][0],
         "document": doc_path.name,
         "model": judge.model,
+        "endpoint": judge.api_url,
         "temperature": (judge.effective_temperature
                         if judge.effective_temperature is not None
                         else judge.judge_temperature),
@@ -372,10 +376,15 @@ def start_judge_batch(spec: dict, axis: str, config: dict, workers: int) -> str:
 
 def public_config(config: dict) -> dict:
     """Never send the key back to the browser; only whether one is present."""
-    view = {k: v for k, v in config.items() if k != "api_key"}
+    view = {k: v for k, v in config.items()
+            if k not in ("api_key", "judge_api_key")}
     key = config.get("api_key") or ""
     view["api_key_present"] = bool(key)
     view["api_key_hint"] = (key[:6] + "…" + key[-4:]) if len(key) > 12 else ""
+    judge_key = config.get("judge_api_key") or ""
+    view["judge_api_key_present"] = bool(judge_key)
+    view["judge_api_key_hint"] = ((judge_key[:6] + "…" + judge_key[-4:])
+                                  if len(judge_key) > 12 else "")
     return view
 
 
@@ -1029,8 +1038,8 @@ class Handler(BaseHTTPRequestHandler):
                 for key in DEFAULT_CONFIG:
                     if key in body:
                         config[key] = body[key]
-                if not config.get("api_key"):
-                    raise RuntimeError("no API key configured")
+                if not (config.get("judge_api_key") or config.get("api_key")):
+                    raise RuntimeError("no judge API key configured")
                 job_id = start_judge_batch({
                     "repo_name": body.get("repo", ""),
                     "custom_path": body.get("path", ""),
