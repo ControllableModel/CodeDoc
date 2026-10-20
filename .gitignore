@@ -112,3 +112,14 @@ standards/*
 webapp/config.local.json
 outputs/console/
 
+# Baseline tooling: the cloned RepoAgent tree, its dedicated Python 3.11 venv, the
+# pruned working copies handed to it, and the wheels staged for the offline install.
+# All of it is reproducible with scripts/run_repoagent.py and a clone; none of it is
+# source we author.
+third_party/RepoAgent/
+third_party/.venv-repoagent311/
+third_party/.venv-repoagent/
+third_party/rawork/
+third_party/wheels/
+third_party/pip-repoagent*.log
+third_party/wheels-download.log

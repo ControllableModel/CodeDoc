@@ -46,6 +46,8 @@ from codedoc.judge.query import LLM_Remote_query, judge_with_retry  # noqa: E402
 from codedoc.sampling import pick_entities  # noqa: E402
 
 MATRIX = ROOT / "outputs" / "matrix"
+DOCS_ROOT = MATRIX
+LAYOUT = "matrix"
 ANALYSIS = ROOT / "results" / "analysis"
 
 #: rubric id -> judge settings
@@ -85,6 +87,18 @@ def build_qname_map(repo: str, limit: int, seed: int) -> dict:
             "path": ctx.entity.path,
         }
     return mapping
+
+
+def doc_dir(axis: str, repo: str) -> Path:
+    """Where the documents for this axis live.
+
+    The matrix layout separates the two generated sets (root/axis/repo); a baseline
+    produces one set only, so the same documents are scored once per rubric
+    (root/repo) and the score directories keep them apart.
+    """
+    if LAYOUT == "flat":
+        return DOCS_ROOT / repo
+    return DOCS_ROOT / axis / repo
 
 
 def rubric_for(axis: str) -> list:
@@ -177,7 +191,7 @@ def aggregate(axis: str) -> dict:
     documents = 0
     empty = 0
 
-    for score_file in sorted((MATRIX / axis).rglob("scores_*/*.json")):
+    for score_file in sorted(DOCS_ROOT.rglob(f"scores_{axis}/*.json")):
         try:
             payload = json.loads(score_file.read_text(encoding="utf-8"))
         except ValueError:
@@ -276,7 +290,7 @@ def aggregate(axis: str) -> dict:
     }
 
 
-def write_reports(results: list) -> None:
+def write_reports(results: list, tag: str = "") -> None:
     lines = ["# Rubric scores for the generated documentation sets", "",
              f"* judge: `{DEFAULTS['model']}`, temperature {DEFAULTS['judge_temperature']}",
              "* two levels are reported: the rubric's main dimensions (ISO: 8 categories, "
@@ -351,8 +365,8 @@ def write_reports(results: list) -> None:
             lines.append(f"| {repo} | " + " | ".join(cells) + " |")
         lines.append("")
 
-    (ANALYSIS / "matrix_scores.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    (ANALYSIS / "matrix_scores.json").write_text(
+    (ANALYSIS / f"matrix_scores{tag}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (ANALYSIS / f"matrix_scores{tag}.json").write_text(
         json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
 
     # one flat CSV per axis, for LaTeX tables
@@ -361,7 +375,7 @@ def write_reports(results: list) -> None:
         for row in result["dimensions"]:
             rows.append(f"\"{row['category']}\",\"{row['dimension']}\",{row['n']},"
                         f"{row['mean'] if row['mean'] is not None else ''},{row['sd'] or ''}")
-        (ANALYSIS / f"matrix_scores_{result['axis']}.csv").write_text(
+        (ANALYSIS / f"matrix_scores{tag}_{result['axis']}.csv").write_text(
             "\n".join(rows) + "\n", encoding="utf-8")
 
 
@@ -373,28 +387,36 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--limit-docs", type=int, default=0)
+    ap.add_argument("--docs-root", default=str(MATRIX),
+                    help="root holding the documents (default outputs/matrix)")
+    ap.add_argument("--layout", choices=["matrix", "flat"], default="matrix",
+                    help="matrix: <root>/<axis>/<repo>; flat: <root>/<repo> scored per axis")
+    ap.add_argument("--report-tag", default="", help="suffix for the report files")
     ap.add_argument("--report-only", action="store_true",
                     help="skip judging, only re-aggregate existing score files")
     args = ap.parse_args()
+    globals()["DOCS_ROOT"] = Path(args.docs_root)
+    globals()["LAYOUT"] = args.layout
 
     if not args.report_only:
         api_key = os.environ.get("LLM_KEY", "")
         if not api_key:
             print("LLM_KEY is not set; refusing to run")
             return 2
-        repos = args.repos or sorted(p.name for p in (MATRIX / args.axes[0]).iterdir() if p.is_dir())
+        root_for_repos = DOCS_ROOT if LAYOUT == "flat" else DOCS_ROOT / args.axes[0]
+        repos = args.repos or sorted(p.name for p in root_for_repos.iterdir() if p.is_dir())
         qname_maps = {repo: build_qname_map(repo, args.limit, args.seed) for repo in repos}
         criteria_sets = {axis: rubric_for(axis) for axis in args.axes}
 
         tasks = []
         for axis in args.axes:
             for repo in repos:
-                doc_dir = MATRIX / axis / repo
-                if not doc_dir.is_dir():
+                docs_dir = doc_dir(axis, repo)
+                if not docs_dir.is_dir():
                     continue
-                score_dir = doc_dir / f"scores_{axis}"
+                score_dir = docs_dir / f"scores_{axis}"
                 score_dir.mkdir(parents=True, exist_ok=True)
-                docs = sorted(doc_dir.glob("*.md"))
+                docs = sorted(docs_dir.glob("*.md"))
                 if args.limit_docs:
                     docs = docs[:args.limit_docs]
                 for doc in docs:
@@ -412,14 +434,14 @@ def main() -> int:
                   f"{(time.time() - stats['started']) / 60:.1f} min")
 
     results = [aggregate(axis) for axis in args.axes]
-    write_reports(results)
+    write_reports(results, args.report_tag)
     for result in results:
         print(f"\n{result['axis']}: {result['documents']} docs, "
               f"overall {result['overall_mean']}, "
               f"{len(result['main_dimensions'])} main dimensions")
         for row in result["main_dimensions"]:
             print(f"   {row['category']:<34} {row['mean_of_dimension_means']}")
-    print(f"\nreport: {ANALYSIS / 'matrix_scores.md'}")
+    print(f"\nreport: {ANALYSIS / f'matrix_scores{args.report_tag}.md'}")
     return 0
 
 
