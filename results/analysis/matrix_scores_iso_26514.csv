@@ -1,15 +1,15 @@
 main_dimension,dimension,n,mean,sd
-"Content Quality","Correctness",578,4.415,0.689
-"Content Quality","Consistency",578,4.761,0.497
-"Content Quality","Comprehensibility",578,4.877,0.333
-"Content Quality","Conciseness",578,3.988,0.405
-"Content Quality","Completeness",578,4.282,0.872
-"Information Structure","Modularity",578,4.965,0.183
-"Information Structure","Structured by Function",578,4.974,0.17
-"Information Structure","Navigability",578,4.967,0.178
-"Information Structure","Metadata",578,4.111,0.418
-"Format & Presentation","Consistent Format",578,4.896,0.305
-"Format & Presentation","Legibility",578,4.953,0.211
+"Content Quality","Correctness",578,4.732,0.447
+"Content Quality","Consistency",578,4.972,0.174
+"Content Quality","Comprehensibility",578,4.808,0.394
+"Content Quality","Conciseness",578,3.995,0.208
+"Content Quality","Completeness",578,4.45,0.786
+"Information Structure","Modularity",578,4.984,0.124
+"Information Structure","Structured by Function",578,4.984,0.124
+"Information Structure","Navigability",578,4.986,0.117
+"Information Structure","Metadata",578,4.875,0.33
+"Format & Presentation","Consistent Format",578,4.893,0.309
+"Format & Presentation","Legibility",578,4.998,0.042
 "Internationalization & Localization","Cultural Neutrality",578,5.0,
-"Internationalization & Localization","Translation-Friendly",578,4.434,0.496
-"Usability & User Experience","User-Centered Design",578,4.63,0.531
+"Internationalization & Localization","Translation-Friendly",578,4.528,0.499
+"Usability & User Experience","User-Centered Design",578,4.112,0.381

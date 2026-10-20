@@ -43,6 +43,7 @@ from codedoc.config import TARGETS  # noqa: E402
 from codedoc.criteria import registry  # noqa: E402
 from codedoc.deps.relations_index import build_index  # noqa: E402
 from codedoc.judge.query import LLM_Remote_query, judge_with_retry  # noqa: E402
+from codedoc.writer.usage import RECORDER  # noqa: E402
 from codedoc.sampling import pick_entities  # noqa: E402
 
 MATRIX = ROOT / "outputs" / "matrix"
@@ -55,6 +56,9 @@ AXES = {
     "iso_26514": {"entity_level_only": True, "label": "ISO/IEC 26514"},
     "github_docs_style": {"entity_level_only": False, "label": "GitHub docs style"},
 }
+
+#: judged tokens are priced by the judge's own endpoint (CNY per million)
+JUDGE_PRICE = {"currency": "CNY", "input": 2.0, "cached_input": 0.2, "output": 8.0}
 
 DEFAULTS = {
     #: The judge runs on the DeepSeek official API, not on the generation gateway:
@@ -436,10 +440,21 @@ def main() -> int:
 
         print(f"documents to judge: {len(tasks)} (already-scored skipped)")
         if tasks:
+            before = [r for r in RECORDER.records if r.get("phase", "").startswith("judge")]
             stats = run_judging(args, tasks, criteria_sets, api_key)
+            mine = [r for r in RECORDER.records
+                    if r.get("phase", "").startswith("judge")][len(before):]
+            prompt_tokens = sum(r["prompt_tokens"] for r in mine)
+            completion_tokens = sum(r["completion_tokens"] for r in mine)
+            cached = sum(r.get("cached_tokens", 0) for r in mine)
+            cost = (max(0, prompt_tokens - cached) / 1e6 * JUDGE_PRICE["input"]
+                    + cached / 1e6 * JUDGE_PRICE["cached_input"]
+                    + completion_tokens / 1e6 * JUDGE_PRICE["output"])
             print(f"judged {stats['done']}, failed {stats['failed']}, "
                   f"unparsed {stats['unparsed']}, "
                   f"{(time.time() - stats['started']) / 60:.1f} min")
+            print(f"judge tokens: in {prompt_tokens:,} (cached {cached:,}) / "
+                  f"out {completion_tokens:,} -> {JUDGE_PRICE['currency']} {cost:.2f}")
 
     results = [aggregate(axis) for axis in args.axes]
     write_reports(results, args.report_tag)
