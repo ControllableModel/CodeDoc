@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the accompanying manuscript."
+title: "CodeDoc: Standards-Guided and Dependency-Aware Code-Level Documentation Generation"
+type: software
+license: MIT
+abstract: >-
+  Reference implementation of a standards-guided, dependency-aware approach to code-level
+  documentation generation. Documentation is generated per code entity from the entity's
+  source, its file path, and its static dependency context, steered by an explicit criterion
+  set derived from documentation standards (ISO/IEC/IEEE 26514 and GitHub documentation
+  style), and judged against that same criterion set so that generation and evaluation share
+  one definition of quality.
+version: 1.0.0
+date-released: 2026-10-21
+repository-code: "https://github.com/DZYCD/CodeEval"
+keywords:
+  - software documentation
+  - documentation generation
+  - large language models
+  - static analysis
+  - software engineering standards
+  - ISO/IEC/IEEE 26514
