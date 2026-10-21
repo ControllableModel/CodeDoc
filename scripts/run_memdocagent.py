@@ -57,29 +57,43 @@ def safe_name(qname: str) -> str:
             .replace("<", "_").replace(">", "_"))
 
 
-def run_tool(repo: str, work: Path, timeout: int) -> dict:
+def run_tool(repo: str, work: Path, timeout: int, wanted_ids: list) -> dict:
     env = dict(os.environ)
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUNBUFFERED"] = "1"
     env["PYTHONPATH"] = f"{TOOL}{os.pathsep}{TOOL / 'src'}"
     env["TOKENIZERS_PARALLELISM"] = "false"
+    # Restrict the tool to the sampled components; its own pruning is per file, so without
+    # this a 60-entity sample still documents every component in those files.
+    allow = OUTDIR / repo / "only.json"
+    allow.parent.mkdir(parents=True, exist_ok=True)
+    allow.write_text(json.dumps(sorted(wanted_ids)), encoding="utf-8")
+    env["MEMDOC_ONLY"] = str(allow)
     cmd = [str(PY), "main.py",
            "--repo-path", str(work),
            "--config-path", "config/agent_config.yaml",
            "--output-dir", str(OUTDIR / repo),
            "--mode", "default"]
     started = time.time()
-    try:
-        result = subprocess.run(cmd, cwd=str(TOOL), capture_output=True, text=True,
-                                encoding="utf-8", errors="replace", env=env,
-                                timeout=timeout)
-        rc, out, err = result.returncode, result.stdout or "", result.stderr or ""
-    except subprocess.TimeoutExpired as exc:
-        rc = -1
-        out = (exc.stdout or b"").decode("utf-8", "replace") if isinstance(exc.stdout, bytes) else (exc.stdout or "")
-        err = f"timed out after {timeout}s"
+    # Output goes to a file, never a pipe: these agents print per-component reasoning
+    # traces, which overflow the OS pipe buffer and deadlock a capturing parent long
+    # before the run finishes.
+    log_path = OUTDIR / repo / "run.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    timed_out = False
+    with open(log_path, "w", encoding="utf-8", errors="replace") as fh:
+        try:
+            result = subprocess.run(cmd, cwd=str(TOOL), stdout=fh,
+                                    stderr=subprocess.STDOUT, env=env, timeout=timeout)
+            rc = result.returncode
+        except subprocess.TimeoutExpired:
+            rc, timed_out = -1, True
+    text = log_path.read_text(encoding="utf-8", errors="replace")
+    tail = text[-4000:]
+    if timed_out:
+        tail += f"\n[timed out after {timeout}s]"
     return {"seconds": round(time.time() - started, 1), "returncode": rc,
-            "stdout_tail": out[-4000:], "stderr_tail": err[-4000:]}
+            "log_path": str(log_path), "stdout_tail": tail, "stderr_tail": ""}
 
 
 def adapt(repo: str, by_file: dict) -> dict:
@@ -117,6 +131,8 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--timeout", type=int, default=14400)
     ap.add_argument("--reuse-work", action="store_true", default=True)
+    ap.add_argument("--only-missing", action="store_true",
+                    help="re-document only entities that have no document yet")
     args = ap.parse_args()
 
     if not PY.exists():
@@ -138,9 +154,23 @@ def main() -> int:
                 work = prepare_pruned(repo, by_file)
             finally:
                 run_repoagent.WORK = original
+        if args.only_missing:
+            existing = {p.stem for p in (OUT / repo).glob("*.md")}
+            filtered = {}
+            for rel, ents in by_file.items():
+                keep = [e for e in ents if safe_name(e["qname"]) not in existing]
+                if keep:
+                    filtered[rel] = keep
+            skipped = sum(len(v) for v in by_file.values()) - sum(len(v) for v in filtered.values())
+            print(f"{repo}: --only-missing skips {skipped} already documented", flush=True)
+            by_file = filtered
+            if not by_file:
+                print(f"{repo}: nothing left to do", flush=True)
+                continue
         entities = sum(len(v) for v in by_file.values())
         print(f"{repo}: {entities} entities in {len(by_file)} files -> {work}", flush=True)
-        result = run_tool(repo, work, args.timeout)
+        wanted = [e["qname"] for ents in by_file.values() for e in ents]
+        result = run_tool(repo, work, args.timeout, wanted)
         print(f"  tool: rc={result['returncode']} {result['seconds']}s", flush=True)
         adapted = adapt(repo, by_file)
         print(f"  adapted: {adapted['written']} documents, {len(adapted['empty'])} empty, "

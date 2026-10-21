@@ -129,6 +129,48 @@ def format_dep(info: Dict[str, object], include_deps: bool = True) -> str:
 {relations}"""
 
 
+def render_evidence(info: Dict[str, object]) -> str:
+    """Mechanical evidence block for the ``{evidence}`` placeholder.
+
+    The criteria CodeDoc scores worst on ask for facts that are decidable from the AST but
+    were previously left to the model to infer: every return path (Completeness), every
+    exception the body can raise (GitHub "Error Reference Content"), and the exact
+    signature (GitHub "Reference Content"). Handing them over as evidence costs a few
+    hundred input tokens and removes the guesswork.
+
+    Line numbers are relative to the source excerpt in the prompt, which is why the block
+    says so: quoting file line numbers here would be wrong after clipping.
+    """
+    signals = info.get("signals") or {}
+    if not isinstance(signals, dict):
+        return ""
+    blocks = []
+
+    signature = str(signals.get("signature") or "").strip()
+    if signature:
+        blocks.append("### Signature\n```python\n" + signature + "\n```")
+    elif str(info.get("kind") or "") == "class":
+        blocks.append("### Signature\n(class declaration — see the source below)")
+
+    returns = signals.get("returns") or []
+    if isinstance(returns, list) and returns:
+        rows = [f"- excerpt line {r['line']}: `return {r['value']}`" for r in returns[:12]]
+        if len(returns) > 12:
+            rows.append(f"- ... {len(returns) - 12} more return statements")
+        blocks.append("### Return statements in the body\n" + "\n".join(rows))
+
+    raises = signals.get("raises") or []
+    if isinstance(raises, list) and raises:
+        rows = [f"- excerpt line {r['line']}: `raise {r['name']}`" for r in raises[:12]]
+        if len(raises) > 12:
+            rows.append(f"- ... {len(raises) - 12} more raise statements")
+        blocks.append("### Raise statements in the body\n" + "\n".join(rows))
+
+    if not blocks:
+        return ""
+    return "## Evidence extracted from the source (mechanical, not inferred)\n\n" + "\n\n".join(blocks)
+
+
 def build_prompt(info: Dict[str, object], args) -> str:
     """Assemble the generation prompt for one entity.
 
@@ -142,6 +184,7 @@ def build_prompt(info: Dict[str, object], args) -> str:
     uses = _build_section(info["uses"], "Dependencies") if args.relevant else ""      # type: ignore[arg-type]
     used_by = _build_section(info["used_by"], "Dependents") if args.relevant else ""  # type: ignore[arg-type]
     relations = render_relations(info) if args.relevant else ""
+    evidence = render_evidence(info)
     source_text = str(info.get("prompt_source") or info["source_code"])
     cap = int(getattr(args, "max_tokens", 0) or 0)
     configured = int(getattr(args, "source_budget", 0) or DEFAULT_SOURCE_BUDGET)
@@ -165,7 +208,7 @@ def build_prompt(info: Dict[str, object], args) -> str:
         template = "Generate docs for {real_name}\n\n{source_code}\n\n{uses}\n{used_by}\n{relations}"
 
     # Budget the source from what the template and the other sections leave over.
-    overhead = len(template) + len(uses) + len(used_by) + len(relations) + 200
+    overhead = len(template) + len(uses) + len(used_by) + len(relations) + len(evidence) + 200
     budget = configured if not cap else max(400, min(configured, cap - overhead))
     source = clip_source(source_text, budget)
 
@@ -176,13 +219,20 @@ def build_prompt(info: Dict[str, object], args) -> str:
         uses=uses,
         used_by=used_by,
         relations=relations,
+        evidence=evidence,
+        # Older templates spell this {signals}; both names carry the same block so a
+        # template written either way keeps working.
+        signals=evidence,
+        kind=str(info.get("kind") or ""),
+        qname=str(info.get("qualified_name") or info["real_name"]),
         language=args.language,
     )
     try:
         return template.format(**values)
     except KeyError:
         # Template predates one of the placeholders (e.g. ``relations``).
-        values.pop("relations", None)
+        for optional in ("relations", "evidence", "signals", "kind", "qname"):
+            values.pop(optional, None)
         return template.format(**values)
 
 

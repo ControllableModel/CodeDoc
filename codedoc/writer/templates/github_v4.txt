@@ -1,0 +1,155 @@
+You are an AI documentation assistant. Document ONE code entity in the style of GitHub's
+documentation guidance.
+
+---
+## How this document is scored (18 criteria, 5 families)
+
+| Family | Criteria |
+|---|---|
+| Content Types & Completeness | Getting Started, Process, Prerequisites, Further Reading, Next Steps |
+| Article Content Families | Conceptual, Tutorial, Error Reference, Reference |
+| Styling & Formatting | Introduction standards, Product label standards, Title standards, Permission declarations |
+| Structure & Organization | Content order, Balanced hierarchy, Category title naming |
+| Content Quality | Content type consistency, Reuse instead of copying |
+
+The criteria this shape of documentation most often fails, and how this template addresses
+each one:
+
+- **Content type consistency** — an article stays inside ONE content type. This artefact is
+  **Reference** content. The single deliberate exception is Getting Started: a short opening
+  sequence that orients the reader, not a full tutorial.
+- **Reference Content** — structured, not narrated: signature, parameter table, return table,
+  error table, and a Behaviour section that states meaning rather than restating arguments.
+- **Error Reference** — errors documented per exception, separately from troubleshooting.
+- **Conceptual content** — carried by the Overview, which explains the problem and the design
+  intent in three short paragraphs rather than one line.
+- **Further Reading and Next Steps are required**, not optional: they are what makes the page
+  a hub. Name the related entities explicitly.
+- **Content order** — prerequisites before usage; reference material grouped together.
+
+---
+## Target entity
+
+- **Name:** `{real_name}`
+- **Kind:** {kind}
+- **Qualified name:** `{qname}`
+- **File path:** `{path}`
+
+{signals}
+
+## Source code
+
+```python
+{source_code}
+```
+
+{uses}
+
+{used_by}
+
+{relations}
+
+---
+## Output rules — read before writing
+
+1. **Emit the sections below in the given order.** For conditional sections, drop the whole
+   section when the condition fails: no "None", no "N/A", no empty table.
+2. **`## Behaviour` is mandatory** and must cover all five families — what it does, inputs,
+   outputs, failures, side effects — one labelled line each. When the source does not show a
+   family, say so in one clause instead of dropping the line.
+3. **Declare the content type once in Metadata and stay inside it.**
+4. **Reference material is tabular**: signature in a code fence, parameters / returns /
+   errors in tables.
+5. **Errors get their own table keyed by exception**, derived from the raise statements in
+   the evidence above. Never invent an exception the source cannot raise.
+6. **No invented facts** — no version, date, author, license, benchmark, or behaviour the
+   source does not show.
+7. **Length: 250–400 words for a function or method, 500–700 for a class.**
+8. **Headings: H1 then H2 only.** Titles stay under 80 characters; the qualified name lives
+   in Metadata, not in the H1.
+9. **Do not copy the dependency source blocks** into the document; refer to them.
+
+---
+## Required output
+
+# `{real_name}` ({kind})
+
+## Metadata
+- **Symbol:** `{qname}`
+- **FilePath:** `{path}`
+- **Kind:** {kind}
+- **Content Type:** Reference
+- **Audience:** integrator or maintainer
+
+## Overview
+(Three short paragraphs of one to two sentences each, 60–120 words total — the conceptual
+carrier of this page: what it is, the problem it solves for the caller, when to use it and
+when not to.)
+
+## Behaviour
+(Required. Five labelled lines, each traceable to the source.)
+- **Function:** what it does, and the essence of its flow.
+- **Inputs:** meaning, defaults and the constraints the source enforces.
+- **Outputs:** every return path and its meaning; what the caller observes if nothing is
+  returned.
+- **Failures:** each exception raised or propagated, with its trigger condition.
+- **Side effects:** state mutations, I/O, network calls, or "none".
+
+## Getting Started
+*(Emit only if the entity is callable from outside its module.)*
+
+**Prerequisites** — imports, configuration, environment variables, and required
+**Permissions** (state "none required" only when the source shows no access check or auth).
+
+1. (obtain or construct what the entity needs)
+2. (the call itself)
+3. (what the caller observes — returned value or emitted effect)
+
+```python
+# Minimal call built from the signature above. No invented arguments.
+```
+
+## Parameters
+*(Emit only if the signature has parameters.)*
+
+| Name | Type | Default | Description | Constraints |
+|---|---|---|---|---|
+
+## Returns
+*(Emit only if the body returns a value.)*
+
+| Type | When it is returned |
+|---|---|
+
+## Errors
+*(Emit only if the source raises, re-raises or propagates an exception.)*
+
+| Error | Raised when | Recovery |
+|---|---|---|
+
+## Related
+*(Emit only if the dependency context is non-empty.)*
+- **Uses:** ...
+- **Used by:** ...
+
+## Notes
+*(Emit only if a caller must know something first: ordering, statefulness, thread-safety.)*
+
+## Further Reading
+*(Always emit; two or three bullets, one line each, naming the related entities explicitly.)*
+- `(closest related entity from Uses or Used by)` — why a reader would go there next.
+- `(module or package that explains the surrounding behaviour)`.
+- The project documentation index, for the wider system this belongs to.
+
+## Next Steps
+*(Always emit; one or two bullets.)*
+- The action a caller takes after this returns successfully.
+- The check a caller should run before calling it again.
+
+## Accessibility
+*(Emit only for entities that render or emit user-facing text or UI.)*
+
+---
+**Output language:** {language}
+
+Write the document only — no preamble, no closing commentary, no meta-discussion.

@@ -1,0 +1,124 @@
+You are an AI documentation assistant. Document ONE code entity for ISO/IEC/IEEE 26514 and ISO/IEC 82079 software documentation.
+
+---
+## How this document is scored (14 entity-level criteria)
+
+| Criterion | Category | What it means here |
+|---|---|---|
+| Correctness | Content Quality | Every stated fact matches the implementation shown below |
+| Consistency | Content Quality | One term per concept; no UI-name drift |
+| Comprehensibility | Content Quality | Plain language a new maintainer can follow |
+| Conciseness | Content Quality | No redundancy, no filler, no restated code |
+| Completeness | Content Quality | Functionality, inputs, outputs, failure modes, preconditions all covered |
+| Modularity | Information Structure | Self-contained: readable without opening the source |
+| Structured by Function | Information Structure | Reference material grouped together, not scattered |
+| Navigability | Information Structure | Headings that let a reader jump to what they need |
+| Metadata | Information Structure | Symbol, path, kind, content type, audience present |
+| Consistent Format | Format & Presentation | One format per artefact type (tables for structured data) |
+| Legibility | Format & Presentation | Short sentences, no wall of text |
+| Cultural Neutrality | Internationalization | No locale-, region- or culture-specific claims |
+| Translation-Friendly | Internationalization | Simple sentences; one idea per sentence |
+| User-Centered Design | Usability | Written for the caller, not for the implementer |
+
+---
+## Target entity
+
+- **Name:** `{real_name}`
+- **Kind:** {kind}
+- **Qualified name:** `{qname}`
+- **File path:** `{path}`
+
+{signals}
+
+## Source code
+
+```python
+{source_code}
+```
+
+{uses}
+
+{used_by}
+
+{relations}
+
+---
+## Output rules — read before writing
+
+1. **Emit only the sections listed for this kind, and only when the condition holds.** Omit a
+   section entirely rather than writing "None", "N/A", "Not applicable" or an empty table.
+2. **Never restate the signature in prose.** The parameter table is the reference; prose that
+   repeats it is scored as redundancy.
+3. **No invented facts.** Every claim must be traceable to the source above, the evidence
+   blocks, or the metadata provided. Do not state a version, release date, author, license,
+   or benchmark, and do not describe behaviour the source does not show.
+4. **Cover all five fact families** or say the source does not show them: what it does;
+   inputs (name, type, default, constraint); outputs (every return path); failures (every
+   raised or propagated exception); side effects (mutations, I/O, network, subprocess).
+5. **Length budget: 120–250 words for a function or method, 250–450 for a class.** Filler
+   costs Conciseness and buys nothing.
+6. **Declare one content type.** This artefact is **Reference** content. Procedural material
+   appears only as a code example under Usage, never as numbered instructions.
+7. **Structured data goes in tables**, not prose: parameters, returns, errors, attributes.
+8. **Heading depth is H1 then H2 only.** No H3, no skipped levels.
+
+---
+## Required output
+
+# `{real_name}` ({kind})
+
+## Metadata
+- **Symbol:** `{qname}`
+- **FilePath:** `{path}`
+- **Kind:** {kind}
+- **Content Type:** Reference
+- **Audience:** integrator or maintainer (pick the closer one; no other values)
+
+## Overview
+(1–2 sentences, at most 50 words: what it does and when a caller reaches for it.)
+
+## Prerequisites
+*(Emit only if the source reads environment variables, files, network, config, or requires a specific decorator/registration.)*
+- **Requirements:** ...
+- **Assumptions:** ...
+
+## Usage
+*(Emit only if the entity is callable from outside its module.)*
+```python
+# A minimal call built from the signature and parameter table above.
+# Do not invent arguments that the signature does not accept.
+```
+
+## Parameters
+*(Emit only if the signature has parameters.)*
+
+| Name | Type | Default | Description | Constraints |
+|---|---|---|---|---|
+
+## Returns
+*(Emit only if the body contains a return statement with a value.)*
+
+| Type | When it is returned |
+|---|---|
+
+## Errors
+*(Emit only if the source raises, re-raises, or propagates an exception. Derive the rows from the raise statements above; do not invent error types.)*
+
+| Error | Raised when | Recovery |
+|---|---|---|
+
+## Related
+*(Emit only if the dependency context above is non-empty.)*
+- **Uses:** ...
+- **Used by:** ...
+
+## Notes
+*(Emit only if a caller must know something before using it, e.g. ordering, thread-safety, statefulness.)*
+
+## Accessibility
+*(Emit only for entities that render or emit user-facing text or UI.)*
+
+---
+**Output language:** {language}
+
+Write the document only — no preamble, no closing commentary, no meta-discussion.

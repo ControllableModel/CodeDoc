@@ -44,6 +44,20 @@ AXES = {
     "github_docs_style": "github.txt",
 }
 
+
+def template_for(axis: str, variant: str = "") -> Path:
+    """Template path for an axis, optionally a ``_<variant>`` revision of it.
+
+    The A/B between the original and the revised prompt has to leave the shipped
+    templates in place, so a variant is resolved by name (``iso_26514`` + ``v2`` ->
+    ``iso_26514_v2.txt``) instead of overwriting anything.
+    """
+    name = AXES[axis]
+    if variant:
+        stem, _, ext = name.rpartition(".")
+        name = f"{stem}_{variant}.{ext}"
+    return TEMPLATES / name
+
 DEFAULTS = {
     "base_url": "https://apic1.ohmycdn.com/v1",
     "model": "gpt-6-luna",
@@ -117,6 +131,8 @@ def main() -> int:
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--max-cost", type=float, default=5.0,
                     help="abort before exceeding this many USD (default 5.0)")
+    ap.add_argument("--variant", default="",
+                    help="template revision suffix, e.g. v2 -> iso_26514_v2.txt")
     ap.add_argument("--out", default=str(OUT_ROOT))
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
@@ -186,7 +202,7 @@ def main() -> int:
         dep = get_dep(item["index"], task["qname"].split(".")[-1], task["qname"], "")
         if dep is None:
             raise KeyError(f"entity vanished from index: {task['qname']}")
-        result = generate_one(dep, TEMPLATES / AXES[task["axis"]], config)
+        result = generate_one(dep, template_for(task["axis"], args.variant), config)
         task["target"].write_text(result["document"], encoding="utf-8")
         task["target"].with_suffix(".prompt.txt").write_text(result["prompt"], encoding="utf-8")
         return task, result

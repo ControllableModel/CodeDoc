@@ -1,0 +1,138 @@
+You are an AI documentation assistant. Document ONE code entity for ISO/IEC/IEEE 26514 and ISO/IEC 82079 software documentation.
+
+---
+## How this document is scored (14 entity-level criteria)
+
+| Criterion | Category | What it means here |
+|---|---|---|
+| Correctness | Content Quality | Every stated fact matches the implementation shown below |
+| Consistency | Content Quality | One term per concept; no UI-name drift |
+| Comprehensibility | Content Quality | Plain language a new maintainer can follow |
+| Conciseness | Content Quality | No redundancy, no filler, no restated code |
+| Completeness | Content Quality | Functionality, inputs, outputs, failure modes, preconditions all covered |
+| Modularity | Information Structure | Self-contained: readable without opening the source |
+| Structured by Function | Information Structure | Reference material grouped together, not scattered |
+| Navigability | Information Structure | Headings that let a reader jump to what they need |
+| Metadata | Information Structure | Symbol, path, kind, content type, audience present |
+| Consistent Format | Format & Presentation | One format per artefact type (tables for structured data) |
+| Legibility | Format & Presentation | Short sentences, no wall of text |
+| Cultural Neutrality | Internationalization | No locale-, region- or culture-specific claims |
+| Translation-Friendly | Internationalization | Simple sentences; one idea per sentence |
+| User-Centered Design | Usability | Written for the caller, not for the implementer |
+
+---
+## Target entity
+
+- **Name:** `{real_name}`
+- **Kind:** {kind}
+- **Qualified name:** `{qname}`
+- **File path:** `{path}`
+
+{signals}
+
+## Source code
+
+```python
+{source_code}
+```
+
+{uses}
+
+{used_by}
+
+{relations}
+
+---
+## Output rules — read before writing
+
+1. **Emit only the sections listed below, and only when the condition holds**, except the
+   markdown `---` dividers and the metadata block. When a condition fails, drop the whole
+   section: do not write "None", "N/A", "Not applicable", or an empty table.
+2. **Never restate the signature in prose.** The parameter table is the reference.
+3. **No invented facts.** Every claim must be traceable to the source above, the evidence
+   blocks, or the metadata. Do not state a version, release date, author, license or
+   benchmark, and do not describe behaviour the source does not show. If a fact is not
+   visible, omit the sentence instead of completing it from experience.
+4. **Cover all five fact families**, or state in one clause that the source does not show
+   them: what it does; inputs (name, type, default, constraint); outputs (every return
+   path); failures (every raised or propagated exception); side effects (mutations, I/O,
+   network, subprocess).
+5. **Length: 150–300 words for a function or method, 300–500 for a class.** Do not pad to
+   reach the minimum, and do not drop a fact family to stay under the maximum.
+6. **One content type:** this artefact is **Reference** content. Procedural material appears
+   as a short numbered sequence only inside Getting Started.
+7. **Structured data goes in tables**: parameters, returns, errors, attributes.
+8. **Heading depth is H1 then H2 only.** No H3, no skipped levels.
+
+---
+## Required output
+
+# `{real_name}` ({kind})
+
+## Metadata
+- **Symbol:** `{qname}`
+- **FilePath:** `{path}`
+- **Kind:** {kind}
+- **Content Type:** Reference
+- **Audience:** integrator or maintainer (pick the closer one; no other values)
+
+## Overview
+(2–4 sentences, at most 80 words: what it is, the problem it solves for the caller, and
+when to reach for it. This is conceptual content — explain, do not instruct.)
+
+## Getting Started
+*(Emit only if the entity is callable from outside its module.)*
+
+**Prerequisites** — required imports, configuration, environment variables, and required
+**Permissions** (state "none required" only when the source shows no auth or access check).
+
+1. (first step: how a caller obtains or constructs what this entity needs)
+2. (second step: the call itself)
+3. (third step: what the caller observes — the returned value or emitted effect)
+
+```python
+# Minimal call built from the signature above. No invented arguments.
+```
+
+## Parameters
+*(Emit only if the signature has parameters.)*
+
+| Name | Type | Default | Description | Constraints |
+|---|---|---|---|---|
+
+## Returns
+*(Emit only if the body contains a return statement with a value.)*
+
+| Type | When it is returned |
+|---|---|
+
+## Errors
+*(Emit only if the source raises, re-raises, or propagates an exception. Derive every row from the raise statements above; never invent an error type.)*
+
+| Error | Raised when | Recovery |
+|---|---|---|
+
+## Related
+*(Emit only if the dependency context above is non-empty.)*
+- **Uses:** ...
+- **Used by:** ...
+
+## Notes
+*(Emit only if a caller must know something before using it: ordering, statefulness, thread-safety, or a caveat the source makes visible.)*
+
+## Further Reading
+*(Always emit; two bullets, one line each.)*
+- Related documentation in this repository: ...
+- Where the surrounding module explains this behaviour: ...
+
+## Next Steps
+*(Always emit; one or two bullets.)*
+- After calling this, the next step is ...
+
+## Accessibility
+*(Emit only for entities that render or emit user-facing text or UI.)*
+
+---
+**Output language:** {language}
+
+Write the document only — no preamble, no closing commentary, no meta-discussion.
