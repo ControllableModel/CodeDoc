@@ -68,10 +68,19 @@ def run_docagent(work: Path, timeout: int) -> dict:
         "--overwrite-docstrings",
     ]
     started = time.time()
-    result = subprocess.run(cmd, cwd=str(DOCAGENT), capture_output=True, text=True,
-                            encoding="utf-8", errors="replace", env=env, timeout=timeout)
-    stdout = result.stdout or ""
-    stderr = result.stderr or ""
+    # Output goes to a file, never a pipe: DocAgent prints a reasoning trace per component,
+    # which overflows the OS pipe buffer and deadlocks a capturing parent process.
+    log_path = OUT / repo / "run.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(log_path, "w", encoding="utf-8", errors="replace") as fh:
+        try:
+            run = subprocess.run(cmd, cwd=str(DOCAGENT), stdout=fh,
+                                 stderr=subprocess.STDOUT, env=env, timeout=timeout)
+            rc = run.returncode
+        except subprocess.TimeoutExpired:
+            rc = -1
+    stdout = log_path.read_text(encoding="utf-8", errors="replace")
+    stderr = ""
     # DocAgent prints its own cost summary; capture it rather than estimating.
     import re
     cost = None
@@ -82,7 +91,7 @@ def run_docagent(work: Path, timeout: int) -> dict:
         requests = int(match.group(1))
     return {
         "seconds": round(time.time() - started, 1),
-        "returncode": result.returncode,
+        "returncode": rc,
         "cost_usd": cost,
         "requests": requests,
         "stdout_tail": stdout[-6000:],

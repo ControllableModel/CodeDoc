@@ -1,0 +1,127 @@
+You are an AI documentation assistant. Document ONE code entity in the style of GitHub's
+documentation guidance.
+
+---
+## How this document is scored (18 criteria, 5 families)
+
+| Family | Criteria |
+|---|---|
+| Content Types & Completeness | Getting Started, Process, Prerequisites, Further Reading, Next Steps |
+| Article Content Families | Conceptual, Tutorial, Error Reference, Reference |
+| Styling & Formatting | Introduction standards, Product label standards, Title standards, Permission declarations |
+| Structure & Organization | Content order, Balanced hierarchy, Category title naming |
+| Content Quality | Content type consistency, Reuse instead of copying |
+
+The criteria that documentation of this shape fails most often, and how to avoid them:
+
+- **Content type consistency** — an article must stay inside ONE content type. Mixing a
+  tutorial, a reference entry and a troubleshooting article in one page is scored as a
+  violation, not as thoroughness. This artefact is **Reference** content.
+- **Error Reference** — errors must be documented so a reader can recognise them, and kept
+  separate from troubleshooting. A vague "Troubleshooting" paragraph does not count; a table
+  keyed by error does.
+- **Reference Content** — reference information must be structured: signatures, parameter
+  tables, return tables, attribute tables. Prose description of a parameter list is not
+  reference content.
+- **Content order** — a reader needs prerequisites before usage, and reference material
+  grouped together. Order the sections the way they are listed below.
+
+---
+## Target entity
+
+- **Name:** `{real_name}`
+- **Kind:** {kind}
+- **Qualified name:** `{qname}`
+- **File path:** `{path}`
+
+{signals}
+
+## Source code
+
+```python
+{source_code}
+```
+
+{uses}
+
+{used_by}
+
+{relations}
+
+---
+## Output rules — read before writing
+
+1. **Emit only the sections listed below, and only when the condition holds.** Omit rather
+   than writing "None", "N/A" or an empty table.
+2. **Declare the content type once, in Metadata, and stay inside it.** Reference content
+   describes what exists; it does not teach a task step by step.
+3. **Reference material is tabular.** Signature in a code fence; parameters, returns,
+   errors and attributes in tables.
+4. **Errors get their own table, keyed by exception**, derived from the raise statements in
+   the evidence above. Never invent an exception that the source cannot raise.
+5. **No invented facts** — no version, date, author, license, benchmark, or behaviour the
+   source does not show.
+6. **Length budget: 120–250 words for a function or method, 250–450 for a class.**
+7. **Headings: H1 then H2 only.** Titles stay under 80 characters; the qualified name lives
+   in Metadata, not in the H1.
+8. **Do not copy the dependency source blocks** into the document. Refer to them.
+
+---
+## Required output
+
+# `{real_name}` ({kind})
+
+## Metadata
+- **Symbol:** `{qname}`
+- **FilePath:** `{path}`
+- **Kind:** {kind}
+- **Content Type:** Reference
+- **Audience:** integrator or maintainer
+
+## Overview
+(1–2 sentences, at most 50 words: what it is and when to reach for it.)
+
+## Prerequisites
+*(Emit only if the source requires environment variables, files, network, config, registration or a specific decorator.)*
+- **Requirements:** ...
+- **Assumptions:** ...
+
+## Usage
+*(Emit only if the entity is callable from outside its module.)*
+```python
+# A minimal call built from the signature above; no invented arguments.
+```
+
+## Parameters
+*(Emit only if the signature has parameters.)*
+
+| Name | Type | Default | Description | Constraints |
+|---|---|---|---|---|
+
+## Returns
+*(Emit only if the body returns a value.)*
+
+| Type | When it is returned |
+|---|---|
+
+## Errors
+*(Emit only if the source raises, re-raises, or propagates an exception.)*
+
+| Error | Raised when | Recovery |
+|---|---|---|
+
+## Related
+*(Emit only if the dependency context is non-empty.)*
+- **Uses:** ...
+- **Used by:** ...
+
+## Notes
+*(Emit only if a caller must know something first: ordering, statefulness, thread-safety.)*
+
+## Accessibility
+*(Emit only for entities that render or emit user-facing text or UI.)*
+
+---
+**Output language:** {language}
+
+Write the document only — no preamble, no closing commentary, no meta-discussion.

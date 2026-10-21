@@ -20,6 +20,8 @@ existing templates.
 
 from __future__ import annotations
 
+from .signals import entity_signals
+
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -250,6 +252,9 @@ def get_dep(
         "uses": uses,
         "used_by": used_by,
         "relations": relations,
+        # Signals come from the *full* entity source, not from the class view: the view
+        # drops method bodies, which is exactly where returns and raises live.
+        "signals": entity_signals(source),
         "is_polymorphic": bool(
             ctx.get(RelationKind.OVERRIDES)
             or ctx.get(RelationKind.OVERRIDDEN_BY)

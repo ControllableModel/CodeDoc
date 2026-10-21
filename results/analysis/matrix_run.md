@@ -4,24 +4,22 @@
 * sampling: relation-stratified, limit 60, seed 42
 * the two axes are generated from different templates and written to different
   directories, so no document is shared between rubrics
-* 1156 documents in 38.2 min, 0 failed, USD 1.0966
+* 314 documents in 19.3 min, 2 failed, USD 0.3166
 
 | repo | entities in repo | sampled | relation links in sample |
 |---|---|---|---|
-| dify_api | 15813 | 60 | 95 |
-| fairseq | 5229 | 60 | 108 |
-| flask-main | 431 | 60 | 103 |
-| joblib | 749 | 60 | 127 |
-| numpy | 2868 | 60 | 91 |
-| openui | 165 | 60 | 57 |
-| pyro | 3396 | 60 | 126 |
 | ragflow | 38 | 38 | 72 |
+| joblib | 749 | 60 | 127 |
 | sonnet | 1605 | 60 | 94 |
-| torch | 49451 | 60 | 115 |
 
 | axis | template | documents | chars | cost (USD) | failed |
 |---|---|---|---|---|---|
-| iso_26514 | iso_26514.txt | 578 | 2,966,273 | 0.4893 | 0 |
-| github_docs_style | github.txt | 578 | 3,462,290 | 0.6073 | 0 |
+| iso_26514 | iso_26514.txt | 156 | 579,926 | 0.1610 | 2 |
+| github_docs_style | github.txt | 158 | 568,421 | 0.1556 | 0 |
 
-Output: `outputs\matrix/<axis>/<repo>/<entity>.md`
+Output: `outputs\tokenbench_v4/<axis>/<repo>/<entity>.md`
+
+## Failures
+
+* joblib / iso_26514 / hashing.Hasher: APIConnectionError: Connection error.
+* sonnet / iso_26514 / src.recurrent.Conv3DLSTM: APIConnectionError: Connection error.

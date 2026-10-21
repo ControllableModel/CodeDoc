@@ -1,0 +1,15 @@
+main_dimension,dimension,n,mean,sd
+"Content Quality","Correctness",156,4.744,0.437
+"Content Quality","Consistency",156,4.987,0.112
+"Content Quality","Comprehensibility",156,4.718,0.45
+"Content Quality","Conciseness",156,4.122,0.429
+"Content Quality","Completeness",156,4.468,0.737
+"Information Structure","Modularity",156,4.936,0.245
+"Information Structure","Structured by Function",156,4.936,0.245
+"Information Structure","Navigability",156,4.955,0.207
+"Information Structure","Metadata",156,4.974,0.158
+"Format & Presentation","Consistent Format",156,4.917,0.276
+"Format & Presentation","Legibility",156,5.0,
+"Internationalization & Localization","Cultural Neutrality",156,5.0,
+"Internationalization & Localization","Translation-Friendly",156,4.724,0.447
+"Usability & User Experience","User-Centered Design",156,4.199,0.486

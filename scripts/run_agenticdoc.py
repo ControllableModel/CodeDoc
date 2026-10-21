@@ -79,15 +79,22 @@ def env_for_run() -> dict:
 
 def run_cli(work: Path, args: list, timeout: int) -> dict:
     started = time.time()
-    result = subprocess.run([str(CLI), *args], cwd=str(work), capture_output=True,
-                            text=True, encoding="utf-8", errors="replace",
-                            env=env_for_run(), timeout=timeout)
-    out = (result.stdout or "") + (result.stderr or "")
+    # Output goes to a file, never a pipe (see run_memdocagent.py).
+    log_path = work / "run.log"
+    with open(log_path, "w", encoding="utf-8", errors="replace") as fh:
+        try:
+            result = subprocess.run([str(CLI), *args], cwd=str(work), stdout=fh,
+                                    stderr=subprocess.STDOUT, env=env_for_run(),
+                                    timeout=timeout)
+            rc = result.returncode
+        except subprocess.TimeoutExpired:
+            rc = -1
+    out = log_path.read_text(encoding="utf-8", errors="replace")
     requests = None
     for match in re.finditer(r"Total Requests:\s*(\d+)", out):
         requests = int(match.group(1))
     return {"args": args, "seconds": round(time.time() - started, 1),
-            "returncode": result.returncode, "requests": requests, "output": out[-4000:]}
+            "returncode": rc, "requests": requests, "output": out[-4000:]}
 
 
 # --------------------------------------------------------------------------- markdown

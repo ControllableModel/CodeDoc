@@ -1,0 +1,393 @@
+[
+  {
+    "axis": "iso_26514",
+    "label": "ISO/IEC 26514",
+    "documents": 0,
+    "empty_verdicts": 0,
+    "dimensions_asked": 14,
+    "dimensions_scored": 0,
+    "overall_mean": null,
+    "main_dimensions": [
+      {
+        "category": "Content Quality",
+        "dimensions": 5,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Information Structure",
+        "dimensions": 4,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Format & Presentation",
+        "dimensions": 2,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Internationalization & Localization",
+        "dimensions": 2,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Usability & User Experience",
+        "dimensions": 1,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      }
+    ],
+    "dimensions": [
+      {
+        "dimension": "Correctness",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Consistency",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Comprehensibility",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Conciseness",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Completeness",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Modularity",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Structured by Function",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Navigability",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Metadata",
+        "category": "Information Structure",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Consistent Format",
+        "category": "Format & Presentation",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Legibility",
+        "category": "Format & Presentation",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Cultural Neutrality",
+        "category": "Internationalization & Localization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Translation-Friendly",
+        "category": "Internationalization & Localization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "User-Centered Design",
+        "category": "Usability & User Experience",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      }
+    ],
+    "per_repo": {},
+    "per_kind": {},
+    "all_main_dimensions": [
+      "Accessibility",
+      "Content Quality",
+      "Format & Presentation",
+      "Information Structure",
+      "Internationalization & Localization",
+      "Maintenance & Updates",
+      "Safety & Compliance",
+      "Usability & User Experience"
+    ],
+    "uncovered_main_dimensions": [
+      "Accessibility",
+      "Maintenance & Updates",
+      "Safety & Compliance"
+    ],
+    "unmatched_keys": {}
+  },
+  {
+    "axis": "github_docs_style",
+    "label": "GitHub docs style",
+    "documents": 0,
+    "empty_verdicts": 0,
+    "dimensions_asked": 18,
+    "dimensions_scored": 0,
+    "overall_mean": null,
+    "main_dimensions": [
+      {
+        "category": "Content Quality",
+        "dimensions": 2,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Structure & Organization",
+        "dimensions": 3,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Styling & Formatting",
+        "dimensions": 4,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Content Types & Completeness",
+        "dimensions": 4,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      },
+      {
+        "category": "Article Content Families",
+        "dimensions": 5,
+        "scored_dimensions": 0,
+        "mean_of_dimension_means": null,
+        "pooled_mean": null,
+        "n_verdicts": 0
+      }
+    ],
+    "dimensions": [
+      {
+        "dimension": "Content Type Consistency",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Reuse Instead of Copying",
+        "category": "Content Quality",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Balanced Hierarchy",
+        "category": "Structure & Organization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Content Order",
+        "category": "Structure & Organization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Category Title Naming",
+        "category": "Structure & Organization",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Title Standards",
+        "category": "Styling & Formatting",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Introduction Standards",
+        "category": "Styling & Formatting",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Permission Declaration Standards",
+        "category": "Styling & Formatting",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Product Label Standards",
+        "category": "Styling & Formatting",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Process Content Standards",
+        "category": "Content Types & Completeness",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Next Steps Standards",
+        "category": "Content Types & Completeness",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Further Reading Standards",
+        "category": "Content Types & Completeness",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Prerequisites Standards",
+        "category": "Content Types & Completeness",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Reference Content",
+        "category": "Article Content Families",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Conceptual Content Guidelines",
+        "category": "Article Content Families",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Error Reference Content Guidelines",
+        "category": "Article Content Families",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Tutorial Content Guidelines",
+        "category": "Article Content Families",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      },
+      {
+        "dimension": "Getting Started Content Guidelines",
+        "category": "Article Content Families",
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "missing": true
+      }
+    ],
+    "per_repo": {},
+    "per_kind": {},
+    "all_main_dimensions": [
+      "Article Content Families",
+      "Content Quality",
+      "Content Types & Completeness",
+      "Structure & Organization",
+      "Styling & Formatting"
+    ],
+    "uncovered_main_dimensions": [],
+    "unmatched_keys": {}
+  }
+]
