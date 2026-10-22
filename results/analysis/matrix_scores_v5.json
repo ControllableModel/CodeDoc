@@ -1,0 +1,661 @@
+[
+  {
+    "axis": "iso_26514",
+    "label": "ISO/IEC 26514",
+    "documents": 158,
+    "empty_verdicts": 0,
+    "dimensions_asked": 14,
+    "dimensions_scored": 14,
+    "overall_mean": 4.762,
+    "main_dimensions": [
+      {
+        "category": "Information Structure",
+        "dimensions": 4,
+        "scored_dimensions": 4,
+        "mean_of_dimension_means": 4.953,
+        "pooled_mean": 4.953,
+        "n_verdicts": 632
+      },
+      {
+        "category": "Format & Presentation",
+        "dimensions": 2,
+        "scored_dimensions": 2,
+        "mean_of_dimension_means": 4.952,
+        "pooled_mean": 4.953,
+        "n_verdicts": 316
+      },
+      {
+        "category": "Internationalization & Localization",
+        "dimensions": 2,
+        "scored_dimensions": 2,
+        "mean_of_dimension_means": 4.877,
+        "pooled_mean": 4.877,
+        "n_verdicts": 316
+      },
+      {
+        "category": "Content Quality",
+        "dimensions": 5,
+        "scored_dimensions": 5,
+        "mean_of_dimension_means": 4.605,
+        "pooled_mean": 4.605,
+        "n_verdicts": 790
+      },
+      {
+        "category": "Usability & User Experience",
+        "dimensions": 1,
+        "scored_dimensions": 1,
+        "mean_of_dimension_means": 4.171,
+        "pooled_mean": 4.171,
+        "n_verdicts": 158
+      }
+    ],
+    "dimensions": [
+      {
+        "dimension": "Correctness",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.747,
+        "sd": 0.435,
+        "missing": false
+      },
+      {
+        "dimension": "Consistency",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.981,
+        "sd": 0.177,
+        "missing": false
+      },
+      {
+        "dimension": "Comprehensibility",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.734,
+        "sd": 0.442,
+        "missing": false
+      },
+      {
+        "dimension": "Conciseness",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.063,
+        "sd": 0.332,
+        "missing": false
+      },
+      {
+        "dimension": "Completeness",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.5,
+        "sd": 0.777,
+        "missing": false
+      },
+      {
+        "dimension": "Modularity",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 4.937,
+        "sd": 0.243,
+        "missing": false
+      },
+      {
+        "dimension": "Structured by Function",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 4.937,
+        "sd": 0.243,
+        "missing": false
+      },
+      {
+        "dimension": "Navigability",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 4.943,
+        "sd": 0.232,
+        "missing": false
+      },
+      {
+        "dimension": "Metadata",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 4.994,
+        "sd": 0.079,
+        "missing": false
+      },
+      {
+        "dimension": "Consistent Format",
+        "category": "Format & Presentation",
+        "n": 158,
+        "mean": 4.911,
+        "sd": 0.284,
+        "missing": false
+      },
+      {
+        "dimension": "Legibility",
+        "category": "Format & Presentation",
+        "n": 158,
+        "mean": 4.994,
+        "sd": 0.079,
+        "missing": false
+      },
+      {
+        "dimension": "Cultural Neutrality",
+        "category": "Internationalization & Localization",
+        "n": 158,
+        "mean": 5.0,
+        "sd": 0.0,
+        "missing": false
+      },
+      {
+        "dimension": "Translation-Friendly",
+        "category": "Internationalization & Localization",
+        "n": 158,
+        "mean": 4.753,
+        "sd": 0.431,
+        "missing": false
+      },
+      {
+        "dimension": "User-Centered Design",
+        "category": "Usability & User Experience",
+        "n": 158,
+        "mean": 4.171,
+        "sd": 0.467,
+        "missing": false
+      }
+    ],
+    "per_repo": {
+      "joblib": {
+        "verdicts": 840,
+        "mean": 4.732,
+        "dimensions": {
+          "Correctness": 4.683,
+          "Consistency": 4.967,
+          "Comprehensibility": 4.65,
+          "Conciseness": 4.067,
+          "Completeness": 4.45,
+          "Modularity": 4.917,
+          "Structured by Function": 4.917,
+          "Navigability": 4.933,
+          "Metadata": 5.0,
+          "Consistent Format": 4.917,
+          "Legibility": 4.983,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.667,
+          "User-Centered Design": 4.1
+        }
+      },
+      "ragflow": {
+        "verdicts": 532,
+        "mean": 4.848,
+        "dimensions": {
+          "Correctness": 4.895,
+          "Consistency": 5.0,
+          "Comprehensibility": 4.895,
+          "Conciseness": 4.132,
+          "Completeness": 4.816,
+          "Modularity": 4.974,
+          "Structured by Function": 4.974,
+          "Navigability": 4.974,
+          "Metadata": 5.0,
+          "Consistent Format": 4.974,
+          "Legibility": 5.0,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.947,
+          "User-Centered Design": 4.289
+        }
+      },
+      "sonnet": {
+        "verdicts": 840,
+        "mean": 4.737,
+        "dimensions": {
+          "Correctness": 4.717,
+          "Consistency": 4.983,
+          "Comprehensibility": 4.717,
+          "Conciseness": 4.017,
+          "Completeness": 4.35,
+          "Modularity": 4.933,
+          "Structured by Function": 4.933,
+          "Navigability": 4.933,
+          "Metadata": 4.983,
+          "Consistent Format": 4.867,
+          "Legibility": 5.0,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.717,
+          "User-Centered Design": 4.167
+        }
+      }
+    },
+    "per_kind": {
+      "class": {
+        "verdicts": 728,
+        "mean": 4.57,
+        "dimensions": {
+          "Correctness": 4.365,
+          "Consistency": 4.981,
+          "Comprehensibility": 4.327,
+          "Conciseness": 3.981,
+          "Completeness": 3.692,
+          "Modularity": 4.827,
+          "Structured by Function": 4.827,
+          "Navigability": 4.846,
+          "Metadata": 4.981,
+          "Consistent Format": 4.788,
+          "Legibility": 5.0,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.385,
+          "User-Centered Design": 3.981
+        }
+      },
+      "function": {
+        "verdicts": 434,
+        "mean": 4.853,
+        "dimensions": {
+          "Correctness": 4.935,
+          "Consistency": 5.0,
+          "Comprehensibility": 4.903,
+          "Conciseness": 4.097,
+          "Completeness": 4.871,
+          "Modularity": 5.0,
+          "Structured by Function": 5.0,
+          "Navigability": 5.0,
+          "Metadata": 5.0,
+          "Consistent Format": 4.968,
+          "Legibility": 5.0,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.903,
+          "User-Centered Design": 4.258
+        }
+      },
+      "method": {
+        "verdicts": 1050,
+        "mean": 4.857,
+        "dimensions": {
+          "Correctness": 4.933,
+          "Consistency": 4.973,
+          "Comprehensibility": 4.947,
+          "Conciseness": 4.107,
+          "Completeness": 4.907,
+          "Modularity": 4.987,
+          "Structured by Function": 4.987,
+          "Navigability": 4.987,
+          "Metadata": 5.0,
+          "Consistent Format": 4.973,
+          "Legibility": 4.987,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.947,
+          "User-Centered Design": 4.267
+        }
+      }
+    },
+    "all_main_dimensions": [
+      "Accessibility",
+      "Content Quality",
+      "Format & Presentation",
+      "Information Structure",
+      "Internationalization & Localization",
+      "Maintenance & Updates",
+      "Safety & Compliance",
+      "Usability & User Experience"
+    ],
+    "uncovered_main_dimensions": [
+      "Accessibility",
+      "Maintenance & Updates",
+      "Safety & Compliance"
+    ],
+    "unmatched_keys": {}
+  },
+  {
+    "axis": "github_docs_style",
+    "label": "GitHub docs style",
+    "documents": 158,
+    "empty_verdicts": 0,
+    "dimensions_asked": 18,
+    "dimensions_scored": 18,
+    "overall_mean": 4.191,
+    "main_dimensions": [
+      {
+        "category": "Styling & Formatting",
+        "dimensions": 4,
+        "scored_dimensions": 4,
+        "mean_of_dimension_means": 4.699,
+        "pooled_mean": 4.699,
+        "n_verdicts": 632
+      },
+      {
+        "category": "Content Quality",
+        "dimensions": 2,
+        "scored_dimensions": 2,
+        "mean_of_dimension_means": 4.459,
+        "pooled_mean": 4.459,
+        "n_verdicts": 316
+      },
+      {
+        "category": "Content Types & Completeness",
+        "dimensions": 4,
+        "scored_dimensions": 4,
+        "mean_of_dimension_means": 4.442,
+        "pooled_mean": 4.441,
+        "n_verdicts": 632
+      },
+      {
+        "category": "Structure & Organization",
+        "dimensions": 3,
+        "scored_dimensions": 3,
+        "mean_of_dimension_means": 4.342,
+        "pooled_mean": 4.342,
+        "n_verdicts": 474
+      },
+      {
+        "category": "Article Content Families",
+        "dimensions": 5,
+        "scored_dimensions": 5,
+        "mean_of_dimension_means": 3.385,
+        "pooled_mean": 3.385,
+        "n_verdicts": 790
+      }
+    ],
+    "dimensions": [
+      {
+        "dimension": "Content Type Consistency",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.962,
+        "sd": 0.191,
+        "missing": false
+      },
+      {
+        "dimension": "Reuse Instead of Copying",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 3.956,
+        "sd": 0.235,
+        "missing": false
+      },
+      {
+        "dimension": "Balanced Hierarchy",
+        "category": "Structure & Organization",
+        "n": 158,
+        "mean": 4.886,
+        "sd": 0.318,
+        "missing": false
+      },
+      {
+        "dimension": "Content Order",
+        "category": "Structure & Organization",
+        "n": 158,
+        "mean": 4.899,
+        "sd": 0.302,
+        "missing": false
+      },
+      {
+        "dimension": "Category Title Naming",
+        "category": "Structure & Organization",
+        "n": 158,
+        "mean": 3.241,
+        "sd": 0.442,
+        "missing": false
+      },
+      {
+        "dimension": "Title Standards",
+        "category": "Styling & Formatting",
+        "n": 158,
+        "mean": 4.892,
+        "sd": 0.31,
+        "missing": false
+      },
+      {
+        "dimension": "Introduction Standards",
+        "category": "Styling & Formatting",
+        "n": 158,
+        "mean": 4.956,
+        "sd": 0.206,
+        "missing": false
+      },
+      {
+        "dimension": "Permission Declaration Standards",
+        "category": "Styling & Formatting",
+        "n": 158,
+        "mean": 4.152,
+        "sd": 0.781,
+        "missing": false
+      },
+      {
+        "dimension": "Product Label Standards",
+        "category": "Styling & Formatting",
+        "n": 158,
+        "mean": 4.797,
+        "sd": 0.402,
+        "missing": false
+      },
+      {
+        "dimension": "Process Content Standards",
+        "category": "Content Types & Completeness",
+        "n": 158,
+        "mean": 4.557,
+        "sd": 0.497,
+        "missing": false
+      },
+      {
+        "dimension": "Next Steps Standards",
+        "category": "Content Types & Completeness",
+        "n": 158,
+        "mean": 4.684,
+        "sd": 0.479,
+        "missing": false
+      },
+      {
+        "dimension": "Further Reading Standards",
+        "category": "Content Types & Completeness",
+        "n": 158,
+        "mean": 4.646,
+        "sd": 0.478,
+        "missing": false
+      },
+      {
+        "dimension": "Prerequisites Standards",
+        "category": "Content Types & Completeness",
+        "n": 158,
+        "mean": 3.88,
+        "sd": 0.599,
+        "missing": false
+      },
+      {
+        "dimension": "Reference Content",
+        "category": "Article Content Families",
+        "n": 158,
+        "mean": 5.0,
+        "sd": 0.0,
+        "missing": false
+      },
+      {
+        "dimension": "Conceptual Content Guidelines",
+        "category": "Article Content Families",
+        "n": 158,
+        "mean": 3.481,
+        "sd": 1.679,
+        "missing": false
+      },
+      {
+        "dimension": "Error Reference Content Guidelines",
+        "category": "Article Content Families",
+        "n": 158,
+        "mean": 4.323,
+        "sd": 0.609,
+        "missing": false
+      },
+      {
+        "dimension": "Tutorial Content Guidelines",
+        "category": "Article Content Families",
+        "n": 158,
+        "mean": 1.051,
+        "sd": 0.314,
+        "missing": false
+      },
+      {
+        "dimension": "Getting Started Content Guidelines",
+        "category": "Article Content Families",
+        "n": 158,
+        "mean": 3.07,
+        "sd": 1.191,
+        "missing": false
+      }
+    ],
+    "per_repo": {
+      "joblib": {
+        "verdicts": 1080,
+        "mean": 4.211,
+        "dimensions": {
+          "Content Type Consistency": 4.967,
+          "Reuse Instead of Copying": 3.967,
+          "Balanced Hierarchy": 4.833,
+          "Content Order": 4.85,
+          "Category Title Naming": 3.317,
+          "Title Standards": 4.95,
+          "Introduction Standards": 4.95,
+          "Permission Declaration Standards": 4.2,
+          "Product Label Standards": 4.867,
+          "Process Content Standards": 4.533,
+          "Next Steps Standards": 4.65,
+          "Further Reading Standards": 4.667,
+          "Prerequisites Standards": 3.883,
+          "Reference Content": 5.0,
+          "Conceptual Content Guidelines": 3.5,
+          "Error Reference Content Guidelines": 4.367,
+          "Tutorial Content Guidelines": 1.033,
+          "Getting Started Content Guidelines": 3.267
+        }
+      },
+      "ragflow": {
+        "verdicts": 684,
+        "mean": 4.164,
+        "dimensions": {
+          "Content Type Consistency": 5.0,
+          "Reuse Instead of Copying": 4.0,
+          "Balanced Hierarchy": 4.974,
+          "Content Order": 5.0,
+          "Category Title Naming": 3.079,
+          "Title Standards": 4.868,
+          "Introduction Standards": 4.974,
+          "Permission Declaration Standards": 4.053,
+          "Product Label Standards": 4.868,
+          "Process Content Standards": 4.553,
+          "Next Steps Standards": 4.711,
+          "Further Reading Standards": 4.605,
+          "Prerequisites Standards": 4.0,
+          "Reference Content": 5.0,
+          "Conceptual Content Guidelines": 2.974,
+          "Error Reference Content Guidelines": 4.421,
+          "Tutorial Content Guidelines": 1.053,
+          "Getting Started Content Guidelines": 2.816
+        }
+      },
+      "sonnet": {
+        "verdicts": 1080,
+        "mean": 4.187,
+        "dimensions": {
+          "Content Type Consistency": 4.933,
+          "Reuse Instead of Copying": 3.917,
+          "Balanced Hierarchy": 4.883,
+          "Content Order": 4.883,
+          "Category Title Naming": 3.267,
+          "Title Standards": 4.85,
+          "Introduction Standards": 4.95,
+          "Permission Declaration Standards": 4.167,
+          "Product Label Standards": 4.683,
+          "Process Content Standards": 4.583,
+          "Next Steps Standards": 4.7,
+          "Further Reading Standards": 4.65,
+          "Prerequisites Standards": 3.8,
+          "Reference Content": 5.0,
+          "Conceptual Content Guidelines": 3.783,
+          "Error Reference Content Guidelines": 4.217,
+          "Tutorial Content Guidelines": 1.067,
+          "Getting Started Content Guidelines": 3.033
+        }
+      }
+    },
+    "per_kind": {
+      "class": {
+        "verdicts": 936,
+        "mean": 4.234,
+        "dimensions": {
+          "Content Type Consistency": 4.885,
+          "Reuse Instead of Copying": 3.885,
+          "Balanced Hierarchy": 4.769,
+          "Content Order": 4.788,
+          "Category Title Naming": 3.404,
+          "Title Standards": 4.904,
+          "Introduction Standards": 4.865,
+          "Permission Declaration Standards": 4.135,
+          "Product Label Standards": 4.75,
+          "Process Content Standards": 4.481,
+          "Next Steps Standards": 4.635,
+          "Further Reading Standards": 4.654,
+          "Prerequisites Standards": 3.673,
+          "Reference Content": 5.0,
+          "Conceptual Content Guidelines": 4.308,
+          "Error Reference Content Guidelines": 4.25,
+          "Tutorial Content Guidelines": 1.154,
+          "Getting Started Content Guidelines": 3.673
+        }
+      },
+      "function": {
+        "verdicts": 558,
+        "mean": 4.281,
+        "dimensions": {
+          "Content Type Consistency": 5.0,
+          "Reuse Instead of Copying": 3.968,
+          "Balanced Hierarchy": 4.903,
+          "Content Order": 4.935,
+          "Category Title Naming": 3.258,
+          "Title Standards": 4.839,
+          "Introduction Standards": 5.0,
+          "Permission Declaration Standards": 4.419,
+          "Product Label Standards": 4.742,
+          "Process Content Standards": 4.677,
+          "Next Steps Standards": 4.871,
+          "Further Reading Standards": 4.806,
+          "Prerequisites Standards": 4.161,
+          "Reference Content": 5.0,
+          "Conceptual Content Guidelines": 3.613,
+          "Error Reference Content Guidelines": 4.484,
+          "Tutorial Content Guidelines": 1.0,
+          "Getting Started Content Guidelines": 3.387
+        }
+      },
+      "method": {
+        "verdicts": 1350,
+        "mean": 4.123,
+        "dimensions": {
+          "Content Type Consistency": 5.0,
+          "Reuse Instead of Copying": 4.0,
+          "Balanced Hierarchy": 4.96,
+          "Content Order": 4.96,
+          "Category Title Naming": 3.12,
+          "Title Standards": 4.907,
+          "Introduction Standards": 5.0,
+          "Permission Declaration Standards": 4.053,
+          "Product Label Standards": 4.853,
+          "Process Content Standards": 4.56,
+          "Next Steps Standards": 4.64,
+          "Further Reading Standards": 4.573,
+          "Prerequisites Standards": 3.907,
+          "Reference Content": 5.0,
+          "Conceptual Content Guidelines": 2.853,
+          "Error Reference Content Guidelines": 4.307,
+          "Tutorial Content Guidelines": 1.0,
+          "Getting Started Content Guidelines": 2.52
+        }
+      }
+    },
+    "all_main_dimensions": [
+      "Article Content Families",
+      "Content Quality",
+      "Content Types & Completeness",
+      "Structure & Organization",
+      "Styling & Formatting"
+    ],
+    "uncovered_main_dimensions": [],
+    "unmatched_keys": {}
+  }
+]

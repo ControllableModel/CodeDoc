@@ -146,3 +146,85 @@ silence.
 v2 and v3 are kept because they document the trade-off: removing structure raises
 Conciseness and destroys the content families; restoring the families costs Conciseness and
 buys back far more.
+
+
+## 7. v5: the rubric is anchored on section names
+
+v4 lost three GitHub criteria that v1 held, and the judge's own evidence strings say why. It
+was not the prose. v2 had renamed the sections:
+
+```
+v4, Conceptual Content, score 1.04:
+  "Not applicable; the document is reference content, not conceptual.
+   No 'About [topic]' section is present."
+
+v1, Conceptual Content, score 3.70:
+  "The 'About' section begins with 'About' and explains the purpose and use cases of the class"
+```
+
+`github.txt` (v1) emits `## About`, `## Quick Start` and `## Permissions & Access` -- the section
+names GitHub's style guide uses. v2-v4 replaced them with house-style names (`## Overview`,
+`## Getting Started`) and folded permissions into prose. The judge scores the criterion by
+recognising the section, so a better-written section under a different heading scores lower.
+
+The second finding is about absence. v4 scored `Error Reference` as a bimodal distribution --
+25 documents at 5, 106 at 1 -- because it omitted the section when the source raised nothing.
+The judge reads an absent section as missing content, not as "not applicable". v1 never hit
+that floor because it always wrote a Troubleshooting paragraph.
+
+v5 therefore changes exactly two things and nothing else:
+
+1. `## Overview` -> `## About`, `## Getting Started` -> `## Quick Start`, and
+   `## Permissions & Access` is restored as its own section.
+2. `## Errors` and `## Permissions & Access` are never omitted; when the source raises nothing
+   the section says so in one line.
+
+Effect over the three repositories:
+
+| dimension (GitHub) | v1 | v4 | **v5** |
+|---|---|---|---|
+| Permission Declaration | 2.86 | 1.58 | **4.14** |
+| Conceptual Content | 3.69 | 1.04 | **3.42** |
+| Error Reference | 1.72 | 2.06 | **4.33** |
+| Process Content | 4.02 | 4.01 | **4.56** |
+| Product Label Standards | 3.91 | 4.40 | **4.81** |
+| Content Type Consistency | 2.38 | 4.68 | **4.97** |
+| Content Order | 3.26 | 4.65 | **4.91** |
+| Prerequisites Standards | 2.89 | 4.45 | 3.89 |
+| Getting Started Content | 3.51 | 3.76 | 3.04 |
+| Tutorial Content | 2.58 | 1.01 | 1.05 |
+
+Totals:
+
+| axis | v1 | v4 | **v5** |
+|---|---|---|---|
+| ISO/IEC 26514 (14 dims) | 4.757 | 4.777 | **4.772** |
+| GitHub docs style (18 dims) | 3.360 | 3.707 | **4.187** |
+
+The ISO axis is flat (-0.004, inside noise) and its only movement is Conciseness 4.15 -> 4.07,
+the price of always emitting the Errors section. The GitHub axis gains **+0.48** over v4 and
+**+0.83** over v1.
+
+Two regressions come from the same rename. `Prerequisites Standards` and `Getting Started`
+fall because v4 carried an explicit `**Prerequisites**` label inside Getting Started that v5's
+Quick Start paragraph does not; a `## Prerequisites` section of its own is the obvious v6 fix,
+worth roughly +0.5 on each. `Tutorial Content` stays at 1.05 despite the Quick Start heading
+because the Metadata declares `Content Type: Reference` and the judge reads the declaration
+before the section: the same declaration that lifts Content Type Consistency to 4.97 caps
+Tutorial Content at the floor. That trade is worth taking -- +2.59 on Content Type Consistency
+against a criterion no entity-level document can satisfy anyway.
+
+## 8. Cost of the revisions
+
+Measured on ragflow (38 entities, ISO axis, one call per entity):
+
+| revision | calls | input tok | output tok | per-call in | per-call out | wall | cost |
+|---|---|---|---|---|---|---|---|
+| v1 | 42 | 57,325 | 51,137 | 1,509 | 1,346 | 137 s | $0.05 |
+| v4 | 38 | 84,133 | 61,386 | 2,214 | 1,615 | 88 s | $0.07 |
+| v5 | 39 | 88,769 | 59,486 | 2,276 | 1,525 | 160 s | $0.08 |
+
+The template grew from 4.1 KB to 7.4 KB and the evidence block is new, which is most of the
++51% input. The output is stable: the mandatory Behaviour and Errors sections buy facts, not
+length. Against MemDocAgent's 44,685 input tokens and 6.1 calls per entity for 3,128 output
+tokens, v5 still spends 20x less input and 6x fewer calls.
