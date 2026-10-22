@@ -228,3 +228,70 @@ The template grew from 4.1 KB to 7.4 KB and the evidence block is new, which is 
 +51% input. The output is stable: the mandatory Behaviour and Errors sections buy facts, not
 length. Against MemDocAgent's 44,685 input tokens and 6.1 calls per entity for 3,128 output
 tokens, v5 still spends 20x less input and 6x fewer calls.
+
+
+## 9. v6: a section of its own for Prerequisites
+
+v5 renamed Getting Started to Quick Start and, in doing so, dropped the `**Prerequisites**`
+label that v4 had carried inside it. Two criteria fell: Prerequisites Standards 4.45 -> 3.89
+and Getting Started 3.76 -> 3.04. v6 adds a `## Prerequisites` section of its own, placed
+before Quick Start, always emitted, and changes nothing else.
+
+| dimension (GitHub) | v1 | v4 | v5 | **v6** |
+|---|---|---|---|---|
+| Prerequisites Standards | 2.89 | 4.45 | 3.89 | **4.97** |
+| Permission Declaration | 2.86 | 1.58 | 4.14 | **4.25** |
+| Category Title Naming | 2.05 | 3.02 | 3.22 | **3.30** |
+| Conceptual Content | 3.69 | 1.04 | 3.42 | **3.49** |
+| Getting Started Content | 3.51 | 3.76 | 3.04 | 3.09 |
+| Process Content | 4.02 | 4.01 | 4.56 | 4.49 |
+| Error Reference | 1.72 | 2.06 | 4.33 | 4.26 |
+
+`Prerequisites Standards` recovers **+1.08** over v5 and lands at 4.97, the highest of any
+revision. The cost is small and lands where expected: ISO Conciseness 4.07 -> 4.04 and
+User-Centered Design 4.19 -> 4.10, because every document now carries a prerequisites block
+even when it needs none.
+
+Totals:
+
+| axis | v1 | v4 | v5 | **v6** |
+|---|---|---|---|---|
+| ISO/IEC 26514 (14 dims) | 4.757 | 4.777 | 4.772 | **4.773** |
+| GitHub docs style (18 dims) | 3.360 | 3.707 | 4.187 | **4.267** |
+
+Token and latency on ragflow (38 entities, ISO axis):
+
+| revision | calls | input tok | output tok | per-call in | per-call out | wall | cost |
+|---|---|---|---|---|---|---|---|
+| v1 | 42 | 57,325 | 51,137 | 1,509 | 1,346 | 137 s | $0.05 |
+| v4 | 38 | 84,133 | 61,386 | 2,214 | 1,615 | 88 s | $0.07 |
+| v5 | 39 | 88,769 | 59,486 | 2,276 | 1,525 | 160 s | $0.08 |
+| v6 | 39 | 92,911 | 63,085 | 2,382 | 1,618 | 147 s | $0.08 |
+
+## 10. Where the sequence ends
+
+v6 is the last revision worth making. What is left is not prompt-shaped:
+
+* **ISO Content Quality** (4.63 against RepoAgent 4.76) is the only main dimension we trail.
+  Its three components are Conciseness 4.04 vs 4.32, Completeness 4.59 vs 4.80 and
+  Correctness 4.76 vs 4.92. Every attempt to move them by prompt has traded one for the
+  other: v2 bought Conciseness +0.92 and paid Completeness -0.39; v6 buys Completeness
+  +0.05 and pays Conciseness -0.03. The remaining gap is a word-budget question, not a
+  template question, and the honest reading is that a single-document-per-entity format
+  with a fixed section set will not out-write a per-file narrative on "completeness" as a
+  judge perceives it.
+* **GitHub Tutorial Content** sits at 1.12 against 1.01 for every baseline, i.e. at the
+  floor for everyone. The Metadata declares `Content Type: Reference`, and the judge reads
+  the declaration before the section; the same declaration is worth +2.59 on Content Type
+  Consistency. Six revisions is enough evidence that this is a definitional conflict
+  between two criteria, not a defect in the prompt.
+* **Getting Started Content** (3.09 against v1's 3.51) is the one remaining regression. v1's
+  `Example Usage` with prose commentary satisfied it more than v6's numbered steps do. It is
+  worth about +0.4 on a single document-set criterion; the fix would be to restore a worked
+  example with narrative, at some cost to Conciseness.
+
+The measurement lesson belongs in the paper's threats-to-validity section: **an LLM judge
+scores a criterion by recognising its section name and reads omission as absence.** Between
+v4 and v5 nothing changed except three headings and a rule that two sections are never
+omitted, and the GitHub axis moved +0.48. Any evaluation that compares generated
+documentation across tools without controlling for section naming is measuring the naming.
