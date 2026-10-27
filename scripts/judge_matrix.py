@@ -132,6 +132,11 @@ def score_of(entry) -> float | None:
     return None
 
 
+#: Interaction style, set from --mode in main(). A module-level holder keeps the thread
+#: workers from needing a new argument in every call site.
+MODE = {"value": "single"}
+
+
 def run_judging(args, tasks: list, criteria_sets: dict, api_key: str) -> dict:
     lock = threading.Lock()
     stats = {"done": 0, "failed": 0, "unparsed": 0, "started": time.time()}
@@ -145,10 +150,34 @@ def run_judging(args, tasks: list, criteria_sets: dict, api_key: str) -> dict:
         judge.use_max_completion_tokens = True
         judge.max_token = max(1024, 200 * len(criteria))
 
-        spec = "\n".join(f"- {c.name}: {c.definition}" for c in criteria)
-        judge.load_JudgeContent_Once(spec)
         text = task["doc"].read_text(encoding="utf-8")
-        verdict, attempts, reason = judge_with_retry(judge, text)
+        if MODE["value"] == "per-dim":
+            # Multi-round (M) interaction style from tab:rq2_extended: one independent
+            # conversation per dimension. It costs len(criteria) calls per document and
+            # exists to show the judge's interaction style does not drive the ranking.
+            verdict = {}
+            attempts = 0
+            unparsed = []
+            for criterion in criteria:
+                judge = LLM_Remote_query(api_key=api_key, api_url=DEFAULTS["base_url"],
+                                         model=DEFAULTS["model"])
+                judge.judge_temperature = DEFAULTS["judge_temperature"]
+                judge.use_max_completion_tokens = True
+                judge.max_token = 700
+                judge.load_judgeContent(criterion.name, criterion.definition)
+                single, tries, reason = judge_with_retry(judge, text)
+                attempts += tries
+                entry = single.get(criterion.name) or next(iter(single.values()), None)
+                if entry:
+                    verdict[criterion.name] = entry
+                else:
+                    unparsed.append(f"{criterion.name}: {reason[:120]}")
+            reason = " | ".join(unparsed)
+        else:
+            # Single-round (S): every dimension in one conversation, the default.
+            spec = "\n".join(f"- {c.name}: {c.definition}" for c in criteria)
+            judge.load_JudgeContent_Once(spec)
+            verdict, attempts, reason = judge_with_retry(judge, text)
 
         payload = {
             "axis": axis,
@@ -400,9 +429,13 @@ def main() -> int:
     ap.add_argument("--layout", choices=["matrix", "flat"], default="matrix",
                     help="matrix: <root>/<axis>/<repo>; flat: <root>/<repo> scored per axis")
     ap.add_argument("--report-tag", default="", help="suffix for the report files")
+    ap.add_argument("--mode", choices=["single", "per-dim"], default="single",
+                    help="single: all dimensions in one conversation (S); "
+                         "per-dim: each dimension in its own interaction (M)")
     ap.add_argument("--report-only", action="store_true",
                     help="skip judging, only re-aggregate existing score files")
     args = ap.parse_args()
+    MODE["value"] = args.mode
     if args.judge_url:
         DEFAULTS["base_url"] = args.judge_url
     if args.judge_model:
