@@ -1,0 +1,307 @@
+[
+  {
+    "axis": "iso_26514",
+    "label": "ISO/IEC 26514",
+    "documents": 158,
+    "empty_verdicts": 0,
+    "dimensions_asked": 14,
+    "dimensions_scored": 14,
+    "overall_mean": 4.091,
+    "main_dimensions": [
+      {
+        "category": "Internationalization & Localization",
+        "dimensions": 2,
+        "scored_dimensions": 2,
+        "mean_of_dimension_means": 4.665,
+        "pooled_mean": 4.665,
+        "n_verdicts": 316
+      },
+      {
+        "category": "Format & Presentation",
+        "dimensions": 2,
+        "scored_dimensions": 2,
+        "mean_of_dimension_means": 4.475,
+        "pooled_mean": 4.475,
+        "n_verdicts": 316
+      },
+      {
+        "category": "Content Quality",
+        "dimensions": 5,
+        "scored_dimensions": 5,
+        "mean_of_dimension_means": 4.375,
+        "pooled_mean": 4.375,
+        "n_verdicts": 790
+      },
+      {
+        "category": "Information Structure",
+        "dimensions": 4,
+        "scored_dimensions": 4,
+        "mean_of_dimension_means": 3.543,
+        "pooled_mean": 3.543,
+        "n_verdicts": 632
+      },
+      {
+        "category": "Usability & User Experience",
+        "dimensions": 1,
+        "scored_dimensions": 1,
+        "mean_of_dimension_means": 2.956,
+        "pooled_mean": 2.956,
+        "n_verdicts": 158
+      }
+    ],
+    "dimensions": [
+      {
+        "dimension": "Correctness",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.456,
+        "sd": 0.591,
+        "missing": false
+      },
+      {
+        "dimension": "Consistency",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.576,
+        "sd": 0.531,
+        "missing": false
+      },
+      {
+        "dimension": "Comprehensibility",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.342,
+        "sd": 0.56,
+        "missing": false
+      },
+      {
+        "dimension": "Conciseness",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 4.854,
+        "sd": 0.353,
+        "missing": false
+      },
+      {
+        "dimension": "Completeness",
+        "category": "Content Quality",
+        "n": 158,
+        "mean": 3.646,
+        "sd": 0.804,
+        "missing": false
+      },
+      {
+        "dimension": "Modularity",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 4.494,
+        "sd": 0.582,
+        "missing": false
+      },
+      {
+        "dimension": "Structured by Function",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 4.563,
+        "sd": 0.578,
+        "missing": false
+      },
+      {
+        "dimension": "Navigability",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 4.076,
+        "sd": 0.768,
+        "missing": false
+      },
+      {
+        "dimension": "Metadata",
+        "category": "Information Structure",
+        "n": 158,
+        "mean": 1.038,
+        "sd": 0.191,
+        "missing": false
+      },
+      {
+        "dimension": "Consistent Format",
+        "category": "Format & Presentation",
+        "n": 158,
+        "mean": 4.032,
+        "sd": 0.706,
+        "missing": false
+      },
+      {
+        "dimension": "Legibility",
+        "category": "Format & Presentation",
+        "n": 158,
+        "mean": 4.918,
+        "sd": 0.275,
+        "missing": false
+      },
+      {
+        "dimension": "Cultural Neutrality",
+        "category": "Internationalization & Localization",
+        "n": 158,
+        "mean": 5.0,
+        "sd": 0.0,
+        "missing": false
+      },
+      {
+        "dimension": "Translation-Friendly",
+        "category": "Internationalization & Localization",
+        "n": 158,
+        "mean": 4.329,
+        "sd": 0.47,
+        "missing": false
+      },
+      {
+        "dimension": "User-Centered Design",
+        "category": "Usability & User Experience",
+        "n": 158,
+        "mean": 2.956,
+        "sd": 0.588,
+        "missing": false
+      }
+    ],
+    "per_repo": {
+      "joblib": {
+        "verdicts": 840,
+        "mean": 4.143,
+        "dimensions": {
+          "Correctness": 4.467,
+          "Consistency": 4.633,
+          "Comprehensibility": 4.333,
+          "Conciseness": 4.833,
+          "Completeness": 3.767,
+          "Modularity": 4.567,
+          "Structured by Function": 4.617,
+          "Navigability": 4.217,
+          "Metadata": 1.033,
+          "Consistent Format": 4.217,
+          "Legibility": 4.967,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.283,
+          "User-Centered Design": 3.067
+        }
+      },
+      "ragflow": {
+        "verdicts": 532,
+        "mean": 4.124,
+        "dimensions": {
+          "Correctness": 4.605,
+          "Consistency": 4.579,
+          "Comprehensibility": 4.553,
+          "Conciseness": 4.816,
+          "Completeness": 3.868,
+          "Modularity": 4.579,
+          "Structured by Function": 4.605,
+          "Navigability": 4.0,
+          "Metadata": 1.079,
+          "Consistent Format": 3.816,
+          "Legibility": 4.921,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.368,
+          "User-Centered Design": 2.947
+        }
+      },
+      "sonnet": {
+        "verdicts": 840,
+        "mean": 4.019,
+        "dimensions": {
+          "Correctness": 4.35,
+          "Consistency": 4.517,
+          "Comprehensibility": 4.217,
+          "Conciseness": 4.9,
+          "Completeness": 3.383,
+          "Modularity": 4.367,
+          "Structured by Function": 4.483,
+          "Navigability": 3.983,
+          "Metadata": 1.017,
+          "Consistent Format": 3.983,
+          "Legibility": 4.867,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.35,
+          "User-Centered Design": 2.85
+        }
+      }
+    },
+    "per_kind": {
+      "class": {
+        "verdicts": 728,
+        "mean": 4.036,
+        "dimensions": {
+          "Correctness": 4.212,
+          "Consistency": 4.731,
+          "Comprehensibility": 4.154,
+          "Conciseness": 4.808,
+          "Completeness": 3.385,
+          "Modularity": 4.423,
+          "Structured by Function": 4.423,
+          "Navigability": 4.154,
+          "Metadata": 1.019,
+          "Consistent Format": 4.115,
+          "Legibility": 4.904,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.212,
+          "User-Centered Design": 2.962
+        }
+      },
+      "function": {
+        "verdicts": 434,
+        "mean": 4.205,
+        "dimensions": {
+          "Correctness": 4.677,
+          "Consistency": 4.581,
+          "Comprehensibility": 4.484,
+          "Conciseness": 4.871,
+          "Completeness": 3.903,
+          "Modularity": 4.581,
+          "Structured by Function": 4.742,
+          "Navigability": 4.355,
+          "Metadata": 1.065,
+          "Consistent Format": 4.226,
+          "Legibility": 4.968,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.452,
+          "User-Centered Design": 2.968
+        }
+      },
+      "method": {
+        "verdicts": 1050,
+        "mean": 4.083,
+        "dimensions": {
+          "Correctness": 4.533,
+          "Consistency": 4.467,
+          "Comprehensibility": 4.413,
+          "Conciseness": 4.88,
+          "Completeness": 3.72,
+          "Modularity": 4.507,
+          "Structured by Function": 4.587,
+          "Navigability": 3.907,
+          "Metadata": 1.04,
+          "Consistent Format": 3.893,
+          "Legibility": 4.907,
+          "Cultural Neutrality": 5.0,
+          "Translation-Friendly": 4.36,
+          "User-Centered Design": 2.947
+        }
+      }
+    },
+    "all_main_dimensions": [
+      "Accessibility",
+      "Content Quality",
+      "Format & Presentation",
+      "Information Structure",
+      "Internationalization & Localization",
+      "Maintenance & Updates",
+      "Safety & Compliance",
+      "Usability & User Experience"
+    ],
+    "uncovered_main_dimensions": [
+      "Accessibility",
+      "Maintenance & Updates",
+      "Safety & Compliance"
+    ],
+    "unmatched_keys": {}
+  }
+]

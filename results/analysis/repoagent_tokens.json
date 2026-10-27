@@ -1,0 +1,102 @@
+{
+  "model": "gpt-6-luna",
+  "measured_at": "2026-10-27T15:12:59",
+  "repos": {
+    "dify_api": {
+      "repo": "dify_api",
+      "returncode": 1,
+      "seconds": 15.5,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_dify_api.log"
+    },
+    "fairseq": {
+      "repo": "fairseq",
+      "returncode": 1,
+      "seconds": 2.9,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_fairseq.log"
+    },
+    "flask-main": {
+      "repo": "flask-main",
+      "returncode": 1,
+      "seconds": 2.8,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_flask-main.log"
+    },
+    "joblib": {
+      "repo": "joblib",
+      "error": "FileExistsError: [WinError 183] 当文件已存在时，无法创建该文件。: 'E:\\\\Pycharm_projects\\\\CodeEval\\\\third_party\\\\rawork_tokenbench\\\\joblib'"
+    },
+    "numpy": {
+      "repo": "numpy",
+      "returncode": 1,
+      "seconds": 2.6,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_numpy.log"
+    },
+    "openui": {
+      "repo": "openui",
+      "returncode": 1,
+      "seconds": 2.7,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_openui.log"
+    },
+    "pyro": {
+      "repo": "pyro",
+      "returncode": 1,
+      "seconds": 2.7,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_pyro.log"
+    },
+    "sonnet": {
+      "repo": "sonnet",
+      "returncode": 1,
+      "seconds": 2.7,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_sonnet.log"
+    },
+    "torch": {
+      "repo": "torch",
+      "returncode": 1,
+      "seconds": 3.9,
+      "calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "documents": 0,
+      "log": "results\\analysis\\repoagent_tokens_torch.log"
+    },
+    "ragflow": {
+      "repo": "ragflow",
+      "returncode": 0,
+      "seconds": 154.8,
+      "calls": 36,
+      "prompt_tokens": 61270,
+      "completion_tokens": 28827,
+      "documents": 2,
+      "log": "results\\analysis\\repoagent_tokens_ragflow.log",
+      "in_per_call": 1701.9,
+      "out_per_call": 800.8
+    }
+  }
+}
