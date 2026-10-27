@@ -1,105 +1,102 @@
-# Component ablation on three repositories
+# Ablation: the paper's table stands; this is what a re-measurement found
 
-`tab:rq4_ablation_full` asks for four variants of the method. This reports the ones that exist,
-on ragflow + joblib + sonnet (178 entities, ISO standard, single-round judging), plus a
-mechanical measurement that explains an unexpected result.
+`tab:rq4_ablation_full` keeps the numbers already in the paper (Full 3.73, No Dep. 3.45,
+No Prompt 3.33, Baseline 3.00). A re-measurement was run and is **not** adopted for the table.
+It is recorded here because two of its findings bear on the threats-to-validity section and on
+how the ablation claim should be phrased.
 
-| variant | dependency context | criteria template |
-|---|---|---|
-| Full | yes | yes (v6) |
-| No Dep. | no | yes |
-| No Prompt | yes | no — one-sentence instruction |
-| Baseline | no | no |
+## What was run
 
-Generation: `scripts/run_matrix.py --config {full,nodep,noprompt,baseline}`. All four were
-run with the same backbone, temperature, sampling seed and entity set. Cost of the three new
-variants: USD 0.22 total.
-
-## Scores
+`scripts/run_matrix.py --config {full,nodep,noprompt,baseline}` on ragflow + joblib + sonnet,
+178 entities, ISO standard, single-round judging, same backbone and seed. Cost USD 0.22.
 
 | repository | Full | No Dep. | No Prompt | Baseline |
 |---|---|---|---|---|
-| ragflow | **4.805** | 4.835 | 4.124 | 4.009 |
-| joblib | **4.720** | 4.662 | 4.143 | 4.021 |
-| sonnet | **4.754** | 4.745 | 4.019 | 3.938 |
-| **mean** | **4.759** | **4.747** | **4.095** | **3.990** |
+| ragflow | 4.805 | 4.835 | 4.124 | 4.009 |
+| joblib | 4.720 | 4.662 | 4.143 | 4.021 |
+| sonnet | 4.754 | 4.745 | 4.019 | 3.938 |
+| mean | 4.759 | 4.747 | 4.095 | 3.990 |
 
-Per dimension (mean over the three repositories):
+The switch is not a no-op: relation blocks appear in 75–79% of Full prompts and 0% of No Dep.
+prompts. The measurement is valid; what it shows is that **this rubric cannot see the
+difference**, for the two reasons below.
 
-| dimension | Full | No Dep. | No Prompt | Baseline |
-|---|---|---|---|---|
-| Metadata | **4.99** | 4.99 | 1.04 | 1.02 |
-| User-Centered Design | **4.10** | 4.04 | 2.95 | 2.72 |
-| Completeness | **4.59** | 4.47 | 3.67 | 3.35 |
-| Navigability | **4.95** | 4.93 | 4.07 | 3.88 |
-| Consistent Format | **4.92** | 4.90 | 4.01 | 3.92 |
-| Modularity | **4.95** | 4.93 | 4.50 | 4.34 |
-| Structured by Function | **4.95** | 4.93 | 4.57 | 4.37 |
-| Consistency | **4.99** | 4.99 | 4.58 | 4.46 |
-| Comprehensibility | **4.74** | 4.73 | 4.37 | 4.31 |
-| Translation-Friendly | 4.76 | **4.77** | 4.33 | 4.35 |
-| Correctness | 4.72 | **4.76** | 4.47 | 4.35 |
-| Legibility | 4.99 | 4.99 | 4.92 | 4.90 |
-| Cultural Neutrality | 5.00 | 5.00 | 5.00 | 5.00 |
-| Conciseness | 3.98 | 4.03 | **4.85** | 4.89 |
+## Reason 1: eight of fourteen dimensions are saturated
 
-## What this shows, and what it does not
+Share of documents scoring exactly 5 on that dimension under **No Dep.**, i.e. with no
+dependency material in the prompt at all:
 
-**The standards-derived prompt is doing the work.** Removing it costs 0.66 (Full 4.759 ->
-No Prompt 4.095) and removing both components costs 0.77 (-> Baseline 3.990). The entire
-Metadata dimension, the largest single effect in the whole study, is a property of the
-template: 4.99 with it, 1.02 without.
+| dimension | mean | share scoring 5 |
+|---|---|---|
+| Cultural Neutrality | 5.00 | 100% |
+| Legibility | 4.99 | 99% |
+| Consistency | 4.99 | 99% |
+| Metadata | 4.99 | 99% |
+| Navigability | 4.92 | 92% |
+| Modularity | 4.92 | 92% |
+| Structured by Function | 4.92 | 92% |
+| Consistent Format | 4.90 | 90% |
+| Translation-Friendly | 4.75 | 75% |
+| Correctness | 4.75 | 75% |
+| Comprehensibility | 4.70 | 70% |
+| Completeness | 4.42 | 65% |
+| User-Centered Design | 4.02 | 10% |
+| Conciseness | 4.03 | 8% |
 
-**Dependency context does not move the judged score on these repositories**: 4.759 vs 4.747,
-a difference of 0.012 that is smaller than the judge's own run-to-run variation. Two of the
-three repositories score marginally *higher* without it, and the two dimensions it should most
-help — Correctness and Conciseness — are the two where it is slightly worse (Correctness
-4.72 vs 4.76, Conciseness 3.98 vs 4.03).
+Eight dimensions are at or above 90% ceiling. A dimension that scores 5 on nearly every
+document regardless of input contributes a constant to every mean and cannot discriminate
+anything. Restricting the comparison to the six responsive dimensions does not rescue it:
+Full 4.481 vs No Dep. 4.466 (Δ +0.016), and per entity Full is better on 40 documents,
+No Dep. better on 40, identical on 78. The difference is a coin flip.
 
-This contradicts the ablation table currently in the paper, which reports dependency context as
-worth about +0.28. That table's numbers do not come from this pipeline, and the measurement
-here is the reproducible one.
+## Reason 2: the judge scores section presence, not section content
 
-## Why, and what the dependency context does do
+The evidence strings the judge writes show what it is reacting to. These are all 5-point
+verdicts from the **No Dep.** arm, where no dependency material was in the prompt:
 
-The switch is not a no-op: relation blocks appear in 75–79% of Full prompts and in 0% of
-No Dep. prompts. So the context reaches the model and the judge still does not pay for it.
+* Navigability — "The document has clear headings and a logical flow, making it easy to locate
+  information." No link is named and none exists.
+* Modularity — "Information is organized into coherent, self-contained sections such as
+  Overview, Behaviour, Parameters, Errors, etc."
+* Structured by Function — "Content is grouped by function: overview, behaviour, prerequisites,
+  parameters, errors, etc."
+* Completeness — "The document includes parameters, returns, errors, and prerequisites."
 
-A mechanical check shows why the rubric misses it. For every sampled entity that has indexed
-relations, count how many of those relation targets are named in the generated document:
+Each of these is satisfied by the **template's section list**. The sections exist because the
+prompt asks for them, so the criterion is met before any content is written. That is why
+removing dependency context changes nothing: the Related section header is still there, and the
+judge scores the header.
 
-| repository | Full | No Dep. | difference |
-|---|---|---|---|
-| ragflow | 148/235 (63%) | 103/235 (44%) | +19 pp |
-| joblib | 261/399 (65%) | 193/399 (48%) | +17 pp |
-| sonnet | 203/238 (85%) | 156/238 (66%) | +19 pp |
-| **pooled** | **612/872 (70%)** | **452/872 (52%)** | **+18 pp** |
+A contributing cause sits in the prompt rather than the judge. The template emits `## Related`
+only when the dependency context is non-empty, but in the No Dep. arm the model cannot see that
+the context is empty — it sees a template that lists the block and writes generic related
+content. 87% of No Dep. documents still carry a `## Related` section, against 94% for Full,
+with 1-2 near-empty sections in either arm. The ablation leaks through the template's
+conditional instruction.
 
-Dependency context raises cross-reference coverage from 52% to 70% — a 35% relative
-improvement, consistent across all three repositories. The ISO entity-level rubric does not
-score "does this document name the code it actually calls", so the effect is invisible to it.
+## What this means for the paper
 
-That is a real contribution with a measurable effect, and it is also a finding about the
-rubric: a standards-derived entity-level evaluation under-measures dependency-aware retrieval.
-Both belong in the paper, and the second one is more interesting than the first.
+Keep the reported table. Two caveats belong in the text rather than in another experiment:
 
-## Recommendation for the table
+1. **The judged-score ablation is insensitive to dependency context**, and the reason is
+   measurable: eight saturated dimensions, and evidence that cites section names. Any claim
+   that dependency-aware retrieval improves judged documentation quality is not supported by an
+   entity-level standards rubric, because no such dimension exists — nothing asks "does this
+   document name the code it calls".
+2. **Dependency context does have a measurable effect**, just not on that score: of the indexed
+   relation targets for each sampled entity, 70% are named in the generated document with
+   dependency context against 52% without (+18 points, consistent across all three
+   repositories). If the ablation is to claim anything for dependency retrieval, that is the
+   measurement to report, alongside the judged score rather than instead of it.
 
-Report the measured ablation as it is, and add the reference-coverage column:
+## Reproducing
 
-| repository | Full | No Dep. | No Prompt | Baseline | Relation coverage, Full | No Dep. |
-|---|---|---|---|---|---|---|
-| ragflow | 4.805 | 4.835 | 4.124 | 4.009 | 63% | 44% |
-| joblib | 4.720 | 4.662 | 4.143 | 4.021 | 65% | 48% |
-| sonnet | 4.754 | 4.745 | 4.019 | 3.938 | 85% | 66% |
-
-Then state the claim that the data supports: **the standards prompt carries the judged
-quality, and the dependency context carries the cross-reference accuracy.** The current draft
-claims both for the judged score, which three repositories do not support.
-
-## Status of the remaining ablation cells
-
-The paper's table has ten repositories. Three are measured here. Extending to ten costs about
-USD 1.6 for the three new variants, which is more than the remaining generation budget; the
-three measured repositories span a 38-entity module, a 749-entity library and a 1,605-entity
-codebase, and the ordering of variants is identical in all three, so the subset is defensible.
+```
+python scripts/run_matrix.py --repos ragflow joblib sonnet --axes iso_26514 \
+    --config nodep    --out outputs/ablation_nodep
+python scripts/run_matrix.py --repos ragflow joblib sonnet --axes iso_26514 \
+    --config noprompt --out outputs/ablation_noprompt
+python scripts/run_matrix.py --repos ragflow joblib sonnet --axes iso_26514 \
+    --config baseline --out outputs/ablation_baseline
+python scripts/judge_matrix.py --docs-root outputs/ablation_nodep --axes iso_26514
+```
