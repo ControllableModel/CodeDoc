@@ -480,13 +480,18 @@ class PythonAstExtractor(Extractor):
     )
 
     def __init__(self) -> None:
-        self._index: Optional[ProjectIndex] = None
+        #: Keyed by repository root. The index used to live in a single slot, so the second
+        #: and every later repository in the same process silently reused the first one's
+        #: index: a loop over ten repositories reported ten identical coverage rows. Cache
+        #: per root, never across roots.
+        self._indexes: Dict[str, ProjectIndex] = {}
 
     # -- helpers ------------------------------------------------------------
     def _build(self, repo_root: str) -> ProjectIndex:
-        if self._index is None:
-            self._index = ProjectIndex(repo_root).build()
-        return self._index
+        key = str(Path(repo_root).resolve())
+        if key not in self._indexes:
+            self._indexes[key] = ProjectIndex(repo_root).build()
+        return self._indexes[key]
 
     def measure(self, repo_root: str) -> Dict[str, int]:
         idx = self._build(repo_root)
