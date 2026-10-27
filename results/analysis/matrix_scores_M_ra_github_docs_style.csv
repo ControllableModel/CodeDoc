@@ -1,0 +1,19 @@
+main_dimension,dimension,n,mean,sd
+"Content Quality","Content Type Consistency",578,3.96,0.503
+"Content Quality","Reuse Instead of Copying",578,2.997,0.311
+"Structure & Organization","Balanced Hierarchy",578,3.443,0.807
+"Structure & Organization","Content Order",578,4.183,0.64
+"Structure & Organization","Category Title Naming",578,1.138,0.418
+"Styling & Formatting","Title Standards",578,2.981,0.604
+"Styling & Formatting","Introduction Standards",578,3.104,0.986
+"Styling & Formatting","Permission Declaration Standards",578,1.0,
+"Styling & Formatting","Product Label Standards",578,3.311,0.567
+"Content Types & Completeness","Process Content Standards",578,1.566,0.749
+"Content Types & Completeness","Next Steps Standards",578,1.009,0.093
+"Content Types & Completeness","Further Reading Standards",578,1.003,0.059
+"Content Types & Completeness","Prerequisites Standards",578,1.943,0.662
+"Article Content Families","Reference Content",578,4.491,0.671
+"Article Content Families","Conceptual Content Guidelines",578,1.208,0.41
+"Article Content Families","Error Reference Content Guidelines",578,1.391,0.744
+"Article Content Families","Tutorial Content Guidelines",578,1.002,0.042
+"Article Content Families","Getting Started Content Guidelines",578,1.0,

@@ -190,6 +190,7 @@ def run_judging(args, tasks: list, criteria_sets: dict, api_key: str) -> dict:
             "unparsed": reason,
             "dimensions_asked": [c.name for c in criteria],
             "model": DEFAULTS["model"],
+            "mode": MODE["value"],
         }
         task["out"].write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         with lock:
@@ -459,7 +460,11 @@ def main() -> int:
                 docs_dir = doc_dir(axis, repo)
                 if not docs_dir.is_dir():
                     continue
-                score_dir = docs_dir / f"scores_{axis}"
+                # The interaction style decides the directory: M scores must not overwrite S
+                # scores, and the resume check below skips any document that already has a
+                # file, so a shared directory would make a per-dim run silently do nothing.
+                suffix = "_M" if MODE["value"] == "per-dim" else ""
+                score_dir = docs_dir / f"scores_{axis}{suffix}"
                 score_dir.mkdir(parents=True, exist_ok=True)
                 docs = sorted(docs_dir.glob("*.md"))
                 if args.limit_docs:
