@@ -1,6 +1,6 @@
 {
   "model": "gpt-6-luna",
-  "measured_at": "2026-10-27T15:12:59",
+  "measured_at": "2026-10-27T16:29:16",
   "repos": {
     "dify_api": {
       "repo": "dify_api",
@@ -24,17 +24,27 @@
     },
     "flask-main": {
       "repo": "flask-main",
-      "returncode": 1,
-      "seconds": 2.8,
-      "calls": 0,
-      "prompt_tokens": 0,
-      "completion_tokens": 0,
-      "documents": 0,
-      "log": "results\\analysis\\repoagent_tokens_flask-main.log"
+      "returncode": 0,
+      "seconds": 1091.4,
+      "calls": 442,
+      "prompt_tokens": 863852,
+      "completion_tokens": 329909,
+      "documents": 20,
+      "log": "results\\analysis\\repoagent_tokens_flask-main.log",
+      "in_per_call": 1954.4,
+      "out_per_call": 746.4
     },
     "joblib": {
       "repo": "joblib",
-      "error": "FileExistsError: [WinError 183] 当文件已存在时，无法创建该文件。: 'E:\\\\Pycharm_projects\\\\CodeEval\\\\third_party\\\\rawork_tokenbench\\\\joblib'"
+      "returncode": 0,
+      "seconds": 2076.2,
+      "calls": 775,
+      "prompt_tokens": 1109052,
+      "completion_tokens": 564767,
+      "documents": 39,
+      "log": "results\\analysis\\repoagent_tokens_joblib.log",
+      "in_per_call": 1431.0,
+      "out_per_call": 728.7
     },
     "numpy": {
       "repo": "numpy",
@@ -48,13 +58,15 @@
     },
     "openui": {
       "repo": "openui",
-      "returncode": 1,
-      "seconds": 2.7,
-      "calls": 0,
-      "prompt_tokens": 0,
-      "completion_tokens": 0,
-      "documents": 0,
-      "log": "results\\analysis\\repoagent_tokens_openui.log"
+      "returncode": 0,
+      "seconds": 412.3,
+      "calls": 168,
+      "prompt_tokens": 208241,
+      "completion_tokens": 112860,
+      "documents": 26,
+      "log": "results\\analysis\\repoagent_tokens_openui.log",
+      "in_per_call": 1239.5,
+      "out_per_call": 671.8
     },
     "pyro": {
       "repo": "pyro",
