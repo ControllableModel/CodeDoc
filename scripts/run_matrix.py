@@ -39,9 +39,13 @@ OUT_ROOT = ROOT / "outputs" / "matrix"
 REPORT = ROOT / "results" / "analysis" / "matrix_run.md"
 
 #: rubric id -> template that produces a document in that rubric's shape
+#: v6 is the shipped prompt as of the six-revision A/B (results/analysis/prompt_variants.md):
+#: it restores the GitHub-standard section anchors, never omits Errors or Prerequisites, and
+#: carries the mandatory Behaviour section. The earlier revisions stay on disk so the
+#: experiment is reproducible by passing --variant v2/v3/v4/v5.
 AXES = {
-    "iso_26514": "iso_26514.txt",
-    "github_docs_style": "github.txt",
+    "iso_26514": "iso_26514_v6.txt",
+    "github_docs_style": "github_v6.txt",
 }
 
 
@@ -73,13 +77,26 @@ PRICE_IN = 0.09 / 1e6
 PRICE_OUT = 0.45 / 1e6
 
 
+#: The four ablation variants of tab:rq4_ablation_full, as (dependency context, criteria
+#: template). Both components are real switches in build_prompt, so a variant is a pair of
+#: arguments rather than a second pipeline.
+VARIANTS = {
+    "full":     (True,  True),   # dependency retrieval + standards prompt
+    "nodep":    (False, True),   # target entity only
+    "noprompt": (True,  False),  # dependency kept, criteria template replaced by the
+                                 # simplified prompt build_prompt emits for prompt_template=None
+    "baseline": (False, False),  # both removed
+}
+
+
 class _PromptArgs:
     """Minimal stand-in for the console's prompt arguments."""
 
-    def __init__(self, template: Path):
-        self.relevant = True
+    def __init__(self, template: Path, variant: str = "full"):
+        relevant, use_template = VARIANTS[variant]
+        self.relevant = relevant
         self.language = DEFAULTS["language"]
-        self.prompt_template = str(template)
+        self.prompt_template = str(template) if use_template else None
         self.max_tokens = DEFAULTS["max_tokens"]
         self.source_budget = DEFAULTS["source_budget"]
 
@@ -88,7 +105,7 @@ def safe_name(qname: str) -> str:
     return qname.replace(".", "_").replace("/", "_").replace("#", "_").replace("<", "_").replace(">", "_")
 
 
-def generate_one(dep: dict, template: Path, config: dict) -> dict:
+def generate_one(dep: dict, template: Path, config: dict, variant: str = "full") -> dict:
     core = LinguisticCore()
     core.LLM_key = config["api_key"]
     core.LLM_url = config["base_url"]
@@ -101,7 +118,7 @@ def generate_one(dep: dict, template: Path, config: dict) -> dict:
     core.label = tag
     core.create_socket()
 
-    prompt = build_prompt(dep, _PromptArgs(template))
+    prompt = build_prompt(dep, _PromptArgs(template, variant))
     started = time.time()
     document = core.process(prompt)
     seconds = time.time() - started
@@ -131,6 +148,8 @@ def main() -> int:
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--max-cost", type=float, default=5.0,
                     help="abort before exceeding this many USD (default 5.0)")
+    ap.add_argument("--config", default="full", choices=list(VARIANTS),
+                    help="ablation variant (tab:rq4_ablation_full); default full")
     ap.add_argument("--variant", default="",
                     help="template revision suffix, e.g. v2 -> iso_26514_v2.txt")
     ap.add_argument("--out", default=str(OUT_ROOT))
@@ -202,7 +221,7 @@ def main() -> int:
         dep = get_dep(item["index"], task["qname"].split(".")[-1], task["qname"], "")
         if dep is None:
             raise KeyError(f"entity vanished from index: {task['qname']}")
-        result = generate_one(dep, template_for(task["axis"], args.variant), config)
+        result = generate_one(dep, template_for(task["axis"], args.variant), config, args.config)
         task["target"].write_text(result["document"], encoding="utf-8")
         task["target"].with_suffix(".prompt.txt").write_text(result["prompt"], encoding="utf-8")
         return task, result
