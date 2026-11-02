@@ -107,9 +107,19 @@ def doc_dir(axis: str, repo: str) -> Path:
     return DOCS_ROOT / axis / repo
 
 
+#: Which slice of a rubric to ask about. ``entity`` keeps the shipped behaviour (the ISO
+#: rubric is filtered to its 14 entity-level dimensions, because the other 12 are
+#: document-set specifications that a single-entity document cannot satisfy). ``all``
+#: asks about every dimension in the set, which is what the full 26-dimension ISO
+#: evaluation needs.
+SCOPE = {"value": "entity"}
+
+
 def rubric_for(axis: str) -> list:
     """Dimensions the judge is asked about for this axis."""
     criteria = registry.load(axis)
+    if SCOPE["value"] == "all":
+        return criteria
     if AXES[axis]["entity_level_only"]:
         # filter on level, not on applies_to(kind): a dimension that names no kinds
         # applies to every kind, so the kind test silently keeps all 26 ISO dimensions
@@ -227,7 +237,14 @@ def aggregate(axis: str) -> dict:
     documents = 0
     empty = 0
 
-    for score_file in sorted(DOCS_ROOT.rglob(f"scores_{axis}/*.json")):
+    #: Read from the same directory the writer targets. The suffix carries the mode
+    #: and scope ("_M", "_all26", "_M_all26"), so aggregating without it would report
+    #: the 14-dimension entity-level slice while the run just wrote 26-dimension scores.
+    _suffix = "_M" if MODE["value"] == "per-dim" else ""
+    if SCOPE["value"] == "all":
+        _suffix += "_all26"
+    score_glob = f"scores_{axis}{_suffix}/*.json"
+    for score_file in sorted(DOCS_ROOT.rglob(score_glob)):
         try:
             payload = json.loads(score_file.read_text(encoding="utf-8"))
         except ValueError:
@@ -430,6 +447,9 @@ def main() -> int:
     ap.add_argument("--layout", choices=["matrix", "flat"], default="matrix",
                     help="matrix: <root>/<axis>/<repo>; flat: <root>/<repo> scored per axis")
     ap.add_argument("--report-tag", default="", help="suffix for the report files")
+    ap.add_argument("--scope", choices=["entity", "all"], default="entity",
+                    help="entity: shipped slice (ISO filters to its 14 entity-level "
+                         "dimensions); all: every dimension in the set (26 for ISO)")
     ap.add_argument("--mode", choices=["single", "per-dim"], default="single",
                     help="single: all dimensions in one conversation (S); "
                          "per-dim: each dimension in its own interaction (M)")
@@ -437,6 +457,7 @@ def main() -> int:
                     help="skip judging, only re-aggregate existing score files")
     args = ap.parse_args()
     MODE["value"] = args.mode
+    SCOPE["value"] = args.scope
     if args.judge_url:
         DEFAULTS["base_url"] = args.judge_url
     if args.judge_model:
@@ -464,6 +485,8 @@ def main() -> int:
                 # scores, and the resume check below skips any document that already has a
                 # file, so a shared directory would make a per-dim run silently do nothing.
                 suffix = "_M" if MODE["value"] == "per-dim" else ""
+                if SCOPE["value"] == "all":
+                    suffix += "_all26"
                 score_dir = docs_dir / f"scores_{axis}{suffix}"
                 score_dir.mkdir(parents=True, exist_ok=True)
                 docs = sorted(docs_dir.glob("*.md"))

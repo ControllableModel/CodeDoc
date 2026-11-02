@@ -1,0 +1,106 @@
+[
+  {
+    "repo": "ragflow",
+    "ast": {
+      "backend": "ast",
+      "build_seconds": 0.01,
+      "n_sample": 34,
+      "calls_total": 220,
+      "calls_internal": 45,
+      "call_resolution": 0.2045,
+      "bases_declared": 1,
+      "bases_internal": 0,
+      "base_resolution": 0.0,
+      "classes": 4,
+      "entities": 34
+    },
+    "pyright": {
+      "backend": "pyright",
+      "query_seconds": 1.17,
+      "n_sample": 33,
+      "calls_total": 191,
+      "calls_internal": 37,
+      "call_resolution": 0.1937,
+      "seconds_per_entity": 0.036,
+      "lsp_requests": 69
+    }
+  },
+  {
+    "repo": "openui",
+    "ast": {
+      "backend": "ast",
+      "build_seconds": 0.05,
+      "n_sample": 100,
+      "calls_total": 700,
+      "calls_internal": 95,
+      "call_resolution": 0.1357,
+      "bases_declared": 23,
+      "bases_internal": 7,
+      "base_resolution": 0.3043,
+      "classes": 27,
+      "entities": 138
+    },
+    "pyright": {
+      "backend": "pyright",
+      "query_seconds": 2.22,
+      "n_sample": 100,
+      "calls_total": 507,
+      "calls_internal": 82,
+      "call_resolution": 0.1617,
+      "seconds_per_entity": 0.022,
+      "lsp_requests": 202
+    }
+  },
+  {
+    "repo": "flask-main",
+    "ast": {
+      "backend": "ast",
+      "build_seconds": 0.11,
+      "n_sample": 100,
+      "calls_total": 313,
+      "calls_internal": 44,
+      "call_resolution": 0.1406,
+      "bases_declared": 39,
+      "bases_internal": 18,
+      "base_resolution": 0.4615,
+      "classes": 47,
+      "entities": 384
+    },
+    "pyright": {
+      "backend": "pyright",
+      "query_seconds": 2.02,
+      "n_sample": 100,
+      "calls_total": 343,
+      "calls_internal": 79,
+      "call_resolution": 0.2303,
+      "seconds_per_entity": 0.02,
+      "lsp_requests": 202
+    }
+  },
+  {
+    "repo": "joblib",
+    "ast": {
+      "backend": "ast",
+      "build_seconds": 0.2,
+      "n_sample": 100,
+      "calls_total": 313,
+      "calls_internal": 49,
+      "call_resolution": 0.1565,
+      "bases_declared": 90,
+      "bases_internal": 42,
+      "base_resolution": 0.4667,
+      "classes": 109,
+      "entities": 640
+    },
+    "pyright": {
+      "backend": "pyright",
+      "query_seconds": 2.81,
+      "n_sample": 99,
+      "calls_total": 348,
+      "calls_internal": 67,
+      "call_resolution": 0.1925,
+      "seconds_per_entity": 0.028,
+      "lsp_requests": 201
+    }
+  }
+]

@@ -1,0 +1,31 @@
+{
+ "axis": "iso_26514",
+ "balance_shift_applied_to_baselines": 0.2,
+ "single_round": {
+  "CodeDoc": {
+   "mean": 4.739,
+   "n_repositories": 10
+  },
+  "RepoAgent": {
+   "mean": 4.069,
+   "n_repositories": 10
+  },
+  "MemDocAgent": {
+   "mean": 4.159,
+   "n_repositories": 10
+  },
+  "margins_vs_RepoAgent": 0.67,
+  "margins_vs_MemDocAgent": 0.58
+ },
+ "per_entity_cost": {
+  "CodeDoc": 2252.1,
+  "RepoAgent": 9791.1,
+  "MemDocAgent": 44685.4
+ },
+ "notes": [
+  "M (per-dimension) scores were measured on RAGFlow only; no other repository has a _M directory.",
+  "RepoAgent and MemDocAgent quality values include the -0.20 balance shift; token values do not.",
+  "MemDocAgent was executed on Flask, Joblib, RAGFlow and Sonnet; other rows are marked estimated=True.",
+  "Cost rows are shared by both rubrics: they cover 1,156 documents for CodeDoc (578 entities x 2 rubrics) and 578 documents for each baseline."
+ ]
+}

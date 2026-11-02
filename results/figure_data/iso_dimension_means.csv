@@ -1,0 +1,43 @@
+method,dimension,mean_over_repositories
+CodeDoc,Completeness,4.492
+CodeDoc,Comprehensibility,4.689
+CodeDoc,Conciseness,3.992
+CodeDoc,Consistency,4.98
+CodeDoc,Consistent Format,4.915
+CodeDoc,Correctness,4.702
+CodeDoc,Cultural Neutrality,5.0
+CodeDoc,Legibility,4.995
+CodeDoc,Metadata,4.977
+CodeDoc,Modularity,4.94
+CodeDoc,Navigability,4.953
+CodeDoc,Structured by Function,4.941
+CodeDoc,Translation-Friendly,4.718
+CodeDoc,User-Centered Design,4.059
+MemDocAgent,Completeness,4.578
+MemDocAgent,Comprehensibility,4.575
+MemDocAgent,Conciseness,3.947
+MemDocAgent,Consistency,4.779
+MemDocAgent,Consistent Format,3.89
+MemDocAgent,Correctness,4.678
+MemDocAgent,Cultural Neutrality,4.8
+MemDocAgent,Legibility,4.766
+MemDocAgent,Metadata,1.0
+MemDocAgent,Modularity,4.784
+MemDocAgent,Navigability,4.776
+MemDocAgent,Structured by Function,4.788
+MemDocAgent,Translation-Friendly,4.108
+MemDocAgent,User-Centered Design,3.231
+RepoAgent,Completeness,4.485
+RepoAgent,Comprehensibility,4.5
+RepoAgent,Conciseness,4.065
+RepoAgent,Consistency,4.693
+RepoAgent,Consistent Format,3.682
+RepoAgent,Correctness,4.674
+RepoAgent,Cultural Neutrality,4.747
+RepoAgent,Legibility,4.615
+RepoAgent,Metadata,1.0
+RepoAgent,Modularity,4.515
+RepoAgent,Navigability,4.416
+RepoAgent,Structured by Function,4.585
+RepoAgent,Translation-Friendly,4.068
+RepoAgent,User-Centered Design,3.073

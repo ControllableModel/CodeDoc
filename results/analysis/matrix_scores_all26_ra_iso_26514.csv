@@ -1,0 +1,27 @@
+main_dimension,dimension,n,mean,sd
+"Content Quality","Correctness",578,4.801,0.58
+"Content Quality","Consistency",578,4.839,0.549
+"Content Quality","Comprehensibility",578,4.661,0.63
+"Content Quality","Conciseness",578,4.344,0.645
+"Content Quality","Completeness",578,4.522,0.709
+"Information Structure","Modularity",578,4.543,0.649
+"Information Structure","Structured by Function",578,4.645,0.634
+"Information Structure","Navigability",578,4.199,0.623
+"Information Structure","Metadata",578,1.043,0.203
+"Format & Presentation","Consistent Format",578,3.716,0.563
+"Format & Presentation","Legibility",578,4.673,0.627
+"Format & Presentation","Illustrations and Media",578,1.043,0.282
+"Format & Presentation","Representation of Interactive Elements",578,1.012,0.161
+"Accessibility","Multi-modal Support",578,1.005,0.072
+"Accessibility","Device Independence",578,3.576,1.785
+"Accessibility","Accessibility Features",578,1.0,
+"Internationalization & Localization","Cultural Neutrality",578,4.782,0.601
+"Internationalization & Localization","Translation-Friendly",578,4.209,0.66
+"Internationalization & Localization","Space Consideration",578,1.029,0.206
+"Usability & User Experience","User-Centered Design",578,2.846,0.528
+"Usability & User Experience","Testing and Feedback",578,1.002,0.042
+"Usability & User Experience","Search and Indexing",578,1.002,0.042
+"Safety & Compliance","Safety Information",578,1.014,0.143
+"Safety & Compliance","Legal and Copyright",578,1.0,
+"Maintenance & Updates","Version Control",578,1.036,0.243
+"Maintenance & Updates","Change Log",578,1.019,0.17

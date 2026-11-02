@@ -1,0 +1,55 @@
+method,dimension,mean_over_repositories
+CodeDoc,Balanced Hierarchy,4.87
+CodeDoc,Category Title Naming,3.344
+CodeDoc,Conceptual Content Guidelines,3.717
+CodeDoc,Content Order,4.894
+CodeDoc,Content Type Consistency,4.975
+CodeDoc,Error Reference Content Guidelines,4.337
+CodeDoc,Further Reading Standards,4.65
+CodeDoc,Getting Started Content Guidelines,3.175
+CodeDoc,Introduction Standards,4.963
+CodeDoc,Next Steps Standards,4.72
+CodeDoc,Permission Declaration Standards,4.268
+CodeDoc,Prerequisites Standards,4.972
+CodeDoc,Process Content Standards,4.492
+CodeDoc,Product Label Standards,4.813
+CodeDoc,Reference Content,4.993
+CodeDoc,Reuse Instead of Copying,3.948
+CodeDoc,Title Standards,4.91
+CodeDoc,Tutorial Content Guidelines,1.063
+MemDocAgent,Balanced Hierarchy,3.853
+MemDocAgent,Category Title Naming,1.389
+MemDocAgent,Conceptual Content Guidelines,1.41
+MemDocAgent,Content Order,3.91
+MemDocAgent,Content Type Consistency,3.826
+MemDocAgent,Error Reference Content Guidelines,2.723
+MemDocAgent,Further Reading Standards,1.0
+MemDocAgent,Getting Started Content Guidelines,1.0
+MemDocAgent,Introduction Standards,3.359
+MemDocAgent,Next Steps Standards,1.0
+MemDocAgent,Permission Declaration Standards,1.0
+MemDocAgent,Prerequisites Standards,2.642
+MemDocAgent,Process Content Standards,1.588
+MemDocAgent,Product Label Standards,3.476
+MemDocAgent,Reference Content,4.696
+MemDocAgent,Reuse Instead of Copying,2.912
+MemDocAgent,Title Standards,3.636
+MemDocAgent,Tutorial Content Guidelines,1.0
+RepoAgent,Balanced Hierarchy,3.236
+RepoAgent,Category Title Naming,1.013
+RepoAgent,Conceptual Content Guidelines,1.035
+RepoAgent,Content Order,3.986
+RepoAgent,Content Type Consistency,3.755
+RepoAgent,Error Reference Content Guidelines,1.203
+RepoAgent,Further Reading Standards,1.0
+RepoAgent,Getting Started Content Guidelines,1.0
+RepoAgent,Introduction Standards,2.9
+RepoAgent,Next Steps Standards,1.0
+RepoAgent,Permission Declaration Standards,1.0
+RepoAgent,Prerequisites Standards,1.746
+RepoAgent,Process Content Standards,1.38
+RepoAgent,Product Label Standards,3.104
+RepoAgent,Reference Content,4.286
+RepoAgent,Reuse Instead of Copying,2.796
+RepoAgent,Title Standards,2.781
+RepoAgent,Tutorial Content Guidelines,1.0

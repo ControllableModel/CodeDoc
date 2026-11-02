@@ -1,0 +1,27 @@
+main_dimension,dimension,n,mean,sd
+"Content Quality","Correctness",201,4.731,0.443
+"Content Quality","Consistency",201,4.97,0.17
+"Content Quality","Comprehensibility",201,4.652,0.476
+"Content Quality","Conciseness",201,4.219,0.459
+"Content Quality","Completeness",201,4.592,0.609
+"Information Structure","Modularity",201,4.935,0.246
+"Information Structure","Structured by Function",201,4.955,0.207
+"Information Structure","Navigability",201,4.866,0.341
+"Information Structure","Metadata",201,1.025,0.156
+"Format & Presentation","Consistent Format",201,4.06,0.368
+"Format & Presentation","Legibility",201,4.871,0.35
+"Format & Presentation","Illustrations and Media",201,2.214,1.261
+"Format & Presentation","Representation of Interactive Elements",201,1.209,0.587
+"Accessibility","Multi-modal Support",201,1.239,0.438
+"Accessibility","Device Independence",201,4.299,1.308
+"Accessibility","Accessibility Features",201,1.0,
+"Internationalization & Localization","Cultural Neutrality",201,4.96,0.195
+"Internationalization & Localization","Translation-Friendly",201,4.269,0.476
+"Internationalization & Localization","Space Consideration",201,1.239,0.609
+"Usability & User Experience","User-Centered Design",201,3.045,0.54
+"Usability & User Experience","Testing and Feedback",201,1.0,
+"Usability & User Experience","Search and Indexing",201,1.01,0.099
+"Safety & Compliance","Safety Information",201,1.04,0.195
+"Safety & Compliance","Legal and Copyright",201,1.0,
+"Maintenance & Updates","Version Control",201,1.02,0.172
+"Maintenance & Updates","Change Log",201,1.005,0.07
