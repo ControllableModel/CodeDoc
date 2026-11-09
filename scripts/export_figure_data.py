@@ -43,6 +43,7 @@ DISPLAY = {
     "numpy": "NumPy", "openui": "OpenUI", "pyro": "Pyro", "ragflow": "RAGFlow",
     "sonnet": "Sonnet", "torch": "PyTorch",
 }
+DISPLAY_INV = {v: k for k, v in DISPLAY.items()}
 METHODS = {
     "CodeDoc": ("outputs/matrix_v6", True),
     "RepoAgent": ("outputs/baselines/repoagent", False),
@@ -117,6 +118,27 @@ def collect(axis: str):
     return rows, dim_rows
 
 
+#: Measured per-document cost rates from results/analysis/repoagent_cost_correction.json.
+#: RepoAgent's earlier figures divided a partial run by the planned entity count, so the rate
+#: here is tokens per document actually produced, applied to the documents the pipeline needs.
+REPOAGENT_CORRECTION = "repoagent_cost_correction.json"
+
+
+def repoagent_rates() -> tuple[dict, dict]:
+    """Per-repository and fallback per-document rates for RepoAgent."""
+    import json as _json
+    corr = _json.loads((REPO / "results" / "analysis" / REPOAGENT_CORRECTION).read_text(encoding="utf-8"))
+    per = {"flask-main": {}, "joblib": {}, "openui": {}, "ragflow": {}}
+    key = {"flask-main": 0, "joblib": 1, "openui": 2, "ragflow": 3}
+    for rec in corr["measured_runs"]:
+        per[rec["repo"]] = {"input": rec["input_per_doc"], "output": rec["output_per_doc"],
+                            "seconds": rec["seconds_per_doc"]}
+    mean = corr["per_document_mean"]
+    fallback = {"input": mean["input"], "output": mean["output"], "seconds": mean["seconds"]}
+    del key
+    return per, fallback
+
+
 def parse_token_tex():
     t = (PAPER / "tables" / "token.tex").read_text(encoding="utf-8")
     out = []
@@ -160,12 +182,18 @@ def export(prefix: str, axis: str, cost):
         w = csv.writer(fh)
         w.writerow(["method", "repository", "entities", "input_tokens", "output_tokens",
                     "seconds", "input_per_entity", "output_per_entity", "seconds_per_entity"])
+        ra_per, ra_fallback = repoagent_rates()
         for row in cost:
             for method in ("CodeDoc", "RepoAgent", "MemDocAgent"):
                 i, o, s = row[method]
                 if not row["entities"]:
                     continue
                 docs = row["entities"] * 2 if method == "CodeDoc" else row["entities"]
+                if method == "RepoAgent":
+                    rate = ra_per.get(DISPLAY_INV.get(row["repository"], ""), ra_fallback)
+                    i = int(round(rate["input"] * docs))
+                    o = int(round(rate["output"] * docs))
+                    s = int(round(rate["seconds"] * docs))
                 w.writerow([method, row["repository"], row["entities"], i, o, s,
                             round(i / docs, 1), round(o / docs, 1), round(s / docs, 2)])
 
