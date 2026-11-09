@@ -117,3 +117,16 @@ outputs/console/
 # All of it is reproducible with scripts/run_repoagent.py and a clone; none of it is
 # source we author.
 third_party/
+
+# ---------------------------------------------------------------------------
+# Experimental data and figures stay local.
+# Scores, per-repository records, exported figure data and the generated plots are
+# regenerable with scripts/export_figure_data.py and the plotting scripts, and the
+# numbers they contain belong with the paper rather than the artifact.
+# ---------------------------------------------------------------------------
+results/*
+!results/README.md
+figures/*
+!figures/README.md
+*.pdf
+!docs/**/*.pdf
