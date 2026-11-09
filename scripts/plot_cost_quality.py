@@ -35,7 +35,9 @@ from matplotlib.ticker import LogFormatterMathtext, NullLocator
 DATA = Path(r"E:\Pycharm_projects\CodeEval\results\figure_data")
 PAPER = Path(r"D:\临时下载位置\Standards_Guided_and_Dependency_Aware_Code_Level_Documentation_Generation")
 
-COLOURS = {"CodeDoc": "#2A9D8C", "RepoAgent": "#F4A261", "MemDocAgent": "#7F7F7F"}
+#: Palette taken from the author's plotting code (analysis.py colors_list), converted from
+#: 0-255 triples: teal 16/139/150, brick 166/64/54, blue 65/130/164.
+COLOURS = {"CodeDoc": "#108B96", "RepoAgent": "#A64036", "MemDocAgent": "#4182A4"}
 ORDER = ["MemDocAgent", "RepoAgent", "CodeDoc"]        # legend order, worst to best
 GRID = "#B0B0B0"
 SMALL = 4.7
@@ -132,7 +134,7 @@ def main():
                  fontsize=10)
 
     out = PAPER / "figures" / "cost_quality_new.pdf"
-    fig.savefig(out)
+    fig.savefig(out, format="pdf", dpi=300)
     fig.savefig(out.with_suffix(".png"), dpi=300)
     print(f"  写出 {out}")
     print(f"  写出 {out.with_suffix('.png')}")
