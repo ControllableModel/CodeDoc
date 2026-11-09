@@ -15,8 +15,9 @@ from pathlib import Path
 
 PAPER = Path(r"D:\临时下载位置\Standards_Guided_and_Dependency_Aware_Code_Level_Documentation_Generation")
 
-TEX = sorted(PAPER.glob("sections/*.tex")) + sorted(
-    p for p in PAPER.glob("tables/*.tex") if not p.name.endswith(".bak"))
+TEX = (sorted(PAPER.glob("sections/*.tex"))
+       + sorted(p for p in PAPER.glob("tables/*.tex") if not p.name.endswith(".bak"))
+       + sorted(PAPER.glob("tables/generated/tab_*.tex")))
 def strip_comments(text: str) -> str:
     """Drop LaTeX comments so rollback blocks are not audited as live content."""
     out = []

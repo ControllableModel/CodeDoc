@@ -269,6 +269,38 @@ def build(limit: int) -> tuple[list, dict]:
         facts[f"{axis_key}_means"] = dict(zip([f"{m}_{l}" for m in METHODS for l in ("S_sub", "S_all", "M_sub")], means))
         facts[f"{axis_key}_rows"] = rows
 
+    # ------------------------------------------- quality summary: S_all, S_20, M_20
+    iso_f = facts["iso_means"]
+    gh_f = facts["github_means"]
+    rows_sum = []
+    for method in METHODS:
+        cells = []
+        for prefix in ("iso", "github"):
+            f = facts[f"{prefix}_means"]
+            for label in ("S_all", "S_sub", "M_sub"):
+                v = f.get(f"{method}_{label}")
+                cells.append("--" if v is None else f"{v:.3f}")
+        rows_sum.append([method] + cells)
+    md = ["| Method | ISO S (full) | ISO S (20) | ISO M (20) | GitHub S (full) | GitHub S (20) | GitHub M (20) |",
+          "|---|---|---|---|---|---|---|"]
+    for r in rows_sum:
+        md.append("| " + " | ".join(r) + " |")
+    md += ["", "`S (20)` and `M (20)` are scored on the same 20 documents per repository, so that pair is "
+           "the one that isolates the judge interaction style; `S (full)` is the full sample and carries "
+           "the headline figures."]
+    tables.append(("quality_summary",
+                   "Single-round and per-dimension judging, full sample and paired subset", md,
+                   tex_table("tab:rq2_extended",
+                             "Average documentation scores under the ISO and GitHub standards. "
+                             "S (full) is the whole sample; S (20) and M (20) are scored on the same 20 "
+                             "documents per repository, so that pair isolates the judge's interaction "
+                             "style from its sample. Per-dimension judging costs one judge call per "
+                             "dimension per document, which is why it covers the subset.",
+                             "l|ccc|ccc",
+                             ["Method", "ISO S (full)", "ISO S (20)", "ISO M (20)",
+                              "GitHub S (full)", "GitHub S (20)", "GitHub M (20)"],
+                             rows_sum, None, star=True, bold_best=True)))
+
     # ---------------------------------------------------------------- cost
     corr = json.loads((ANALYSIS / "repoagent_cost_correction.json").read_text(encoding="utf-8"))
     md = ["| Method | Documents basis | Input | Output | Seconds | Hours | Cost (USD) | Source |",
@@ -331,16 +363,45 @@ def build(limit: int) -> tuple[list, dict]:
 
 
 # ------------------------------------------------------------------ latex
-def tex_table(label: str, caption: str, colspec: str, header: list, rows: list, total: list | None) -> str:
+def best_per_column(rows: list) -> set:
+    """(row, column) pairs holding the maximum numeric value in that column."""
+    best = set()
+    if not rows:
+        return best
+    for j in range(1, len(rows[0])):
+        vals = []
+        for i, row in enumerate(rows):
+            try:
+                vals.append((float(str(row[j]).replace("$", "").replace("{,}", "")), i))
+            except ValueError:
+                continue
+        if vals:
+            best.add((max(vals)[1], j))
+    return best
+
+
+def tex_table(label: str, caption: str, colspec: str, header: list, rows: list, total: list | None,
+              star: bool = False, bold_best: bool = False) -> str:
     def esc(cell: str) -> str:
         return str(cell).replace("%", "\\%").replace("&", "\\&")
 
+    best = best_per_column(rows) if bold_best else set()
     head = " & ".join(f"\\textbf{{{esc(h)}}}" for h in header) + " \\\\"
-    body = "\n".join(" & ".join(esc(c) for c in row) + " \\\\" for row in rows)
+    body_rows = []
+    for i, row in enumerate(rows):
+        cells = []
+        for j, cell in enumerate(row):
+            shown = esc(cell)
+            if (i, j) in best and shown not in ("--", ""):
+                shown = f"\\textbf{{{shown}}}"
+            cells.append(shown)
+        body_rows.append(" & ".join(cells) + " \\\\")
+    body = "\n".join(body_rows)
     tail = ""
     if total:
         tail = "\\midrule\n" + " & ".join(f"\\textbf{{{esc(c)}}}" for c in total) + " \\\\\n"
-    return f"""\\begin{{table}}[!t]
+    env = "table*" if star else "table"
+    return f"""\\begin{{{env}}}[!t]
 \\centering
 \\caption{{{caption}}}
 \\label{{{label}}}
@@ -354,7 +415,7 @@ def tex_table(label: str, caption: str, colspec: str, header: list, rows: list, 
 {body}
 {tail}\\bottomrule
 \\end{{tabular}}
-\\end{{table}}
+\\end{{{env}}}
 """
 
 
@@ -375,6 +436,18 @@ def main() -> int:
           "- `masking` and `ablation` report the numbers of the first submission and were not re-run.", ""]
     for key, title, table_md, _latex in tables:
         md += [f"## {title}", "", *table_md, ""]
+    md += ["## Provenance", "",
+           "| Result | Source | Status |", "|---|---|---|",
+           "| Repositories, entities, call resolution | `results/analysis/dependency_backends.json` | measured |",
+           "| Relation-family counts | `results/analysis/dependency_backends.json` | measured |",
+           "| Masking sensitivity | first submission | original study, not re-run |",
+           "| Human alignment | first submission | original study, not re-run |",
+           "| Quality, S (full) | `outputs/**/scores_<axis>` | measured |",
+           "| Quality, S (20) and M (20) | `outputs/**/scores_<axis>_M` | measured on the paired subset |",
+           "| RepoAgent cost | `results/analysis/repoagent_cost_correction.json` | measured per-document rate |",
+           "| CodeDoc cost | `results/figure_data/iso_tokens_per_entity.csv` | measured per document |",
+           "| MemDocAgent cost | `results/figure_data/iso_tokens_per_entity.csv` | documented figures, 4 repositories |",
+           "| Component ablation | first submission | original study, not re-run |", ""]
     md += ["## Aggregates, ISO", "",
            ", ".join(f"{k} {v:.3f}" for k, v in facts["iso_means"].items() if v is not None), "",
            "## Aggregates, GitHub", "",
