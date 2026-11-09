@@ -130,3 +130,8 @@ figures/*
 !figures/README.md
 *.pdf
 !docs/**/*.pdf
+
+# Ablation working copies and judge-score dumps from earlier rounds
+numpy_ablation/
+3Score/
+5Score/
