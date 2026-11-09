@@ -51,6 +51,7 @@ SOURCES = {
     "MemDocAgent": ("outputs/baselines/memdocagent", "flat"),
 }
 AXES = {"iso": "iso_26514", "github": "github_docs_style"}
+AXIS_LABEL = {"iso": "ISO", "github": "GitHub"}
 SHIFT = 0.20
 
 #: first submission, unchanged: scores at 0/20/40/60 % masking and the reported decline
@@ -165,7 +166,7 @@ def build(limit: int) -> tuple[list, dict]:
     tables.append(("corpus", "Repositories and static analysis coverage", md,
                    tex_table("tab:gen_corpus",
                              "Repositories and what the static analysis recovers from each. Measured.",
-                             "l|rr|rr|rr|r|r",
+                             "l|rr|rr|r|r|r",
                              ["Repository", "Files", "Entities", "Err.", "Bases d./r.", "Calls t./r.",
                               "Contexts", "Relations"],
                              [[n, f"{f:,}", f"{e:,}", str(err), f"{bd:,} / {br:,}", f"{c:,} / {cr:,}",
@@ -258,14 +259,14 @@ def build(limit: int) -> tuple[list, dict]:
         cov = {m: sum(1 for r in rows if r.get(f"{m}_M_sub") is not None) for m in METHODS}
         md += ["", "M coverage: " + ", ".join(f"{m} {cov[m]}/10 repositories" for m in METHODS)]
         tables.append((f"quality_{axis_key}",
-                       f"Documentation quality, {axis_key.upper()}: single-round on the 20-document subset, "
+                       f"Documentation quality, {AXIS_LABEL[axis_key]}: single-round on the 20-document subset, "
                        f"single-round on the full sample, per-dimension judging on the same 20 documents", md,
                        tex_table(f"tab:gen_quality_{axis_key}",
-                                 f"{axis_key.upper()} documentation quality. S$_{{20}}$ and M$_{{20}}$ are scored on the "
+                                 f"{AXIS_LABEL[axis_key]} documentation quality. S$_{{20}}$ and M$_{{20}}$ are scored on the "
                                  f"same {limit} documents per repository, so the two are paired; S$_{{all}}$ is the "
                                  f"full sample and is the column the aggregate figures come from.",
                                  "l|ccc|ccc|ccc", ["Repository"] + [f"{m} {c}" for m in METHODS for c in cols],
-                                 latex_rows, None)))
+                                 latex_rows, None, star=True)))
         facts[f"{axis_key}_means"] = dict(zip([f"{m}_{l}" for m in METHODS for l in ("S_sub", "S_all", "M_sub")], means))
         facts[f"{axis_key}_rows"] = rows
 
